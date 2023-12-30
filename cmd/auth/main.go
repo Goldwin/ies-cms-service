@@ -32,6 +32,7 @@ func main() {
 		})
 	})
 
+	authComponent.Start()
 	controller.InitializeAuthController(r, authComponent, authOutputComponent)
 
 	r.Run(fmt.Sprintf(":%d", config.ControllerConfig.Port))

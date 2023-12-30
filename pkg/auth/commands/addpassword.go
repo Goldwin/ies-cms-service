@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
@@ -13,16 +14,17 @@ import (
 )
 
 const (
-	AddPasswordErrorInvalidInput AppErrorCode = 20401
+	AddPasswordErrorInvalidInput          AppErrorCode = 20401
+	AddPasswordErrorFailedToVerifyAccount AppErrorCode = 20402
 )
 
-type AddPassword struct {
-	input dto.PasswordInput
+type AddPasswordCommand struct {
+	Input dto.PasswordInput
 }
 
-func (cmd AddPassword) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.PasswordResult] {
+func (cmd AddPasswordCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.PasswordResult] {
 
-	if cmd.input.Password != cmd.input.ConfirmPassword {
+	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
 		return AppExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: AppErrorDetail{
@@ -31,8 +33,41 @@ func (cmd AddPassword) Execute(ctx repositories.CommandContext) AppExecutionResu
 			},
 		}
 	}
+
+	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Input.Email))
+
+	if err != nil {
+
+		return AppExecutionResult[dto.PasswordResult]{
+			Status: ExecutionStatusFailed,
+			Error: AppErrorDetail{
+				Code:    AddPasswordErrorFailedToVerifyAccount,
+				Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
+			},
+		}
+	}
+
+	if account == nil {
+		_, err = ctx.AccountRepository().AddAccount(entities.Account{
+			Email:  entities.EmailAddress(cmd.Input.Email),
+			Roles:  []entities.Role{},
+			Person: entities.Person{},
+		})
+
+		if err != nil {
+
+			return AppExecutionResult[dto.PasswordResult]{
+				Status: ExecutionStatusFailed,
+				Error: AppErrorDetail{
+					Code:    AddPasswordErrorFailedToVerifyAccount,
+					Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
+				},
+			}
+		}
+	}
+
 	password := entities.PasswordDetail{
-		EmailAddress: entities.EmailAddress(cmd.input.Email),
+		EmailAddress: entities.EmailAddress(cmd.Input.Email),
 	}
 
 	salt, err := rand.Int(rand.Reader, big.NewInt(999999))
@@ -47,7 +82,7 @@ func (cmd AddPassword) Execute(ctx repositories.CommandContext) AppExecutionResu
 	}
 
 	password.Salt = salt.Bytes()
-	passwordAndSalt := append([]byte(cmd.input.Email), password.Salt...)
+	passwordAndSalt := append([]byte(cmd.Input.Password), password.Salt...)
 	passwordHash := sha256.Sum256(passwordAndSalt)
 	password.PasswordHash = passwordHash[:]
 

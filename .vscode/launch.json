@@ -24,6 +24,8 @@
             "env": {
                 "MODE": "dev",
                 "ROOT_DIR": "${workspaceFolder}",
+                "ADMIN_EMAIL":"admin@iespik.org",
+                "ADMIN_PASSWORD":"iesadmin",               
             }
         }
     ]

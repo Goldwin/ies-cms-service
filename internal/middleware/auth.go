@@ -12,6 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	AllAccessScope = "ALL_ACCESS"
+)
+
 type authMiddleware struct {
 	scopes     []string
 	authUrl    string
@@ -115,7 +119,7 @@ func checkScopes(scopes []string, requiredScopes []string) bool {
 	}
 
 	for _, scope := range scopes {
-		if requiredMap[scope] {
+		if requiredMap[scope] || scope == AllAccessScope {
 			return true
 		}
 	}

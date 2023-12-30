@@ -9,6 +9,8 @@ type Role struct {
 }
 
 const (
+	AllAccess Scope = "ALL_ACCESS"
+
 	EventView    Scope = "EVENT_VIEW"
 	EventCheckIn Scope = "EVENT_CHECK_IN"
 )
@@ -20,6 +22,13 @@ var (
 		Scopes: []Scope{
 			EventCheckIn,
 			EventView,
+		},
+	}
+	Admin = Role{
+		ID:   0,
+		Name: "Admin",
+		Scopes: []Scope{
+			AllAccess,
 		},
 	}
 )
