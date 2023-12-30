@@ -36,7 +36,6 @@ func InitializePeopleManagementController(
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
 	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
 
-	//TODO switch with consumer group type of pubsub when we have more than 1 service node
 	eventBusComponent.Subscribe("auth.registered", func(ctx context.Context, event common.Event) {
 		authData := auth.AuthData{}
 		msgpack.Unmarshal(event.Body, &authData)

@@ -1,15 +1,19 @@
 package controllers
 
 import (
+	"context"
 	"errors"
 	"strings"
 
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
+	"github.com/Goldwin/ies-pik-cms/internal/bus/common"
 	output "github.com/Goldwin/ies-pik-cms/internal/out/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
+	people "github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/gin-gonic/gin"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type authController struct {
@@ -42,6 +46,20 @@ func InitializeAuthController(r *gin.Engine, authComponent auth.AuthComponent,
 	authGroup.POST("otp", authController.otp)
 	authGroup.POST("otp/signin", authController.otpSignIn)
 	authGroup.POST("password/signin", authController.passwordSignIn)
+
+	eventBusComponent.Subscribe("people.added", func(ctx context.Context, event common.Event) {
+		var person people.Person
+		err := msgpack.Unmarshal(event.Body, &person)
+		if err != nil {
+			return
+		}
+		authComponent.CompleteRegistration(ctx, dto.CompleteRegistrationInput{
+			FirstName:  person.FirstName,
+			MiddleName: person.MiddleName,
+			LastName:   person.LastName,
+			Email:      person.EmailAddress,
+		}, authOutputComponent.RegistrationOutput())
+	})
 }
 
 func (a *authController) completeRegistration(c *gin.Context) {
