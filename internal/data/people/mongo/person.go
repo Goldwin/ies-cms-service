@@ -21,7 +21,7 @@ type Person struct {
 	PhoneNumbers      []string  `bson:"phoneNumbers"`
 	EmailAddress      string    `bson:"emailAddress"`
 	MaritalStatus     string    `bson:"maritalStatus"`
-	Birthday          string    `bson:"birthday"`
+	Birthday          *string   `bson:"birthday"`
 }
 
 type Address struct {
@@ -101,6 +101,15 @@ func toPersonMongoModel(e entities.Person) Person {
 	for i, phone := range e.PhoneNumbers {
 		phones[i] = string(phone)
 	}
+
+	var birthday *string
+	if e.Birthday != nil {
+		str := fmt.Sprintf("%04d-%02d-%02d", e.Birthday.Year, e.Birthday.Month, e.Birthday.Day)
+		birthday = &str
+	} else {
+		birthday = nil
+	}
+
 	return Person{
 		ID:                e.ID,
 		FirstName:         e.FirstName,
@@ -111,12 +120,12 @@ func toPersonMongoModel(e entities.Person) Person {
 		PhoneNumbers:      phones,
 		EmailAddress:      string(e.EmailAddress),
 		MaritalStatus:     e.MaritalStatus,
-		Birthday:          fmt.Sprintf("%04d-%02d-%02d", e.Birthday.Year, e.Birthday.Month, e.Birthday.Day),
+		Birthday:          birthday,
 	}
 }
 
 func toPersonEntities(p Person) entities.Person {
-	var birthday entities.YearMonthDay
+	var birthday *entities.YearMonthDay
 	addresses := make([]entities.Address, len(p.Addresses))
 	for i, address := range p.Addresses {
 		addresses[i] = entities.Address(address)
@@ -128,7 +137,12 @@ func toPersonEntities(p Person) entities.Person {
 		phones[i] = entities.PhoneNumber(phone)
 	}
 
-	fmt.Sscanf(p.Birthday, "%d-%d-%d", &birthday.Year, &birthday.Month, &birthday.Day)
+	if p.Birthday == nil {
+		birthday = nil
+	} else {
+		birthday = &entities.YearMonthDay{}
+		fmt.Sscanf(*p.Birthday, "%d-%d-%d", &birthday.Year, &birthday.Month, &birthday.Day)
+	}
 
 	return entities.Person{
 		ID:                p.ID,

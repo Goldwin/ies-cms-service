@@ -5,8 +5,8 @@ type HouseholdPerson struct {
 	FirstName    string
 	MiddleName   string
 	LastName     string
-	PhoneNumber  PhoneNumber
-	EmailAddress EmailAddress
+	PhoneNumber  string
+	EmailAddress string
 }
 
 type Household struct {

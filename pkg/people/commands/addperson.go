@@ -44,7 +44,7 @@ func (cmd AddPersonCommand) Execute(ctx repositories.CommandContext) AppExecutio
 		EmailAddress:      entities.EmailAddress(c.EmailAddress),
 		MaritalStatus:     c.MaritalStatus,
 		ProfilePictureUrl: c.ProfilePictureUrl,
-		Birthday:          entities.YearMonthDay(c.Birthday.ToEntity()),
+		Birthday:          c.Birthday.ToEntity(),
 	}
 
 	err = person.Validate()

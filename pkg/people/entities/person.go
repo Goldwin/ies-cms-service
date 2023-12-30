@@ -35,7 +35,7 @@ type Person struct {
 	PhoneNumbers      []PhoneNumber
 	EmailAddress      EmailAddress
 	MaritalStatus     string
-	Birthday          YearMonthDay
+	Birthday          *YearMonthDay
 }
 
 func (p *Person) Validate() error {
@@ -53,7 +53,7 @@ func (p *Person) Validate() error {
 		}
 	}
 
-	if !p.Birthday.IsValid() {
+	if p.Birthday != nil && !p.Birthday.IsValid() {
 		return fmt.Errorf("invalid birthday: %04d-%02d-%02d", p.Birthday.Year, p.Birthday.Month, p.Birthday.Day)
 	}
 

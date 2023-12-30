@@ -14,10 +14,6 @@ type Address struct {
 	PostalCode string `json:"postal_code"`
 }
 
-type PhoneNumber string
-
-type EmailAddress string
-
 type YearMonthDay string
 
 type Person struct {
@@ -27,14 +23,17 @@ type Person struct {
 	LastName          string        `json:"last_name"`
 	ProfilePictureUrl string        `json:"profile_picture_url"`
 	Addresses         []Address     `json:"addresses"`
-	PhoneNumbers      []PhoneNumber `json:"phone_numbers"`
-	EmailAddress      EmailAddress  `json:"email_address"`
+	PhoneNumbers      []string      `json:"phone_numbers"`
+	EmailAddress      string        `json:"email_address"`
 	MaritalStatus     string        `json:"marital_status"`
-	Birthday          YearMonthDay  `json:"birthday"`
+	Birthday          *YearMonthDay `json:"birthday"`
 }
 
-func (y YearMonthDay) ToEntity() entities.YearMonthDay {
+func (y *YearMonthDay) ToEntity() *entities.YearMonthDay {
+	if y == nil {
+		return nil
+	}
 	var ymd entities.YearMonthDay
-	fmt.Sscanf(string(y), "%d-%d-%d", &ymd.Year, &ymd.Month, &ymd.Day)
-	return ymd
+	fmt.Sscanf(string(*y), "%d-%d-%d", &ymd.Year, &ymd.Month, &ymd.Day)
+	return &ymd
 }

@@ -13,6 +13,9 @@ const (
 
 	EventView    Scope = "EVENT_VIEW"
 	EventCheckIn Scope = "EVENT_CHECK_IN"
+
+	ProfileView   Scope = "PROFILE_VIEW"
+	ProfileUpdate Scope = "PROFILE_UPDATE"
 )
 
 var (
@@ -22,6 +25,8 @@ var (
 		Scopes: []Scope{
 			EventCheckIn,
 			EventView,
+			ProfileView,
+			ProfileUpdate,
 		},
 	}
 	Admin = Role{

@@ -94,8 +94,8 @@ func (cmd AddHouseholdCommand) Execute(ctx repositories.CommandContext) AppExecu
 		FirstName:    result.HouseholdHead.FirstName,
 		MiddleName:   result.HouseholdHead.MiddleName,
 		LastName:     result.HouseholdHead.LastName,
-		EmailAddress: dto.EmailAddress(memberEmail),
-		PhoneNumber:  dto.PhoneNumber(memberPhone),
+		EmailAddress: string(memberEmail),
+		PhoneNumber:  string(memberPhone),
 	}
 
 	householdMembersDto := make([]dto.HouseholdPerson, len(result.Members))
@@ -114,8 +114,8 @@ func (cmd AddHouseholdCommand) Execute(ctx repositories.CommandContext) AppExecu
 			ID:           member.ID,
 			FirstName:    member.FirstName,
 			LastName:     member.LastName,
-			EmailAddress: dto.EmailAddress(memberEmail),
-			PhoneNumber:  dto.PhoneNumber(memberPhone),
+			EmailAddress: string(memberEmail),
+			PhoneNumber:  string(memberPhone),
 		}
 	}
 

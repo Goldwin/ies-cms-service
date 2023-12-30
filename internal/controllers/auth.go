@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	output "github.com/Goldwin/ies-pik-cms/internal/out/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
@@ -16,7 +17,9 @@ type authController struct {
 	authOutputComponent output.AuthOutputComponent
 }
 
-func InitializeAuthController(r *gin.Engine, authComponent auth.AuthComponent, authOutputComponent output.AuthOutputComponent) {
+func InitializeAuthController(r *gin.Engine, authComponent auth.AuthComponent,
+	eventBusComponent bus.EventBusComponent,
+	authOutputComponent output.AuthOutputComponent) {
 	authController := authController{
 		authComponent:       authComponent,
 		authOutputComponent: authOutputComponent,

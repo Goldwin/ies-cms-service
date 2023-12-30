@@ -20,7 +20,7 @@ func main() {
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig, infraComponent)
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
-	eventBus := bus.NewLocalEventBusComponent()
+	eventBus := bus.NewRedisEventBusComponent(infraComponent)
 	authOutputComponent := out.NewAuthOutputComponent(eventBus)
 
 	gin.SetMode(config.ControllerConfig.Mode)
@@ -33,7 +33,7 @@ func main() {
 	})
 
 	authComponent.Start()
-	controller.InitializeAuthController(r, authComponent, authOutputComponent)
+	controller.InitializeAuthController(r, authComponent, eventBus, authOutputComponent)
 
 	r.Run(fmt.Sprintf(":%d", config.ControllerConfig.Port))
 }

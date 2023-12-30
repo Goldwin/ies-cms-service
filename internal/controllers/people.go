@@ -1,11 +1,18 @@
 package controllers
 
 import (
+	"context"
+	"log"
+
+	"github.com/Goldwin/ies-pik-cms/internal/bus"
+	"github.com/Goldwin/ies-pik-cms/internal/bus/common"
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
+	auth "github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/gin-gonic/gin"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type peopleManagementController struct {
@@ -17,6 +24,7 @@ func InitializePeopleManagementController(
 	r *gin.Engine,
 	middlewareComponent middleware.MiddlewareComponent,
 	peopleComponent people.PeopleManagementComponent,
+	eventBusComponent bus.EventBusComponent,
 ) {
 	c := &peopleManagementController{
 		peopleComponent: peopleComponent,
@@ -27,6 +35,26 @@ func InitializePeopleManagementController(
 	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
 	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
+
+	//TODO switch with consumer group type of pubsub when we have more than 1 service node
+	eventBusComponent.Subscribe("auth.registered", func(ctx context.Context, event common.Event) {
+		authData := auth.AuthData{}
+		msgpack.Unmarshal(event.Body, &authData)
+		peopleComponent.AddPerson(ctx, dto.Person{
+			ID:           authData.ID,
+			EmailAddress: authData.Email,
+			FirstName:    authData.FirstName,
+			LastName:     authData.LastName,
+		}, &outputDecorator[dto.Person]{
+			output: nil,
+			errFunction: func(err commands.AppErrorDetail) {
+				log.Printf("Consuming topic %v failed. Error: %s", event.Topic, err.Error())
+			},
+			successFunc: func(person dto.Person) {
+				log.Printf("Consuming topic %v succeeded.", event.Topic)
+			},
+		})
+	})
 }
 
 func (c *peopleManagementController) addPersonInfo(ctx *gin.Context) {

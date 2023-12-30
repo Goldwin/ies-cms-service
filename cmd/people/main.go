@@ -3,11 +3,13 @@ package main
 import (
 	"net/http"
 
+	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	"github.com/Goldwin/ies-pik-cms/internal/config"
 	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
 	peopleData "github.com/Goldwin/ies-pik-cms/internal/data/people"
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
+
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +21,7 @@ func main() {
 	dataLayerComponent := peopleData.NewPeopleDataLayerComponent(config.DataConfig, infraComponent)
 	peopleManagementComponent := people.NewPeopleManagementComponent(dataLayerComponent)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
+	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)
 
 	r := gin.Default()
 
@@ -28,7 +31,7 @@ func main() {
 		})
 	})
 
-	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent)
+	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent, eventBusComponent)
 
 	r.Run()
 }
