@@ -16,14 +16,14 @@ import (
 )
 
 type AuthCommandTest struct {
-	ctx               *mocks.Context
+	ctx               *mocks.CommandContext
 	accountRepository *mocks.AccountRepository
 	suite.Suite
 }
 
 func (t *AuthCommandTest) SetupTest() {
 	t.accountRepository = mocks.NewAccountRepository(t.T())
-	t.ctx = mocks.NewContext(t.T())
+	t.ctx = mocks.NewCommandContext(t.T())
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)
 }
 

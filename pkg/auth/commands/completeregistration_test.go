@@ -14,13 +14,13 @@ import (
 )
 
 type CompleteRegistrationCommandTest struct {
-	ctx               *mocks.Context
+	ctx               *mocks.CommandContext
 	accountRepository *mocks.AccountRepository
 	suite.Suite
 }
 
 func (t *CompleteRegistrationCommandTest) SetupTest() {
-	t.ctx = mocks.NewContext(t.T())
+	t.ctx = mocks.NewCommandContext(t.T())
 	t.accountRepository = mocks.NewAccountRepository(t.T())
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)
 }

@@ -16,19 +16,22 @@ import (
 )
 
 type SignInCommandTest struct {
-	ctx               *mocks.Context
-	otpRepository     *mocks.OtpRepository
-	accountRepository *mocks.AccountRepository
+	ctx                *mocks.CommandContext
+	otpRepository      *mocks.OtpRepository
+	accountRepository  *mocks.AccountRepository
+	passwordRepository *mocks.PasswordRepository
 	suite.Suite
 }
 
 func (t *SignInCommandTest) SetupTest() {
 	t.otpRepository = mocks.NewOtpRepository(t.T())
 	t.accountRepository = mocks.NewAccountRepository(t.T())
-	t.ctx = mocks.NewContext(t.T())
+	t.passwordRepository = mocks.NewPasswordRepository(t.T())
+	t.ctx = mocks.NewCommandContext(t.T())
 
 	t.ctx.EXPECT().OtpRepository().Maybe().Return(t.otpRepository)
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)
+	t.ctx.EXPECT().PasswordRepository().Maybe().Return(t.passwordRepository)
 }
 
 func (t *SignInCommandTest) TestExecute_OtpSignIn_Success() {
@@ -265,7 +268,11 @@ func (t *SignInCommandTest) TestExecute_PasswordLogin_Failed() {
 	email := "p6bqK@example.com"
 	password := []byte("password")
 
-	t.otpRepository.EXPECT().RemoveOtp(mock.AnythingOfType("entities.Otp")).Maybe().Return(nil)
+	t.passwordRepository.EXPECT().Get(mock.AnythingOfType("entities.EmailAddress")).Return(
+		nil,
+		errors.New("Failed to Retrieve stored password"),
+	)
+
 	result := commands.SigninCommand{
 		Email:     email,
 		Password:  password,
@@ -274,7 +281,7 @@ func (t *SignInCommandTest) TestExecute_PasswordLogin_Failed() {
 	}.Execute(t.ctx)
 
 	assert.Equal(t.T(), common.ExecutionStatusFailed, result.Status)
-	assert.Equal(t.T(), commands.SignInErrorPasswordLoginNotSupported, result.Error.Code)
+	assert.Equal(t.T(), commands.SignInErrorPasswordFailedToGetAccountDetail, result.Error.Code)
 }
 
 func TestSignIn(t *testing.T) {

@@ -7,24 +7,31 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type localAuthContext struct {
-	otpRepository     repositories.OtpRepository
-	accountRepository repositories.AccountRepository
+type redisAuthContext struct {
+	otpRepository      repositories.OtpRepository
+	accountRepository  repositories.AccountRepository
+	passwordRepository repositories.PasswordRepository
+}
+
+// PasswordRepository implements repositories.CommandContext.
+func (c *redisAuthContext) PasswordRepository() repositories.PasswordRepository {
+	return c.passwordRepository
 }
 
 // AccountRepository implements repositories.Context.
-func (c *localAuthContext) AccountRepository() repositories.AccountRepository {
+func (c *redisAuthContext) AccountRepository() repositories.AccountRepository {
 	return c.accountRepository
 }
 
 // OtpRepository implements repositories.Context.
-func (c *localAuthContext) OtpRepository() repositories.OtpRepository {
+func (c *redisAuthContext) OtpRepository() repositories.OtpRepository {
 	return c.otpRepository
 }
 
 func NewContext(ctx context.Context, client redis.UniversalClient, txPipeline redis.Pipeliner) repositories.CommandContext {
-	return &localAuthContext{
-		otpRepository:     NewOtpRepository(ctx, client, txPipeline),
-		accountRepository: NewAccountRepository(ctx, client, txPipeline),
+	return &redisAuthContext{
+		otpRepository:      NewOtpRepository(ctx, client, txPipeline),
+		accountRepository:  NewAccountRepository(ctx, client, txPipeline),
+		passwordRepository: NewPasswordRepository(ctx, client, txPipeline),
 	}
 }

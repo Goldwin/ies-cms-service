@@ -31,14 +31,14 @@ func (f *ToggleRandReader) Read(p []byte) (n int, err error) {
 }
 
 type GenerateOtpCommandTest struct {
-	ctx           *mocks.Context
+	ctx           *mocks.CommandContext
 	otpRepository *mocks.OtpRepository
 	suite.Suite
 }
 
 func (t *GenerateOtpCommandTest) SetupTest() {
 	t.otpRepository = mocks.NewOtpRepository(t.T())
-	t.ctx = mocks.NewContext(t.T())
+	t.ctx = mocks.NewCommandContext(t.T())
 
 	t.ctx.EXPECT().OtpRepository().Maybe().Return(t.otpRepository)
 }

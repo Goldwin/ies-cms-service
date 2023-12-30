@@ -1,0 +1,4 @@
+EMAIL_ADDRESS=example@gmail.com;
+EMAIL_PASSWORD=password;
+ADMIN_EMAIL=admin;
+ADMIN_PASSWORD=password;

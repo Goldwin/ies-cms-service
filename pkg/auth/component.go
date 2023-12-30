@@ -6,6 +6,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
+	"github.com/Goldwin/ies-pik-cms/pkg/common"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
@@ -20,11 +21,20 @@ type AuthComponent interface {
 	GenerateOtp(ctx context.Context, input dto.OtpInput, output out.Output[dto.OtpResult])
 	CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData])
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
+	common.Component
 }
 
 type authComponentImpl struct {
 	worker    worker.UnitOfWork[repositories.CommandContext]
 	secretKey []byte
+}
+
+// Start implements AuthComponent.
+func (a *authComponentImpl) Start() {
+}
+
+// Stop implements AuthComponent.
+func (a *authComponentImpl) Stop() {
 }
 
 // Auth implements AuthComponent.
