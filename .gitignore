@@ -1,0 +1,3 @@
+*.exe
+*configs/prod/*
+env.txt

@@ -1,0 +1,22 @@
+infrastructure:
+  redis:
+    hosts: "localhost:6379"
+    password: ""
+    db: 1
+    maxRetries: 5
+    readTimeout: 5s
+    writeTimeout: 5s
+  mongo:
+    hosts: "localhost:27017"
+    username: "people-service"
+    password: "abc123!"
+    db: "person"
+    maxRetries: 5
+    readTimeout: 5s
+    writeTimeout: 5s
+  datalayer:
+    command:
+      mode: "mongo"
+      useTransaction: false
+  controller:
+    port: 8080

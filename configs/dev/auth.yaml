@@ -1,0 +1,14 @@
+infrastructure:
+  redis:
+    hosts: "localhost:6379"
+    password: ""
+    db: 1
+    maxRetries: 5
+    readTimeout: 5s
+    writeTimeout: 5s
+datalayer:
+  command:
+    mode: "redis"
+    useTransaction: true
+controller:
+  port: 8081
