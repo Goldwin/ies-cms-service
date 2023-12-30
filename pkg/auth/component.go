@@ -34,7 +34,7 @@ type authComponentImpl struct {
 // Start implements AuthComponent.
 func (a *authComponentImpl) Start() {
 	a.worker.Execute(context.Background(), func(ctx repositories.CommandContext) error {
-		res := commands.AddPasswordCommand{
+		res := commands.SavePasswordCommand{
 			Input: dto.PasswordInput{
 				Email:           os.Getenv("ADMIN_EMAIL"),
 				Password:        []byte(os.Getenv("ADMIN_PASSWORD")),

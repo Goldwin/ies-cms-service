@@ -18,11 +18,11 @@ const (
 	AddPasswordErrorFailedToVerifyAccount AppErrorCode = 20402
 )
 
-type AddPasswordCommand struct {
+type SavePasswordCommand struct {
 	Input dto.PasswordInput
 }
 
-func (cmd AddPasswordCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.PasswordResult] {
+func (cmd SavePasswordCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.PasswordResult] {
 
 	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
 		return AppExecutionResult[dto.PasswordResult]{
