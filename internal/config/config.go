@@ -8,6 +8,7 @@ import (
 	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
 	"github.com/Goldwin/ies-pik-cms/internal/data"
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
+	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v3"
 )
@@ -17,6 +18,7 @@ type Config struct {
 	InfraConfig      infra.InfraConfig           `yaml:"infrastructure"`
 	DataConfig       data.DataLayerConfig        `yaml:"datalayer"`
 	ControllerConfig controller.ControllerConfig `yaml:"controller"`
+	MiddlewareConfig middleware.MiddlewareConfig `yaml:"middleware"`
 }
 
 func LoadConfig(module string) Config {

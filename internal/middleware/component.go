@@ -7,16 +7,20 @@ type MiddlewareComponent interface {
 }
 
 type middlewareComponentImpl struct {
+	config MiddlewareConfig
 }
 
 // Auth implements MiddlewareComponent.
-func (*middlewareComponentImpl) Auth(scopes ...string) gin.HandlerFunc {
+func (m *middlewareComponentImpl) Auth(scopes ...string) gin.HandlerFunc {
 	auth := authMiddleware{
-		scopes: scopes,
+		scopes:  scopes,
+		authUrl: m.config.AuthUrl,
 	}
 	return auth.Auth
 }
 
-func NewMiddlewareComponent() MiddlewareComponent {
-	return &middlewareComponentImpl{}
+func NewMiddlewareComponent(config MiddlewareConfig) MiddlewareComponent {
+	return &middlewareComponentImpl{
+		config: config,
+	}
 }

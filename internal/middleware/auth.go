@@ -3,7 +3,9 @@ package middleware
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
@@ -14,6 +16,10 @@ type authMiddleware struct {
 	scopes     []string
 	authUrl    string
 	httpClient http.Client
+}
+
+type DataWrapper struct {
+	Data AuthData `json:"data"`
 }
 
 type AuthData struct {
@@ -30,6 +36,7 @@ func (a *authMiddleware) Auth(c *gin.Context) {
 	token, err := extractBearerToken(header)
 
 	if err != nil {
+		log.Default().Printf("Failed to extract bearer token: %s", err.Error())
 		c.AbortWithStatusJSON(401, gin.H{
 			"error": gin.H{
 				"code":    1,
@@ -54,7 +61,7 @@ func (a *authMiddleware) Auth(c *gin.Context) {
 		c.AbortWithStatusJSON(403, gin.H{
 			"error": gin.H{
 				"code":    1,
-				"message": "Unauthorized",
+				"message": fmt.Sprintf("Forbidden. User must have one of the following scopes: [%s]", strings.Join(a.scopes, ", ")),
 			},
 		})
 		return
@@ -63,28 +70,29 @@ func (a *authMiddleware) Auth(c *gin.Context) {
 }
 
 func (a *authMiddleware) fetchAuthData(token string) (AuthData, error) {
-	authData := AuthData{}
+	authData := DataWrapper{}
 	req, err := http.NewRequest("GET", a.authUrl, nil)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	if err != nil {
-		return authData, err
+		return authData.Data, err
 	}
 
 	response, err := a.httpClient.Do(req)
 	if err != nil {
-		return authData, err
+		return authData.Data, err
 	}
 
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		return authData, err
+		return authData.Data, err
 	}
 	bytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return authData, err
+		return authData.Data, err
 	}
 	err = json.Unmarshal(bytes, &authData)
-	return authData, err
+	return authData.Data, err
 }
 
 func extractBearerToken(bearer string) (string, error) {

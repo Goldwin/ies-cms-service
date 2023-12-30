@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
@@ -9,17 +10,23 @@ import (
 
 type peopleManagementController struct {
 	peopleComponent people.PeopleManagementComponent
+	middleware      middleware.MiddlewareComponent
 }
 
-func InitializePeopleManagementController(r *gin.Engine, peopleComponent people.PeopleManagementComponent) {
+func InitializePeopleManagementController(
+	r *gin.Engine,
+	middlewareComponent middleware.MiddlewareComponent,
+	peopleComponent people.PeopleManagementComponent,
+) {
 	c := &peopleManagementController{
 		peopleComponent: peopleComponent,
+		middleware:      middlewareComponent,
 	}
 	rg := r.Group("people")
-	rg.POST("person", c.addPersonInfo)
-	rg.PUT("person/:id", c.updatePersonInfo)
-	rg.POST("household", c.addHousehold)
-	rg.PUT("household/:id", c.updateHousehold)
+	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
+	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
+	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
+	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
 }
 
 func (c *peopleManagementController) addPersonInfo(ctx *gin.Context) {

@@ -14,9 +14,13 @@ infrastructure:
     maxRetries: 5
     readTimeout: 5s
     writeTimeout: 5s
-  datalayer:
-    command:
-      mode: "mongo"
-      useTransaction: false
-  controller:
-    port: 8080
+controller:
+  port: 8080  
+datalayer:
+  command:
+    mode: "mongo"
+    useTransaction: false
+middleware:
+  authUrl: "http://localhost:8081/auth"
+
+  
