@@ -20,7 +20,7 @@ type SaveEventCommand struct {
 
 func (cmd SaveEventCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.ChurchEvent] {
 	event := entities.ChurchEvent{
-		ID:        fmt.Sprintf("%d", time.Now().UnixNano()),
+		ID:        fmt.Sprintf("%d.%s", time.Now().Unix(), cmd.Input.Name),
 		Name:      cmd.Input.Name,
 		StartTime: cmd.Input.StartTime,
 	}

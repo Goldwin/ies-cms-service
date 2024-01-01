@@ -1,8 +1,12 @@
 package repositories
 
-import "github.com/Goldwin/ies-pik-cms/pkg/events/entities"
+import (
+	"time"
+
+	"github.com/Goldwin/ies-pik-cms/pkg/events/entities"
+)
 
 type ChurchEventScheduleRepository interface {
 	Save(entities.ChurchEventSchedule) error
-	Get(string) (*entities.ChurchEventSchedule, error)
+	GetByTimezoneAndWeekDay(timezoneOffset int, weekday time.Weekday) (*entities.ChurchEventSchedule, error)
 }
