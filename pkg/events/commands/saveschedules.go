@@ -19,7 +19,7 @@ type CreateEventScheduleCommand struct {
 
 func (cmd CreateEventScheduleCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.ChurchEventSchedule] {
 	schedule := entities.ChurchEventSchedule{
-		ID:             fmt.Sprintf("%+02d%02d%02d%02d", cmd.Input.TimezoneOffset, cmd.Input.DayOfWeek, cmd.Input.Hours, cmd.Input.Minute),
+		ID:             fmt.Sprintf("%+02d%02d%02d%02d.%s", cmd.Input.TimezoneOffset, cmd.Input.DayOfWeek, cmd.Input.Hours, cmd.Input.Minute, cmd.Input.Name),
 		Name:           cmd.Input.Name,
 		DayOfWeek:      cmd.Input.DayOfWeek,
 		Hours:          cmd.Input.Hours,
