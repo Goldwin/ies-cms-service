@@ -14,12 +14,7 @@ func (cmd CreateEventCommand) Execute() AppExecutionResult[dto.ChurchEvent] {
 	return AppExecutionResult[dto.ChurchEvent]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.ChurchEvent{
-			ID:     "",
-			Year:   0,
-			Month:  0,
-			Day:    0,
-			Hours:  0,
-			Minute: 0,
+			ID: "",
 		},
 	}
 }

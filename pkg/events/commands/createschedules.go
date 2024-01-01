@@ -6,12 +6,13 @@ import (
 )
 
 type CreateEventSchedulesCommand struct {
+	input dto.ChurchEventSchedule
 }
 
-func (cmd CreateEventSchedulesCommand) Execute() AppExecutionResult[dto.EventSchedule] {
-	return AppExecutionResult[dto.EventSchedule]{
+func (cmd CreateEventSchedulesCommand) Execute() AppExecutionResult[dto.ChurchEventSchedule] {
+	return AppExecutionResult[dto.ChurchEventSchedule]{
 		Status: ExecutionStatusSuccess,
 		Error:  AppErrorDetail{},
-		Result: dto.EventSchedule{},
+		Result: dto.ChurchEventSchedule{},
 	}
 }

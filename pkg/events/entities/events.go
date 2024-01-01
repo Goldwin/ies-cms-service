@@ -1,10 +1,9 @@
 package entities
 
+import "time"
+
 type ChurchEvent struct {
-	ID     string
-	Year   int
-	Month  int
-	Day    int
-	Hours  int
-	Minute int
+	ID        string
+	Name      string
+	StartTime time.Time
 }
