@@ -1,8 +1,8 @@
 package repositories
 
-import "github.com/Goldwin/ies-pik-cms/pkg/events/dto"
+import "github.com/Goldwin/ies-pik-cms/pkg/events/entities"
 
 type ChurchEventScheduleRepository interface {
-	Save(dto.ChurchEventSchedule) error
-	Get(string) (*dto.ChurchEventSchedule, error)
+	Save(entities.ChurchEventSchedule) error
+	Get(string) (*entities.ChurchEventSchedule, error)
 }
