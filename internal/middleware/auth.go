@@ -113,6 +113,9 @@ func extractBearerToken(bearer string) (string, error) {
 }
 
 func checkScopes(scopes []string, requiredScopes []string) bool {
+	if len(requiredScopes) == 0 {
+		return true
+	}
 	requiredMap := make(map[string]bool)
 	for _, requiredScope := range requiredScopes {
 		requiredMap[requiredScope] = true

@@ -12,3 +12,5 @@ datalayer:
     useTransaction: true
 controller:
   port: 8081
+middleware:
+  authUrl: "http://localhost:8081/auth"

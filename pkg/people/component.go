@@ -37,14 +37,16 @@ func (p *peopleManagementComponent) AddHousehold(ctx context.Context, input dto.
 	var result AppExecutionResult[dto.Household]
 	_ = p.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
 		result = commands.AddHouseholdCommand{Input: input}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 // AddPerson implements PeopleManagementComponent.
@@ -52,14 +54,17 @@ func (p *peopleManagementComponent) AddPerson(ctx context.Context, input dto.Per
 	var result AppExecutionResult[dto.Person]
 	_ = p.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
 		result = commands.AddPersonCommand{Input: input}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
+
 }
 
 // UpdateHousehold implements PeopleManagementComponent.
@@ -67,14 +72,16 @@ func (p *peopleManagementComponent) UpdateHousehold(ctx context.Context, input d
 	var result AppExecutionResult[dto.Household]
 	_ = p.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
 		result = commands.UpdateHouseholdCommand{Input: input}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 // UpdatePerson implements PeopleManagementComponent.
@@ -82,14 +89,16 @@ func (p *peopleManagementComponent) UpdatePerson(ctx context.Context, input dto.
 	var result AppExecutionResult[dto.Person]
 	_ = p.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
 		result = commands.UpdatePersonCommand{Input: input}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 func NewPeopleManagementComponent(data PeopleDataLayerComponent) PeopleManagementComponent {

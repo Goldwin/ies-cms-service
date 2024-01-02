@@ -70,14 +70,16 @@ func (a *authComponentImpl) Auth(ctx context.Context, input dto.AuthInput, outpu
 			Token:     input.Token,
 			SecretKey: a.secretKey,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 
 }
 
@@ -91,14 +93,16 @@ func (a *authComponentImpl) CompleteRegistration(ctx context.Context, input dto.
 			LastName:   input.LastName,
 			Email:      input.Email,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 // GenerateOtp implements AuthComponent.
@@ -108,14 +112,16 @@ func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput,
 		result = commands.GenerateOtpCommand{
 			Email: input.Email,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 // SignIn implements AuthComponent.
@@ -128,14 +134,16 @@ func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, o
 			Method:    commands.SigninMethod(input.Method),
 			SecretKey: a.secretKey,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 func NewAuthComponent(component AuthDataLayerComponent, secretKey []byte) AuthComponent {

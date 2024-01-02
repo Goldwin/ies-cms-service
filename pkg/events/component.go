@@ -32,14 +32,17 @@ func (c *churchEventComponentImpl) CreateSession(ctx context.Context, input dto.
 		result = commands.CreateChurchEventSessionCommand{
 			EventID: input.EventID,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 // CreateEvent implements ChurchEventComponent.
@@ -49,14 +52,16 @@ func (c *churchEventComponentImpl) CreateEvent(ctx context.Context, input dto.Ch
 		result = commands.CreateEventCommands{
 			Input: input,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 // CheckIn implements ChurchEventComponent.
@@ -66,14 +71,16 @@ func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckI
 		result = commands.CheckInCommands{
 			Input: input,
 		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
+		if result.Status != ExecutionStatusSuccess {
 			return result.Error
 		}
 		return nil
 	})
+	if result.Status == ExecutionStatusSuccess {
+		output.OnSuccess(result.Result)
+	} else {
+		output.OnError(result.Error)
+	}
 }
 
 func NewChurchEventComponent(datalayer ChurchDataLayerComponent) ChurchEventComponent {
