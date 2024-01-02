@@ -58,6 +58,7 @@ func (cmd UpdatePersonCommand) Execute(ctx repositories.CommandContext) AppExecu
 		EmailAddress:      entities.EmailAddress(c.EmailAddress),
 		MaritalStatus:     c.MaritalStatus,
 		Birthday:          c.Birthday.ToEntity(),
+		Gender:            entities.Gender(c.Gender),
 	}
 
 	err = person.Validate()

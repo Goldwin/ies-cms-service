@@ -46,54 +46,15 @@ func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckI
 
 // CreateDailyEvent implements ChurchEventComponent.
 func (c *churchEventComponentImpl) CreateDailyEvent(ctx context.Context, input time.Weekday, output out.Output[[]dto.ChurchEvent]) {
-	var result AppExecutionResult[[]dto.ChurchEvent]
-	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
-		result = commands.CreateDailyEventCommand{
-			Day: input,
-		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
-			return result.Error
-		}
-		return nil
-	})
 }
 
 // SaveEvent implements ChurchEventComponent.
 func (c *churchEventComponentImpl) SaveEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent]) {
-	var result AppExecutionResult[dto.ChurchEvent]
-	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
-		result = commands.SaveEventCommand{
-			Input: input,
-		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
-			return result.Error
-		}
-		return nil
-	})
+
 }
 
 // CreateEventSchedule implements ChurchEventComponent.
 func (c *churchEventComponentImpl) CreateEventSchedule(ctx context.Context, input dto.ChurchEventSchedule, output out.Output[dto.ChurchEventSchedule]) {
-
-	var result AppExecutionResult[dto.ChurchEventSchedule]
-	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
-		result = commands.CreateEventScheduleCommand{
-			Input: input,
-		}.Execute(ctx)
-		if result.Status == ExecutionStatusSuccess {
-			go output.OnSuccess(result.Result)
-		} else {
-			go output.OnError(result.Error)
-			return result.Error
-		}
-		return nil
-	})
 }
 
 func NewChurchEventComponent(datalayer ChurchDataLayerComponent) ChurchEventComponent {

@@ -11,6 +11,13 @@ type PhoneNumber string
 
 type EmailAddress string
 
+type Gender string
+
+const (
+	Male   Gender = "MALE"
+	Female Gender = "FEMALE"
+)
+
 type YearMonthDay struct {
 	Year  int
 	Month int
@@ -36,6 +43,7 @@ type Person struct {
 	EmailAddress      EmailAddress
 	MaritalStatus     string
 	Birthday          *YearMonthDay
+	Gender            Gender
 }
 
 func (p *Person) Validate() error {
