@@ -72,9 +72,8 @@ func convertToLocationEntities(locations []dto.Location) []entities.Location {
 	var result []entities.Location
 	for _, location := range locations {
 		result = append(result, entities.Location{
-			Name:         location.Name,
-			AgeFilter:    entities.AgeFilter(location.AgeFilter),
-			GenderFilter: entities.GenderFilter(location.GenderFilter),
+			Name:      location.Name,
+			AgeFilter: entities.AgeFilter(location.AgeFilter),
 		})
 	}
 	return result

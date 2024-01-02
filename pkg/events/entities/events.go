@@ -5,9 +5,6 @@ import "time"
 const (
 	FrequencyWeekly Frequency = "WEEKLY"
 	FrequencyDaily  Frequency = "DAILY"
-
-	MaleOnly   GenderFilter = "MALE"
-	FemaleOnly GenderFilter = "FEMALE"
 )
 
 type AgeFilter struct {
@@ -15,12 +12,9 @@ type AgeFilter struct {
 	To   int
 }
 
-type GenderFilter string
-
 type Location struct {
-	Name         string
-	AgeFilter    AgeFilter
-	GenderFilter GenderFilter
+	Name      string
+	AgeFilter AgeFilter
 }
 
 type Frequency string

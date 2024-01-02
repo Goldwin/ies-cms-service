@@ -12,4 +12,5 @@ type CheckInEvent struct {
 	Person    Person    `json:"person"`
 	SessionID string    `json:"session_id"`
 	CheckInAt time.Time `json:"check_in_at"`
+	Location  Location  `json:"location"`
 }

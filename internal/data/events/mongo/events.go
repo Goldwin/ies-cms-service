@@ -60,7 +60,6 @@ func (c *churchEventRepositoryImpl) Get(id string) (*entities.ChurchEvent, error
 				From: l.AgeFilter.From,
 				To:   l.AgeFilter.To,
 			},
-			GenderFilter: entities.GenderFilter(l.GenderFilter),
 		})
 	}
 
@@ -82,9 +81,8 @@ func (c *churchEventRepositoryImpl) Save(e entities.ChurchEvent) error {
 
 	for _, l := range e.Locations {
 		locations = append(locations, Location{
-			Name:         l.Name,
-			AgeFilter:    AgeFilter{From: l.AgeFilter.From, To: l.AgeFilter.To},
-			GenderFilter: GenderFilter(l.GenderFilter),
+			Name:      l.Name,
+			AgeFilter: AgeFilter{From: l.AgeFilter.From, To: l.AgeFilter.To},
 		})
 	}
 	_, err := c.db.Collection("events").UpdateByID(c.ctx, e.ID, bson.M{
