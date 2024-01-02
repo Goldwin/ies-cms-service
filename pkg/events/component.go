@@ -18,7 +18,7 @@ type ChurchDataLayerComponent interface {
 type ChurchEventComponent interface {
 	CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[[]dto.CheckInEvent])
 	CreateEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent])
-	CreateSession(ctx context.Context, eventId string, output out.Output[dto.ChurchEventSession])
+	CreateSession(ctx context.Context, input dto.CreateSessionInput, output out.Output[dto.ChurchEventSession])
 }
 
 type churchEventComponentImpl struct {
@@ -26,11 +26,11 @@ type churchEventComponentImpl struct {
 }
 
 // CreateSession implements ChurchEventComponent.
-func (c *churchEventComponentImpl) CreateSession(ctx context.Context, eventId string, output out.Output[dto.ChurchEventSession]) {
+func (c *churchEventComponentImpl) CreateSession(ctx context.Context, input dto.CreateSessionInput, output out.Output[dto.ChurchEventSession]) {
 	var result AppExecutionResult[dto.ChurchEventSession]
 	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
 		result = commands.CreateChurchEventSessionCommand{
-			EventID: eventId,
+			EventID: input.EventID,
 		}.Execute(ctx)
 		if result.Status == ExecutionStatusSuccess {
 			go output.OnSuccess(result.Result)

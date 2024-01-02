@@ -10,6 +10,10 @@ const (
 	FemaleOnly GenderFilter = "FEMALE"
 )
 
+type CreateSessionInput struct {
+	EventID string
+}
+
 type AgeFilter struct {
 	From int
 	To   int
@@ -37,7 +41,7 @@ type ChurchEvent struct {
 
 type ChurchEventSession struct {
 	ID        string
-	Name string
+	Name      string
 	SessionNo int
 	StartTime time.Time
 	ShowAt    time.Time

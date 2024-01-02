@@ -27,6 +27,8 @@ func InitializeEventsController(
 
 	rg := r.Group("events")
 	rg.POST("checkin", middlewareComponent.Auth("EVENT_CHECK_IN"), c.checkIn)
+	rg.POST("", middlewareComponent.Auth("EVENT_CREATE"), c.createEvent)
+	rg.POST("session", middlewareComponent.Auth("EVENT_SESSION_CREATE"), c.createNewSession)
 }
 
 func (c *churchEventController) checkIn(ctx *gin.Context) {
@@ -40,6 +42,42 @@ func (c *churchEventController) checkIn(ctx *gin.Context) {
 			})
 		},
 		successFunc: func(response []dto.CheckInEvent) {
+			ctx.JSON(200, gin.H{
+				"data": response,
+			})
+		},
+	})
+}
+
+func (c *churchEventController) createEvent(ctx *gin.Context) {
+	input := dto.ChurchEvent{}
+	ctx.BindJSON(&input)
+	c.churchEventComponent.CreateEvent(ctx, input, &outputDecorator[dto.ChurchEvent]{
+		output: nil,
+		errFunction: func(err commands.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(400, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(response dto.ChurchEvent) {
+			ctx.JSON(200, gin.H{
+				"data": response,
+			})
+		},
+	})
+}
+
+func (c *churchEventController) createNewSession(ctx *gin.Context) {
+	input := dto.CreateSessionInput{}
+	ctx.BindJSON(&input)
+	c.churchEventComponent.CreateSession(ctx, input, &outputDecorator[dto.ChurchEventSession]{
+		output: nil,
+		errFunction: func(err commands.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(400, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(response dto.ChurchEventSession) {
 			ctx.JSON(200, gin.H{
 				"data": response,
 			})
