@@ -4,4 +4,5 @@ type CommandContext interface {
 	EventCheckInRepository() EventCheckInRepository
 	ChurchEventRepository() ChurchEventRepository
 	PersonRepository() PersonRepository
+	ChurchEventSessionRepository() ChurchEventSessionRepository
 }

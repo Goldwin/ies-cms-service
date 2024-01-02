@@ -2,7 +2,6 @@ package events
 
 import (
 	"context"
-	"time"
 
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
@@ -17,21 +16,37 @@ type ChurchDataLayerComponent interface {
 }
 
 type ChurchEventComponent interface {
-	CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[dto.CheckInEvent])
-	SaveEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent])
-	CreateEventSchedule(ctx context.Context, input dto.ChurchEventSchedule, output out.Output[dto.ChurchEventSchedule])
-	CreateDailyEvent(ctx context.Context, input time.Weekday, output out.Output[[]dto.ChurchEvent])
+	CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[[]dto.CheckInEvent])
+	CreateEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent])
+	CreateSession(ctx context.Context, eventId string, output out.Output[dto.ChurchEventSession])
 }
 
 type churchEventComponentImpl struct {
 	commandWorker worker.UnitOfWork[repositories.CommandContext]
 }
 
-// CheckIn implements ChurchEventComponent.
-func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[dto.CheckInEvent]) {
-	var result AppExecutionResult[dto.CheckInEvent]
+// CreateSession implements ChurchEventComponent.
+func (c *churchEventComponentImpl) CreateSession(ctx context.Context, eventId string, output out.Output[dto.ChurchEventSession]) {
+	var result AppExecutionResult[dto.ChurchEventSession]
 	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
-		result = commands.CheckInCommands{
+		result = commands.CreateChurchEventSessionCommand{
+			EventID: eventId,
+		}.Execute(ctx)
+		if result.Status == ExecutionStatusSuccess {
+			go output.OnSuccess(result.Result)
+		} else {
+			go output.OnError(result.Error)
+			return result.Error
+		}
+		return nil
+	})
+}
+
+// CreateEvent implements ChurchEventComponent.
+func (c *churchEventComponentImpl) CreateEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent]) {
+	var result AppExecutionResult[dto.ChurchEvent]
+	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
+		result = commands.CreateEventCommands{
 			Input: input,
 		}.Execute(ctx)
 		if result.Status == ExecutionStatusSuccess {
@@ -44,17 +59,21 @@ func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckI
 	})
 }
 
-// CreateDailyEvent implements ChurchEventComponent.
-func (c *churchEventComponentImpl) CreateDailyEvent(ctx context.Context, input time.Weekday, output out.Output[[]dto.ChurchEvent]) {
-}
-
-// SaveEvent implements ChurchEventComponent.
-func (c *churchEventComponentImpl) SaveEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent]) {
-
-}
-
-// CreateEventSchedule implements ChurchEventComponent.
-func (c *churchEventComponentImpl) CreateEventSchedule(ctx context.Context, input dto.ChurchEventSchedule, output out.Output[dto.ChurchEventSchedule]) {
+// CheckIn implements ChurchEventComponent.
+func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[[]dto.CheckInEvent]) {
+	var result AppExecutionResult[[]dto.CheckInEvent]
+	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
+		result = commands.CheckInCommands{
+			Input: input,
+		}.Execute(ctx)
+		if result.Status == ExecutionStatusSuccess {
+			go output.OnSuccess(result.Result)
+		} else {
+			go output.OnError(result.Error)
+			return result.Error
+		}
+		return nil
+	})
 }
 
 func NewChurchEventComponent(datalayer ChurchDataLayerComponent) ChurchEventComponent {

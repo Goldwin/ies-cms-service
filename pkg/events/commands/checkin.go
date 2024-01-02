@@ -22,10 +22,10 @@ type CheckInCommands struct {
 	Input dto.CheckInInput
 }
 
-func (cmd CheckInCommands) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.CheckInEvent] {
-	person, err := ctx.PersonRepository().Get(cmd.Input.PersonID)
+func (cmd CheckInCommands) Execute(ctx repositories.CommandContext) AppExecutionResult[[]dto.CheckInEvent] {
+	persons, err := ctx.PersonRepository().GetByIds(cmd.Input.PersonIDs)
 	if err != nil {
-		return AppExecutionResult[dto.CheckInEvent]{
+		return AppExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
 			Error: AppErrorDetail{
 				Code:    CheckInCommandsFailedToFetchPerson,
@@ -34,20 +34,42 @@ func (cmd CheckInCommands) Execute(ctx repositories.CommandContext) AppExecution
 		}
 	}
 
-	if person == nil {
-		return AppExecutionResult[dto.CheckInEvent]{
+	if len(persons) != len(cmd.Input.PersonIDs) {
+		return AppExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
 			Error: AppErrorDetail{
 				Code:    CheckInCommandsErrorPersonNotFound,
-				Message: fmt.Sprintf("Person Not Found: %s", err.Error()),
+				Message: fmt.Sprintf("Cannot fetch all person info"),
 			},
 		}
 	}
 
-	event, err := ctx.ChurchEventRepository().Get(cmd.Input.EventID)
+	checker, err := ctx.PersonRepository().Get(cmd.Input.CheckerID)
 
 	if err != nil {
-		return AppExecutionResult[dto.CheckInEvent]{
+		return AppExecutionResult[[]dto.CheckInEvent]{
+			Status: ExecutionStatusFailed,
+			Error: AppErrorDetail{
+				Code:    CheckInCommandsFailedToFetchPerson,
+				Message: fmt.Sprintf("Failed to Fetch Person: %s", err.Error()),
+			},
+		}
+	}
+
+	if checker == nil {
+		return AppExecutionResult[[]dto.CheckInEvent]{
+			Status: ExecutionStatusFailed,
+			Error: AppErrorDetail{
+				Code:    CheckInCommandsErrorPersonNotFound,
+				Message: fmt.Sprintf("Person Not Found"),
+			},
+		}
+	}
+
+	session, err := ctx.ChurchEventSessionRepository().Get(cmd.Input.EventID)
+
+	if err != nil {
+		return AppExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
 			Error: AppErrorDetail{
 				Code:    CheckInCommandsFailedToFetchEvent,
@@ -56,8 +78,8 @@ func (cmd CheckInCommands) Execute(ctx repositories.CommandContext) AppExecution
 		}
 	}
 
-	if event == nil {
-		return AppExecutionResult[dto.CheckInEvent]{
+	if session == nil {
+		return AppExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
 			Error: AppErrorDetail{
 				Code:    CheckInCommandsErrorEventNotFound,
@@ -66,40 +88,39 @@ func (cmd CheckInCommands) Execute(ctx repositories.CommandContext) AppExecution
 		}
 	}
 
-	checkin := entities.CheckInEvent{
-		ID:        fmt.Sprintf("%s.%s", event.ID, person.ID),
-		Person:    *person,
-		Event:     *event,
-		CheckInAt: time.Now(),
-	}
+	result := []dto.CheckInEvent{}
 
-	err = ctx.EventCheckInRepository().Save(checkin)
-
-	if err != nil {
-		return AppExecutionResult[dto.CheckInEvent]{
-			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
-				Code:    CheckInCommandsFailedToCheckIn,
-				Message: fmt.Sprintf("Failed to CheckIn: %s", err.Error()),
-			},
+	for _, person := range persons {
+		checkin := entities.CheckInEvent{
+			ID:        fmt.Sprintf("%s.%s", session.ID, person.ID),
+			Person:    person,
+			SessionID: session.ID,
+			CheckInAt: time.Now(),
 		}
+		err = ctx.EventCheckInRepository().Save(checkin)
+		if err != nil {
+			return AppExecutionResult[[]dto.CheckInEvent]{
+				Status: ExecutionStatusFailed,
+				Error: AppErrorDetail{
+					Code:    CheckInCommandsFailedToCheckIn,
+					Message: fmt.Sprintf("Failed to CheckIn: %s", err.Error()),
+				},
+			}
+		}
+		result = append(result, dto.CheckInEvent{
+			ID: checkin.SessionID,
+			Person: dto.Person{
+				ID:        checkin.Person.ID,
+				FirstName: checkin.Person.FirstName,
+				LastName:  checkin.Person.LastName,
+			},
+			SessionID: checkin.SessionID,
+			CheckInAt: checkin.CheckInAt,
+		})
 	}
 
-	return AppExecutionResult[dto.CheckInEvent]{
+	return AppExecutionResult[[]dto.CheckInEvent]{
 		Status: ExecutionStatusSuccess,
-		Result: dto.CheckInEvent{
-			ID: checkin.ID,
-			Person: dto.Person{
-				ID:        person.ID,
-				FirstName: person.FirstName,
-				LastName:  person.LastName,
-			},
-			Event: dto.ChurchEvent{
-				ID:        event.ID,
-				Name:      event.Name,
-				StartTime: event.StartTime,
-			},
-			CheckInAt: checkin.CheckInAt,
-		},
+		Result: result,
 	}
 }

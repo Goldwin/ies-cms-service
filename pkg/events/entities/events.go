@@ -25,17 +25,22 @@ type Location struct {
 
 type Frequency string
 
-type ChurchScheduleEvent struct {
+type ChurchEvent struct {
 	ID                     string
 	Name                   string
 	Locations              []Location
 	EventFrequency         Frequency
 	LatestSessionStartTime time.Time
+	LatestShowAt           time.Time
+	LatestHideAt           time.Time
+	LatestSessionNo        int
 }
 
-type ChurchEvent struct {
+type ChurchEventSession struct {
 	ID        string
+	Name      string
 	SessionNo int
 	StartTime time.Time
-	ChurchScheduleEvent
+	ShowAt    time.Time
+	HideAt    time.Time
 }

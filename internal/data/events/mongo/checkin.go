@@ -16,10 +16,10 @@ type eventCheckInRepositoryImpl struct {
 }
 
 type EventCheckInModel struct {
-	ID        string      `bson:"_id"`
-	Person    Person      `bson:"person"`
-	Event     ChurchEvent `bson:"event"`
-	CheckInAt time.Time   `bson:"check_in_at"`
+	ID        string    `bson:"_id"`
+	Person    Person    `bson:"person"`
+	SessionID string    `bson:"session_id"`
+	CheckInAt time.Time `bson:"check_in_at"`
 }
 
 // Get implements EventCheckInRepository.
@@ -40,11 +40,6 @@ func (e *eventCheckInRepositoryImpl) Get(id string) (*entities.CheckInEvent, err
 			FirstName: model.Person.FirstName,
 			LastName:  model.Person.LastName,
 		},
-		Event: entities.ChurchEvent{
-			ID:        id,
-			Name:      model.Event.Name,
-			StartTime: model.Event.StartTime,
-		},
 		CheckInAt: model.CheckInAt,
 	}, err
 }
@@ -54,7 +49,7 @@ func (e *eventCheckInRepositoryImpl) Save(checkIn entities.CheckInEvent) error {
 	_, err := e.db.Collection("checkin").InsertOne(e.ctx, EventCheckInModel{
 		ID:        checkIn.ID,
 		Person:    Person{ID: checkIn.Person.ID, FirstName: checkIn.Person.FirstName, LastName: checkIn.Person.LastName},
-		Event:     ChurchEvent{ID: checkIn.Event.ID, Name: checkIn.Event.Name, StartTime: checkIn.Event.StartTime},
+		SessionID: checkIn.SessionID,
 		CheckInAt: checkIn.CheckInAt,
 	})
 	return err

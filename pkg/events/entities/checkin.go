@@ -5,6 +5,6 @@ import "time"
 type CheckInEvent struct {
 	ID        string
 	Person    Person
-	Event     ChurchEvent
+	SessionID string
 	CheckInAt time.Time
 }

@@ -13,6 +13,7 @@ type Person struct {
 	ID        string `bson:"_id"`
 	FirstName string `bson:"firstName"`
 	LastName  string `bson:"lastName"`
+	Birthday  string `bson:"birthday"`
 }
 
 type personRepositoryImpl struct {
@@ -21,8 +22,8 @@ type personRepositoryImpl struct {
 }
 
 // GetByIds implements repositories.PersonRepository.
-func (p *personRepositoryImpl) GetByIds(ids ...string) ([]*entities.Person, error) {
-	result := make([]*entities.Person, 0)
+func (p *personRepositoryImpl) GetByIds(ids []string) ([]entities.Person, error) {
+	result := make([]entities.Person, 0)
 	res, err := p.db.Collection("persons").Find(p.ctx, bson.M{"_id": bson.M{"$in": ids}})
 	if err != nil {
 		return nil, err
@@ -32,10 +33,11 @@ func (p *personRepositoryImpl) GetByIds(ids ...string) ([]*entities.Person, erro
 		if err := res.Decode(&model); err != nil {
 			return nil, err
 		}
-		result = append(result, &entities.Person{
+		result = append(result, entities.Person{
 			ID:        model.ID,
 			FirstName: model.FirstName,
 			LastName:  model.LastName,
+			Birthday:  model.Birthday,
 		})
 	}
 	return result, nil
