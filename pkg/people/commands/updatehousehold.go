@@ -6,7 +6,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
 )
 
 const (
@@ -19,7 +18,7 @@ type UpdateHouseholdCommand struct {
 	Input dto.HouseHoldInput
 }
 
-func (cmd UpdateHouseholdCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.Household] {
+func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Household] {
 	householdHead, err := ctx.PersonRepository().Get(cmd.Input.HouseholdHeadPersonId)
 
 	if err != nil {
@@ -80,11 +79,6 @@ func (cmd UpdateHouseholdCommand) Execute(ctx repositories.CommandContext) AppEx
 
 	result, err := ctx.HouseholdRepository().UpdateHousehold(household)
 
-	memberEmail := ""
-	if len(result.HouseholdHead.EmailAddress) > 0 {
-		memberEmail = string(result.HouseholdHead.EmailAddress[0])
-	}
-
 	memberPhone := ""
 	if len(result.HouseholdHead.PhoneNumbers) > 0 {
 		memberPhone = string(result.HouseholdHead.PhoneNumbers[0])
@@ -95,17 +89,13 @@ func (cmd UpdateHouseholdCommand) Execute(ctx repositories.CommandContext) AppEx
 		FirstName:    result.HouseholdHead.FirstName,
 		MiddleName:   result.HouseholdHead.MiddleName,
 		LastName:     result.HouseholdHead.LastName,
-		EmailAddress: string(memberEmail),
+		EmailAddress: string(result.HouseholdHead.EmailAddress),
 		PhoneNumber:  string(memberPhone),
 	}
 
 	householdMembersDto := make([]dto.HouseholdPerson, len(result.Members))
 
 	for i, member := range result.Members {
-		memberEmail = ""
-		if len(result.HouseholdHead.EmailAddress) > 0 {
-			memberEmail = string(result.HouseholdHead.EmailAddress[0])
-		}
 
 		memberPhone = ""
 		if len(result.HouseholdHead.PhoneNumbers) > 0 {
@@ -115,7 +105,7 @@ func (cmd UpdateHouseholdCommand) Execute(ctx repositories.CommandContext) AppEx
 			ID:           member.ID,
 			FirstName:    member.FirstName,
 			LastName:     member.LastName,
-			EmailAddress: string(memberEmail),
+			EmailAddress: string(member.EmailAddress),
 			PhoneNumber:  string(memberPhone),
 		}
 	}

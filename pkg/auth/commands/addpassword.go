@@ -9,7 +9,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 )
 
@@ -22,7 +21,7 @@ type SavePasswordCommand struct {
 	Input dto.PasswordInput
 }
 
-func (cmd SavePasswordCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.PasswordResult] {
+func (cmd SavePasswordCommand) Execute(ctx CommandContext) AppExecutionResult[dto.PasswordResult] {
 
 	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
 		return AppExecutionResult[dto.PasswordResult]{

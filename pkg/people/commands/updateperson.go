@@ -6,7 +6,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
 )
 
 /*
@@ -22,7 +21,7 @@ const (
 	UpdatePersonErrorCodeInvalidInput AppErrorCode = 10103
 )
 
-func (cmd UpdatePersonCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.Person] {
+func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Person] {
 	var err error
 	c := cmd.Input
 	addresses := make([]entities.Address, len(c.Addresses))
@@ -58,6 +57,7 @@ func (cmd UpdatePersonCommand) Execute(ctx repositories.CommandContext) AppExecu
 		EmailAddress:      entities.EmailAddress(c.EmailAddress),
 		MaritalStatus:     c.MaritalStatus,
 		Birthday:          c.Birthday.ToEntity(),
+		Gender:            entities.Gender(c.Gender),
 	}
 
 	err = person.Validate()

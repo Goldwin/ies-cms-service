@@ -8,16 +8,16 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/data/auth/redis"
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
+	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 )
 
 type authDataLayerComponentImpl struct {
-	commandWorker worker.UnitOfWork[repositories.CommandContext]
+	commandWorker worker.UnitOfWork[commands.CommandContext]
 }
 
 // CommandWorker implements auth.AuthDataLayerComponent.
-func (a *authDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[repositories.CommandContext] {
+func (a *authDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[commands.CommandContext] {
 	return a.commandWorker
 }
 

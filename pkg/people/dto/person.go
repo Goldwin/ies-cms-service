@@ -27,6 +27,7 @@ type Person struct {
 	EmailAddress      string        `json:"email_address"`
 	MaritalStatus     string        `json:"marital_status"`
 	Birthday          *YearMonthDay `json:"birthday"`
+	Gender            string        `json:"gender"`
 }
 
 func (y *YearMonthDay) ToEntity() *entities.YearMonthDay {

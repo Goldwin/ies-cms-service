@@ -7,6 +7,7 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	"github.com/Goldwin/ies-pik-cms/internal/bus/common"
+	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	output "github.com/Goldwin/ies-pik-cms/internal/out/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
@@ -23,26 +24,17 @@ type authController struct {
 
 func InitializeAuthController(r *gin.Engine, authComponent auth.AuthComponent,
 	eventBusComponent bus.EventBusComponent,
-	authOutputComponent output.AuthOutputComponent) {
+	authOutputComponent output.AuthOutputComponent,
+	middlewareComponent middleware.MiddlewareComponent,
+) {
 	authController := authController{
 		authComponent:       authComponent,
 		authOutputComponent: authOutputComponent,
 	}
 
 	authGroup := r.Group("auth")
-	authGroup.GET("", authController.auth, func(ctx *gin.Context) {
-		result, ok := ctx.Get("auth_data")
-		if !ok {
-			ctx.JSON(401, gin.H{
-				"error": "Unauthorized",
-			})
-			return
-		}
-		ctx.JSON(200, gin.H{
-			"data": result,
-		})
-	})
-	authGroup.POST("registration", authController.auth, authController.completeRegistration)
+	authGroup.GET("", authController.auth)
+	authGroup.POST("registration", middlewareComponent.Auth(), authController.completeRegistration)
 	authGroup.POST("otp", authController.otp)
 	authGroup.POST("otp/signin", authController.otpSignIn)
 	authGroup.POST("password/signin", authController.passwordSignIn)
@@ -73,7 +65,7 @@ func (a *authController) completeRegistration(c *gin.Context) {
 		return
 	}
 	c.BindJSON(&input)
-	authData, ok := authRaw.(dto.AuthData)
+	authData, ok := authRaw.(middleware.AuthData)
 
 	if !ok {
 		c.AbortWithStatusJSON(400, gin.H{
@@ -126,6 +118,9 @@ func (a *authController) auth(c *gin.Context) {
 		},
 		successFunc: func(result dto.AuthData) {
 			c.Set("auth_data", result)
+			c.JSON(200, gin.H{
+				"data": result,
+			})
 		},
 	}
 	a.authComponent.Auth(c, input, output)

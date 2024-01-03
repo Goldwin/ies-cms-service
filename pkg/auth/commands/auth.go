@@ -5,7 +5,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/golang-jwt/jwt"
 )
@@ -22,7 +21,7 @@ type AuthCommand struct {
 	SecretKey []byte
 }
 
-func (cmd AuthCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.AuthData] {
+func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthData] {
 
 	claims, err := cmd.extractClaims()
 

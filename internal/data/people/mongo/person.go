@@ -22,6 +22,7 @@ type Person struct {
 	EmailAddress      string    `bson:"emailAddress"`
 	MaritalStatus     string    `bson:"maritalStatus"`
 	Birthday          *string   `bson:"birthday"`
+	Gender            string    `bson:"gender"`
 }
 
 type Address struct {
@@ -121,6 +122,7 @@ func toPersonMongoModel(e entities.Person) Person {
 		EmailAddress:      string(e.EmailAddress),
 		MaritalStatus:     e.MaritalStatus,
 		Birthday:          birthday,
+		Gender:            string(e.Gender),
 	}
 }
 
@@ -155,6 +157,7 @@ func toPersonEntities(p Person) entities.Person {
 		EmailAddress:      entities.EmailAddress(p.EmailAddress),
 		MaritalStatus:     p.MaritalStatus,
 		Birthday:          birthday,
+		Gender:            entities.Gender(p.Gender),
 	}
 }
 

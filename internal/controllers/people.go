@@ -11,6 +11,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
+	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
 	"github.com/gin-gonic/gin"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -33,6 +34,8 @@ func InitializePeopleManagementController(
 	rg := r.Group("people")
 	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
 	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
+	rg.GET("person/:id", middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
+	rg.GET("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
 	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
 
@@ -128,6 +131,39 @@ func (c *peopleManagementController) updatePersonInfo(ctx *gin.Context) {
 			ctx.JSON(200, gin.H{
 				"data": person,
 			})
+		},
+	})
+}
+
+func (c *peopleManagementController) viewPerson(ctx *gin.Context) {
+	id := ctx.Param("id")
+	c.peopleComponent.ViewPerson(ctx, queries.ViewPersonQuery{
+		ID: id,
+	}, &outputDecorator[queries.ViewPersonResult]{
+		output: nil,
+		errFunction: func(err commands.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(500, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(result queries.ViewPersonResult) {
+			ctx.JSON(200, result)
+		},
+	})
+}
+
+func (c *peopleManagementController) searchPerson(ctx *gin.Context) {
+	var input queries.SearchPersonQuery
+	ctx.BindQuery(&input)
+	c.peopleComponent.SearchPerson(ctx, input, &outputDecorator[queries.SearchPersonResult]{
+		output: nil,
+		errFunction: func(err commands.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(500, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(result queries.SearchPersonResult) {
+			ctx.JSON(200, result)
 		},
 	})
 }

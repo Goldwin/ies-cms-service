@@ -5,7 +5,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 )
 
@@ -24,7 +23,7 @@ type CompleteRegistrationCommand struct {
 	Email      string
 }
 
-func (cmd CompleteRegistrationCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.AuthData] {
+func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthData] {
 	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
 	if err != nil {
 		return AppExecutionResult[dto.AuthData]{

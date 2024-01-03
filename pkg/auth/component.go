@@ -7,7 +7,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	"github.com/Goldwin/ies-pik-cms/pkg/common"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
@@ -15,7 +14,7 @@ import (
 )
 
 type AuthDataLayerComponent interface {
-	CommandWorker() worker.UnitOfWork[repositories.CommandContext]
+	CommandWorker() worker.UnitOfWork[commands.CommandContext]
 }
 
 type AuthComponent interface {
@@ -27,13 +26,13 @@ type AuthComponent interface {
 }
 
 type authComponentImpl struct {
-	worker    worker.UnitOfWork[repositories.CommandContext]
+	worker    worker.UnitOfWork[commands.CommandContext]
 	secretKey []byte
 }
 
 // Start implements AuthComponent.
 func (a *authComponentImpl) Start() {
-	a.worker.Execute(context.Background(), func(ctx repositories.CommandContext) error {
+	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
 		res := commands.SavePasswordCommand{
 			Input: dto.PasswordInput{
 				Email:           os.Getenv("ADMIN_EMAIL"),
@@ -46,7 +45,7 @@ func (a *authComponentImpl) Start() {
 		}
 		return nil
 	})
-	a.worker.Execute(context.Background(), func(ctx repositories.CommandContext) error {
+	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
 		res := commands.GrantAdminRoleCommand{
 			Email: os.Getenv("ADMIN_EMAIL"),
 		}.Execute(ctx)
@@ -65,7 +64,7 @@ func (a *authComponentImpl) Stop() {
 // Auth implements AuthComponent.
 func (a *authComponentImpl) Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData]) {
 	var result AppExecutionResult[dto.AuthData]
-	_ = a.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.AuthCommand{
 			Token:     input.Token,
 			SecretKey: a.secretKey,
@@ -80,12 +79,13 @@ func (a *authComponentImpl) Auth(ctx context.Context, input dto.AuthInput, outpu
 	} else {
 		output.OnError(result.Error)
 	}
+
 }
 
 // CompleteRegistration implements AuthComponent.
 func (a *authComponentImpl) CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData]) {
 	var result AppExecutionResult[dto.AuthData]
-	_ = a.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.CompleteRegistrationCommand{
 			FirstName:  input.FirstName,
 			MiddleName: input.MiddleName,
@@ -102,13 +102,12 @@ func (a *authComponentImpl) CompleteRegistration(ctx context.Context, input dto.
 	} else {
 		output.OnError(result.Error)
 	}
-
 }
 
 // GenerateOtp implements AuthComponent.
 func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput, output out.Output[dto.OtpResult]) {
 	var result AppExecutionResult[dto.OtpResult]
-	_ = a.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.GenerateOtpCommand{
 			Email: input.Email,
 		}.Execute(ctx)
@@ -117,7 +116,6 @@ func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput,
 		}
 		return nil
 	})
-
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
@@ -128,7 +126,7 @@ func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput,
 // SignIn implements AuthComponent.
 func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, output out.Output[dto.SignInResult]) {
 	var result AppExecutionResult[dto.SignInResult]
-	_ = a.worker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.SigninCommand{
 			Email:     input.Email,
 			Password:  []byte(input.Password),

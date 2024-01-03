@@ -9,6 +9,7 @@ import (
 	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
 	authData "github.com/Goldwin/ies-pik-cms/internal/data/auth"
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
+	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	out "github.com/Goldwin/ies-pik-cms/internal/out/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ func main() {
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
 	eventBus := bus.NewRedisEventBusComponent(infraComponent)
 	authOutputComponent := out.NewAuthOutputComponent(eventBus)
+	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 
 	gin.SetMode(config.ControllerConfig.Mode)
 	r := gin.Default()
@@ -33,7 +35,7 @@ func main() {
 	})
 
 	authComponent.Start()
-	controller.InitializeAuthController(r, authComponent, eventBus, authOutputComponent)
+	controller.InitializeAuthController(r, authComponent, eventBus, authOutputComponent, middlewareComponent)
 
 	r.Run(fmt.Sprintf(":%d", config.ControllerConfig.Port))
 }
