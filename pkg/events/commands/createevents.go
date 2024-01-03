@@ -7,7 +7,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
 	"github.com/google/uuid"
 )
 
@@ -19,7 +18,7 @@ type CreateEventCommands struct {
 	Input dto.ChurchEvent
 }
 
-func (c CreateEventCommands) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.ChurchEvent] {
+func (c CreateEventCommands) Execute(ctx CommandContext) AppExecutionResult[dto.ChurchEvent] {
 	c.Input.ID = uuid.NewString()
 	event := entities.ChurchEvent{
 		ID:                     c.Input.ID,

@@ -8,15 +8,15 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/events"
-	"github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
+	"github.com/Goldwin/ies-pik-cms/pkg/events/commands"
 )
 
 type churchEventDataLayerComponentImpl struct {
-	commandWorker worker.UnitOfWork[repositories.CommandContext]
+	commandWorker worker.UnitOfWork[commands.CommandContext]
 }
 
 // CommandWorker implements events.ChurchDataLayerComponent.
-func (c *churchEventDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[repositories.CommandContext] {
+func (c *churchEventDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[commands.CommandContext] {
 	return c.commandWorker
 }
 

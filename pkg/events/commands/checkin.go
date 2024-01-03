@@ -7,7 +7,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
 )
 
 const (
@@ -22,7 +21,7 @@ type CheckInCommands struct {
 	Input dto.CheckInInput
 }
 
-func (cmd CheckInCommands) Execute(ctx repositories.CommandContext) AppExecutionResult[[]dto.CheckInEvent] {
+func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.CheckInEvent] {
 	persons, err := ctx.PersonRepository().GetByIds(cmd.Input.PersonIDs)
 	if err != nil {
 		return AppExecutionResult[[]dto.CheckInEvent]{

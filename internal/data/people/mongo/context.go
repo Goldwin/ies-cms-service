@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 
+	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -22,7 +23,7 @@ func (c *contextImpl) PersonRepository() repositories.PersonRepository {
 	return c.personRepository
 }
 
-func NewContext(ctx context.Context, db *mongo.Database) repositories.CommandContext {
+func NewContext(ctx context.Context, db *mongo.Database) commands.CommandContext {
 	return &contextImpl{
 		householdRepository: NewHouseholdRepository(ctx, db),
 		personRepository:    NewPersonRepository(ctx, db),

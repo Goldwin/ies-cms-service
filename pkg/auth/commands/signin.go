@@ -8,7 +8,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/golang-jwt/jwt"
 )
@@ -36,14 +35,14 @@ type SigninCommand struct {
 	SecretKey []byte
 }
 
-func (cmd SigninCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.SignInResult] {
+func (cmd SigninCommand) Execute(ctx CommandContext) AppExecutionResult[dto.SignInResult] {
 	if cmd.Method == SigninMethodPassword {
 		return cmd.passwordLogin(ctx)
 	}
 	return cmd.otpSignIn(ctx)
 }
 
-func (cmd SigninCommand) passwordLogin(ctx repositories.CommandContext) AppExecutionResult[dto.SignInResult] {
+func (cmd SigninCommand) passwordLogin(ctx CommandContext) AppExecutionResult[dto.SignInResult] {
 	passwordRepository := ctx.PasswordRepository()
 	password, err := passwordRepository.Get(entities.EmailAddress(cmd.Email))
 	if err != nil {
@@ -110,7 +109,7 @@ func (cmd SigninCommand) passwordLogin(ctx repositories.CommandContext) AppExecu
 	}
 }
 
-func (cmd SigninCommand) otpSignIn(ctx repositories.CommandContext) AppExecutionResult[dto.SignInResult] {
+func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.SignInResult] {
 	otpRepository := ctx.OtpRepository()
 	accountRepository := ctx.AccountRepository()
 	otp, err := otpRepository.GetOtp(entities.EmailAddress(cmd.Email))

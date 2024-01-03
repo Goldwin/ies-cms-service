@@ -8,11 +8,10 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
 )
 
 type ChurchDataLayerComponent interface {
-	CommandWorker() worker.UnitOfWork[repositories.CommandContext]
+	CommandWorker() worker.UnitOfWork[commands.CommandContext]
 }
 
 type ChurchEventComponent interface {
@@ -22,13 +21,13 @@ type ChurchEventComponent interface {
 }
 
 type churchEventComponentImpl struct {
-	commandWorker worker.UnitOfWork[repositories.CommandContext]
+	commandWorker worker.UnitOfWork[commands.CommandContext]
 }
 
 // CreateSession implements ChurchEventComponent.
 func (c *churchEventComponentImpl) CreateSession(ctx context.Context, input dto.CreateSessionInput, output out.Output[dto.ChurchEventSession]) {
 	var result AppExecutionResult[dto.ChurchEventSession]
-	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = c.commandWorker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.CreateChurchEventSessionCommand{
 			EventID: input.EventID,
 		}.Execute(ctx)
@@ -48,7 +47,7 @@ func (c *churchEventComponentImpl) CreateSession(ctx context.Context, input dto.
 // CreateEvent implements ChurchEventComponent.
 func (c *churchEventComponentImpl) CreateEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent]) {
 	var result AppExecutionResult[dto.ChurchEvent]
-	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = c.commandWorker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.CreateEventCommands{
 			Input: input,
 		}.Execute(ctx)
@@ -67,7 +66,7 @@ func (c *churchEventComponentImpl) CreateEvent(ctx context.Context, input dto.Ch
 // CheckIn implements ChurchEventComponent.
 func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[[]dto.CheckInEvent]) {
 	var result AppExecutionResult[[]dto.CheckInEvent]
-	_ = c.commandWorker.Execute(ctx, func(ctx repositories.CommandContext) error {
+	_ = c.commandWorker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.CheckInCommands{
 			Input: input,
 		}.Execute(ctx)

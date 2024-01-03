@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 
+	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	"github.com/redis/go-redis/v9"
 )
@@ -28,7 +29,7 @@ func (c *redisAuthContext) OtpRepository() repositories.OtpRepository {
 	return c.otpRepository
 }
 
-func NewContext(ctx context.Context, client redis.UniversalClient, txPipeline redis.Pipeliner) repositories.CommandContext {
+func NewContext(ctx context.Context, client redis.UniversalClient, txPipeline redis.Pipeliner) commands.CommandContext {
 	return &redisAuthContext{
 		otpRepository:      NewOtpRepository(ctx, client, txPipeline),
 		accountRepository:  NewAccountRepository(ctx, client, txPipeline),

@@ -7,7 +7,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
 )
 
 const (
@@ -18,7 +17,7 @@ type CreateChurchEventSessionCommand struct {
 	EventID string
 }
 
-func (cmd CreateChurchEventSessionCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.ChurchEventSession] {
+func (cmd CreateChurchEventSessionCommand) Execute(ctx CommandContext) AppExecutionResult[dto.ChurchEventSession] {
 	events, err := ctx.ChurchEventRepository().Get(cmd.EventID)
 	if err != nil {
 		return AppExecutionResult[dto.ChurchEventSession]{

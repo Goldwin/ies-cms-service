@@ -9,7 +9,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 )
 
@@ -25,7 +24,7 @@ const (
 	GenerateOtpErrorOtpExists        AppErrorCode = 20004
 )
 
-func (cmd GenerateOtpCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.OtpResult] {
+func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto.OtpResult] {
 	otp, _ := ctx.OtpRepository().GetOtp(entities.EmailAddress(cmd.Email))
 	if otp != nil {
 		expireSecond := otp.ExpiredTime.Sub(time.Now()).Seconds()

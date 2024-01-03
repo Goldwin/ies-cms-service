@@ -6,7 +6,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
 )
 
 const (
@@ -19,7 +18,7 @@ type UpdateHouseholdCommand struct {
 	Input dto.HouseHoldInput
 }
 
-func (cmd UpdateHouseholdCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.Household] {
+func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Household] {
 	householdHead, err := ctx.PersonRepository().Get(cmd.Input.HouseholdHeadPersonId)
 
 	if err != nil {

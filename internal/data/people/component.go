@@ -8,15 +8,15 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
-	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
+	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 )
 
 type peopleDataLayerComponentImpl struct {
-	commandWorker worker.UnitOfWork[repositories.CommandContext]
+	commandWorker worker.UnitOfWork[commands.CommandContext]
 }
 
 // CommandWorker implements people.PeopleDataLayerComponent.
-func (p *peopleDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[repositories.CommandContext] {
+func (p *peopleDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[commands.CommandContext] {
 	return p.commandWorker
 }
 

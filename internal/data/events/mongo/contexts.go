@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 
+	"github.com/Goldwin/ies-pik-cms/pkg/events/commands"
 	. "github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -33,7 +34,7 @@ func (c *commandContextImpl) PersonRepository() PersonRepository {
 	return c.personRepository
 }
 
-func NewCommandContext(ctx context.Context, mongo *mongo.Database) CommandContext {
+func NewCommandContext(ctx context.Context, mongo *mongo.Database) commands.CommandContext {
 	return &commandContextImpl{
 		churchEventRepository:  NewChurchEventRepository(ctx, mongo),
 		eventCheckInRepository: NewEventCheckInRepository(ctx, mongo),

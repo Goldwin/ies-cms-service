@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
-	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
+	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -14,7 +14,7 @@ type unitOfWorkImpl struct {
 }
 
 // Execute implements worker.UnitOfWork.
-func (u *unitOfWorkImpl) Execute(ctx context.Context, op worker.AtomicOperation[repositories.CommandContext]) error {
+func (u *unitOfWorkImpl) Execute(ctx context.Context, op worker.AtomicOperation[commands.CommandContext]) error {
 	db := u.mongoClient.Database("people")
 	session, err := db.Client().StartSession()
 	if err != nil {
@@ -35,7 +35,7 @@ func (u *unitOfWorkImpl) Execute(ctx context.Context, op worker.AtomicOperation[
 	return op(c)
 }
 
-func NewUnitOfWork(mongoClient *mongo.Client, useTransaction bool) worker.UnitOfWork[repositories.CommandContext] {
+func NewUnitOfWork(mongoClient *mongo.Client, useTransaction bool) worker.UnitOfWork[commands.CommandContext] {
 	return &unitOfWorkImpl{
 		mongoClient:    mongoClient,
 		useTransaction: useTransaction,

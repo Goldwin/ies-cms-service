@@ -6,7 +6,6 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
-	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
 )
 
 /*
@@ -21,7 +20,7 @@ const (
 	AddPersonErrorCodeInvalidInput AppErrorCode = 10003
 )
 
-func (cmd AddPersonCommand) Execute(ctx repositories.CommandContext) AppExecutionResult[dto.Person] {
+func (cmd AddPersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Person] {
 	var err error
 	c := cmd.Input
 	addresses := make([]entities.Address, len(c.Addresses))
