@@ -20,10 +20,22 @@ type ChurchEventComponent interface {
 	CheckIn(ctx context.Context, input dto.CheckInInput, output out.Output[[]dto.CheckInEvent])
 	CreateEvent(ctx context.Context, input dto.ChurchEvent, output out.Output[dto.ChurchEvent])
 	CreateSession(ctx context.Context, input dto.CreateSessionInput, output out.Output[dto.ChurchEventSession])
+	SearchEvent(ctx context.Context, input queries.SearchEventQuery, output out.Output[queries.SearchEventResult])
 }
 
 type churchEventComponentImpl struct {
 	commandWorker worker.UnitOfWork[commands.CommandContext]
+	queryWorker   worker.QueryWorker[queries.QueryContext]
+}
+
+// SearchEvent implements ChurchEventComponent.
+func (c *churchEventComponentImpl) SearchEvent(ctx context.Context, input queries.SearchEventQuery, output out.Output[queries.SearchEventResult]) {
+	result, err := c.queryWorker.Query(ctx).SearchEvent().Execute(input)
+	if err != nil {
+		output.OnError(AppErrorDetailWorkerFailure(err))
+	} else {
+		output.OnSuccess(result)
+	}
 }
 
 // CreateSession implements ChurchEventComponent.
@@ -87,5 +99,6 @@ func (c *churchEventComponentImpl) CheckIn(ctx context.Context, input dto.CheckI
 func NewChurchEventComponent(datalayer ChurchDataLayerComponent) ChurchEventComponent {
 	return &churchEventComponentImpl{
 		commandWorker: datalayer.CommandWorker(),
+		queryWorker:   datalayer.QueryWorker(),
 	}
 }

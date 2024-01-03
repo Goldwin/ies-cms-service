@@ -17,6 +17,8 @@ type PeopleDataLayerComponent interface {
 }
 
 type PeopleManagementComponent interface {
+	ViewPerson(context.Context, queries.ViewPersonQuery, out.Output[queries.ViewPersonResult])
+	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
 	AddPerson(context.Context, dto.Person, out.Output[dto.Person])
 	AddHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	UpdatePerson(context.Context, dto.Person, out.Output[dto.Person])
@@ -30,7 +32,26 @@ func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext
 }
 
 type peopleManagementComponent struct {
-	worker worker.UnitOfWork[commands.CommandContext]
+	worker      worker.UnitOfWork[commands.CommandContext]
+	queryWorker worker.QueryWorker[queries.QueryContext]
+}
+
+// SearchPerson implements PeopleManagementComponent.
+func (p *peopleManagementComponent) SearchPerson(ctx context.Context, input queries.SearchPersonQuery, output out.Output[queries.SearchPersonResult]) {
+	result, err := p.queryWorker.Query(ctx).SearchPerson().Execute(input)
+	if err != nil {
+		output.OnError(AppErrorDetailWorkerFailure(err))
+	}
+	output.OnSuccess(result)
+}
+
+// ViewPerson implements PeopleManagementComponent.
+func (p *peopleManagementComponent) ViewPerson(ctx context.Context, input queries.ViewPersonQuery, output out.Output[queries.ViewPersonResult]) {
+	result, err := p.queryWorker.Query(ctx).ViewPerson().Execute(input)
+	if err != nil {
+		output.OnError(AppErrorDetailWorkerFailure(err))
+	}
+	output.OnSuccess(result)
 }
 
 // AddHousehold implements PeopleManagementComponent.
@@ -104,6 +125,7 @@ func (p *peopleManagementComponent) UpdatePerson(ctx context.Context, input dto.
 
 func NewPeopleManagementComponent(data PeopleDataLayerComponent) PeopleManagementComponent {
 	return &peopleManagementComponent{
-		worker: data.CommandWorker(),
+		worker:      data.CommandWorker(),
+		queryWorker: data.QueryWorker(),
 	}
 }
