@@ -19,6 +19,12 @@ controller:
 datalayer:
   command:
     mode: "mongo"
+    db: "church-management"
+    useTransaction: false
+  query:
+    db: "church-management"
+    mode: "mongo"
+
     useTransaction: false
 middleware:
   authUrl: "http://localhost:8081/auth"

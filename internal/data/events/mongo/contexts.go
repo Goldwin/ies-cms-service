@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/events/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/events/queries"
 	. "github.com/Goldwin/ies-pik-cms/pkg/events/repositories"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -39,5 +40,20 @@ func NewCommandContext(ctx context.Context, mongo *mongo.Database) commands.Comm
 		churchEventRepository:  NewChurchEventRepository(ctx, mongo),
 		eventCheckInRepository: NewEventCheckInRepository(ctx, mongo),
 		personRepository:       NewPersonRepository(ctx, mongo),
+	}
+}
+
+type queryContextImpl struct {
+	searchEvent queries.SearchEvent
+}
+
+// SearchEvent implements queries.QueryContext.
+func (q *queryContextImpl) SearchEvent() queries.SearchEvent {
+	return q.searchEvent
+}
+
+func NewQueryContext(ctx context.Context, db *mongo.Database) queries.QueryContext {
+	return &queryContextImpl{
+		searchEvent: SearchEvent(ctx, db),
 	}
 }

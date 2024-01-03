@@ -10,7 +10,6 @@ infrastructure:
     hosts: "localhost:27017"
     username: "people-service"
     password: "abc123!"
-    db: "person"
     maxRetries: 5
     readTimeout: 5s
     writeTimeout: 5s
@@ -19,6 +18,12 @@ controller:
 datalayer:
   command:
     mode: "mongo"
+    db: "church-management"
+    useTransaction: false
+  query:
+    db: "church-management"
+    mode: "mongo"
+
     useTransaction: false
 middleware:
   authUrl: "http://localhost:8081/auth"

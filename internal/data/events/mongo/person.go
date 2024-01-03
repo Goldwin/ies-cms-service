@@ -28,6 +28,7 @@ func (p *personRepositoryImpl) GetByIds(ids []string) ([]entities.Person, error)
 	if err != nil {
 		return nil, err
 	}
+	defer res.Close(p.ctx)
 	for res.Next(p.ctx) {
 		var model Person
 		if err := res.Decode(&model); err != nil {
@@ -40,6 +41,7 @@ func (p *personRepositoryImpl) GetByIds(ids []string) ([]entities.Person, error)
 			Birthday:  model.Birthday,
 		})
 	}
+
 	return result, nil
 }
 

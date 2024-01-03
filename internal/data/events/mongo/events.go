@@ -19,9 +19,8 @@ type AgeFilter struct {
 type GenderFilter string
 
 type Location struct {
-	Name         string       `bson:"name"`
-	AgeFilter    AgeFilter    `bson:"age_filter"`
-	GenderFilter GenderFilter `bson:"gender_filter"`
+	Name      string    `bson:"name"`
+	AgeFilter AgeFilter `bson:"age_filter"`
 }
 
 type ChurchEvent struct {

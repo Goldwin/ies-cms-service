@@ -8,10 +8,12 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
+	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
 )
 
 type PeopleDataLayerComponent interface {
 	CommandWorker() worker.UnitOfWork[commands.CommandContext]
+	QueryWorker() worker.QueryWorker[queries.QueryContext]
 }
 
 type PeopleManagementComponent interface {

@@ -22,9 +22,8 @@ type AgeFilter struct {
 type GenderFilter string
 
 type Location struct {
-	Name         string
-	AgeFilter    AgeFilter
-	GenderFilter GenderFilter
+	Name      string
+	AgeFilter AgeFilter
 }
 
 type Frequency string

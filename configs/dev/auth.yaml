@@ -10,6 +10,9 @@ datalayer:
   command:
     mode: "redis"
     useTransaction: true
+  query:
+    mode: "redis"
+    useTransaction: false
 controller:
   port: 8081
 middleware:

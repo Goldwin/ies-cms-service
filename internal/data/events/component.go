@@ -9,10 +9,17 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/events"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/events/queries"
 )
 
 type churchEventDataLayerComponentImpl struct {
 	commandWorker worker.UnitOfWork[commands.CommandContext]
+	queryWorker   worker.QueryWorker[queries.QueryContext]
+}
+
+// QueryWorker implements events.ChurchDataLayerComponent.
+func (c *churchEventDataLayerComponentImpl) QueryWorker() worker.QueryWorker[queries.QueryContext] {
+	return c.queryWorker
 }
 
 // CommandWorker implements events.ChurchDataLayerComponent.
@@ -28,6 +35,7 @@ func NewChurchEventDataLayerComponent(config data.DataLayerConfig, infra infra.I
 		log.Fatalf("Command mode %s is not supported for People Management Data Layer Component", config.CommandConfig.Mode)
 	}
 	return &churchEventDataLayerComponentImpl{
-		commandWorker: mongo.NewUnitOfWork(infra.Mongo(), config.CommandConfig.UseTransaction),
+		commandWorker: mongo.NewUnitOfWork(infra.Mongo(), config.CommandConfig.DB, config.CommandConfig.UseTransaction),
+		queryWorker:   mongo.NewQueryWorker(infra.Mongo(), config.QueryConfig.DB, config.QueryConfig.UseTransaction),
 	}
 }

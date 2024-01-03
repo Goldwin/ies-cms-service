@@ -1,6 +1,8 @@
 package queries
 
-import "github.com/Goldwin/ies-pik-cms/pkg/events/dto"
+import (
+	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
+)
 
 //TODO: implement
 

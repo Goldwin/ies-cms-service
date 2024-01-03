@@ -1,6 +1,8 @@
 package queries
 
-import "github.com/Goldwin/ies-pik-cms/pkg/people/dto"
+import (
+	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
+)
 
 type ViewPersonQuery struct {
 	ID string

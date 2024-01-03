@@ -8,6 +8,7 @@ const (
 
 type WorkerConfig struct {
 	Mode           string `yaml:"mode"`
+	DB             string `yaml:"db"`
 	UseTransaction bool   `yaml:"useTransaction"`
 }
 
