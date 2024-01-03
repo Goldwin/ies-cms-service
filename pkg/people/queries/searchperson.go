@@ -7,8 +7,8 @@ import (
 //TODO: implement
 
 type SearchPersonQuery struct {
-	LastID string
-	Limit  int
+	LastID string `json:"last_id"`
+	Limit  int    `json:"limit"`
 }
 
 type SearchPersonResult struct {
