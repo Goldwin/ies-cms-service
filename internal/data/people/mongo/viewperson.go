@@ -17,7 +17,7 @@ type viewPersonImpl struct {
 // Execute implements queries.ViewPerson.
 func (v *viewPersonImpl) Execute(query queries.ViewPersonQuery) (queries.ViewPersonResult, error) {
 	person := Person{}
-	err := v.db.Collection("person").FindOne(v.ctx, bson.M{"id": query.ID}).Decode(&person)
+	err := v.db.Collection("person").FindOne(v.ctx, bson.M{"_id": query.ID}).Decode(&person)
 	if err != nil {
 		return queries.ViewPersonResult{}, err
 	}
