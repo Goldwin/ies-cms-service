@@ -17,3 +17,4 @@ controller:
   port: 8081
 middleware:
   authUrl: "http://localhost:8081/auth"
+  cors: true

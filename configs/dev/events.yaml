@@ -27,4 +27,5 @@ datalayer:
     useTransaction: false
 middleware:
   authUrl: "http://localhost:8081/auth"
+  cors: true
   
