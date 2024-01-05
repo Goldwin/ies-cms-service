@@ -52,6 +52,7 @@ func NewUnitOfWork(mongoClient *mongo.Client, databaseName string, useTransactio
 	return &unitOfWorkImpl{
 		mongoClient:    mongoClient,
 		useTransaction: useTransaction,
+		dbName:         databaseName,
 	}
 }
 
@@ -59,5 +60,6 @@ func NewQueryWorker(mongoClient *mongo.Client, databaseName string, useTransacti
 	return &queryWorkerImpl{
 		mongoClient:    mongoClient,
 		useTransaction: useTransaction,
+		dbName:         databaseName,
 	}
 }

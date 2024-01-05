@@ -24,6 +24,7 @@ func main() {
 	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)
 
 	r := gin.Default()
+	r.Use(middlewareComponent.Cors())
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

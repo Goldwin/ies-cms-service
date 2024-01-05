@@ -9,9 +9,11 @@ infrastructure:
 datalayer:
   command:
     mode: "redis"
+    db: 1
     useTransaction: true
   query:
     mode: "redis"
+    db: 1
     useTransaction: false
 controller:
   port: 8081

@@ -35,7 +35,7 @@ func InitializePeopleManagementController(
 	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
 	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
 	rg.GET("person/:id", middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
-	rg.GET("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
+	rg.POST("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
 	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
 
