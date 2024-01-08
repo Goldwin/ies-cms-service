@@ -67,6 +67,9 @@ func (e EmailAddress) IsValid() bool {
 }
 
 func (p PhoneNumber) IsValid() bool {
+	if p == "" {
+		return true
+	}
 	// Regular expression pattern for a phone number
 	pattern := `^\+?[1-9]\d{1,14}$`
 
