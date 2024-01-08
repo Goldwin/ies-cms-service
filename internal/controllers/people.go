@@ -61,7 +61,13 @@ func InitializePeopleManagementController(
 
 func (c *peopleManagementController) addPersonInfo(ctx *gin.Context) {
 	var input dto.Person
-	ctx.BindJSON(&input)
+	err := ctx.BindJSON(&input)
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	input.ID = ""
 	c.peopleComponent.AddPerson(ctx, input, &outputDecorator[dto.Person]{
 		output: nil,

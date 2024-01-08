@@ -79,34 +79,24 @@ func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult
 
 	result, err := ctx.HouseholdRepository().UpdateHousehold(household)
 
-	memberPhone := ""
-	if len(result.HouseholdHead.PhoneNumbers) > 0 {
-		memberPhone = string(result.HouseholdHead.PhoneNumbers[0])
-	}
-
 	householdHeadDto := dto.HouseholdPerson{
 		ID:           result.HouseholdHead.ID,
 		FirstName:    result.HouseholdHead.FirstName,
 		MiddleName:   result.HouseholdHead.MiddleName,
 		LastName:     result.HouseholdHead.LastName,
 		EmailAddress: string(result.HouseholdHead.EmailAddress),
-		PhoneNumber:  string(memberPhone),
+		PhoneNumber:  string(result.HouseholdHead.PhoneNumber),
 	}
 
 	householdMembersDto := make([]dto.HouseholdPerson, len(result.Members))
 
 	for i, member := range result.Members {
-
-		memberPhone = ""
-		if len(result.HouseholdHead.PhoneNumbers) > 0 {
-			memberPhone = string(result.HouseholdHead.PhoneNumbers[0])
-		}
 		householdMembersDto[i] = dto.HouseholdPerson{
 			ID:           member.ID,
 			FirstName:    member.FirstName,
 			LastName:     member.LastName,
 			EmailAddress: string(member.EmailAddress),
-			PhoneNumber:  string(memberPhone),
+			PhoneNumber:  string(member.PhoneNumber),
 		}
 	}
 

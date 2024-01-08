@@ -35,17 +35,6 @@ func ViewPerson(ctx context.Context, db *mongo.Database) queries.ViewPerson {
 }
 
 func toPersonDTO(person Person) dto.Person {
-	addresses := make([]dto.Address, len(person.Addresses))
-
-	for i, address := range person.Addresses {
-		addresses[i] = dto.Address{
-			Line1:      address.Line1,
-			Line2:      address.Line2,
-			City:       address.City,
-			Province:   address.Province,
-			PostalCode: address.PostalCode,
-		}
-	}
 
 	result := dto.Person{
 		ID:                person.ID,
@@ -53,8 +42,8 @@ func toPersonDTO(person Person) dto.Person {
 		MiddleName:        person.MiddleName,
 		LastName:          person.LastName,
 		ProfilePictureUrl: person.ProfilePictureUrl,
-		Addresses:         addresses,
-		PhoneNumbers:      person.PhoneNumbers,
+		Address:           person.Address,
+		PhoneNumber:       person.PhoneNumber,
 		EmailAddress:      person.EmailAddress,
 		MaritalStatus:     person.MaritalStatus,
 		Gender:            person.Gender,

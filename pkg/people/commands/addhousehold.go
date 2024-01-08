@@ -78,43 +78,25 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 	result, err := ctx.HouseholdRepository().AddHousehold(household)
 
-	memberEmail := ""
-	if len(result.HouseholdHead.EmailAddress) > 0 {
-		memberEmail = string(result.HouseholdHead.EmailAddress[0])
-	}
-
-	memberPhone := ""
-	if len(result.HouseholdHead.PhoneNumbers) > 0 {
-		memberPhone = string(result.HouseholdHead.PhoneNumbers[0])
-	}
-
 	householdHeadDto := dto.HouseholdPerson{
 		ID:           result.HouseholdHead.ID,
 		FirstName:    result.HouseholdHead.FirstName,
 		MiddleName:   result.HouseholdHead.MiddleName,
 		LastName:     result.HouseholdHead.LastName,
-		EmailAddress: string(memberEmail),
-		PhoneNumber:  string(memberPhone),
+		EmailAddress: string(result.HouseholdHead.EmailAddress),
+		PhoneNumber:  string(result.HouseholdHead.PhoneNumber),
 	}
 
 	householdMembersDto := make([]dto.HouseholdPerson, len(result.Members))
 
 	for i, member := range result.Members {
-		memberEmail = ""
-		if len(result.HouseholdHead.EmailAddress) > 0 {
-			memberEmail = string(result.HouseholdHead.EmailAddress[0])
-		}
 
-		memberPhone = ""
-		if len(result.HouseholdHead.PhoneNumbers) > 0 {
-			memberPhone = string(result.HouseholdHead.PhoneNumbers[0])
-		}
 		householdMembersDto[i] = dto.HouseholdPerson{
 			ID:           member.ID,
 			FirstName:    member.FirstName,
 			LastName:     member.LastName,
-			EmailAddress: string(memberEmail),
-			PhoneNumber:  string(memberPhone),
+			EmailAddress: string(member.EmailAddress),
+			PhoneNumber:  string(member.PhoneNumber),
 		}
 	}
 

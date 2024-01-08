@@ -24,22 +24,14 @@ type YearMonthDay struct {
 	Day   int
 }
 
-type Address struct {
-	Line1      string
-	Line2      string
-	City       string
-	Province   string
-	PostalCode string
-}
-
 type Person struct {
 	ID                string
 	FirstName         string
 	MiddleName        string
 	LastName          string
 	ProfilePictureUrl string
-	Addresses         []Address
-	PhoneNumbers      []PhoneNumber
+	Address           string
+	PhoneNumber       PhoneNumber
 	EmailAddress      EmailAddress
 	MaritalStatus     string
 	Birthday          *YearMonthDay
@@ -55,10 +47,8 @@ func (p *Person) Validate() error {
 		return fmt.Errorf("invalid email: %s", p.EmailAddress)
 	}
 
-	for _, phone := range p.PhoneNumbers {
-		if !phone.IsValid() {
-			return fmt.Errorf("invalid phone number: %s", phone)
-		}
+	if !p.PhoneNumber.IsValid() {
+		return fmt.Errorf("invalid phone number: %s", p.PhoneNumber)
 	}
 
 	if p.Birthday != nil && !p.Birthday.IsValid() {

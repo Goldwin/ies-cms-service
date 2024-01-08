@@ -8,7 +8,6 @@ type corsMiddleware struct {
 
 func (c *corsMiddleware) Cors(ctx *gin.Context) {
 	if !c.enabled {
-		ctx.Next()
 		return
 	}
 
@@ -21,6 +20,4 @@ func (c *corsMiddleware) Cors(ctx *gin.Context) {
 		ctx.AbortWithStatus(204)
 		return
 	}
-
-	ctx.Next()
 }

@@ -101,7 +101,7 @@ func toHouseholdMemberEntities(e HouseholdMember) entities.Person {
 		LastName:          e.LastName,
 		ProfilePictureUrl: e.ProfilePictureUrl,
 		EmailAddress:      entities.EmailAddress(e.Email),
-		PhoneNumbers:      []entities.PhoneNumber{entities.PhoneNumber(e.PhoneNumber)},
+		PhoneNumber:       entities.PhoneNumber(e.PhoneNumber),
 	}
 }
 
@@ -123,7 +123,7 @@ func toHouseholdMemberModel(e entities.Person) HouseholdMember {
 		LastName:          e.LastName,
 		ProfilePictureUrl: e.ProfilePictureUrl,
 		Email:             string(e.EmailAddress),
-		PhoneNumber:       string(e.PhoneNumbers[0]),
+		PhoneNumber:       string(e.PhoneNumber),
 	}
 }
 

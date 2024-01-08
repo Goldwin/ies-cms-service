@@ -12,25 +12,17 @@ import (
 )
 
 type Person struct {
-	ID                string    `bson:"_id"`
-	FirstName         string    `bson:"firstName"`
-	MiddleName        string    `bson:"middleName"`
-	LastName          string    `bson:"lastName"`
-	ProfilePictureUrl string    `bson:"profilePictureUrl"`
-	Addresses         []Address `bson:"addresses"`
-	PhoneNumbers      []string  `bson:"phoneNumbers"`
-	EmailAddress      string    `bson:"emailAddress"`
-	MaritalStatus     string    `bson:"maritalStatus"`
-	Birthday          *string   `bson:"birthday"`
-	Gender            string    `bson:"gender"`
-}
-
-type Address struct {
-	Line1      string `bson:"line1"`
-	Line2      string `bson:"line2"`
-	City       string `bson:"city"`
-	Province   string `bson:"province"`
-	PostalCode string `bson:"postalCode"`
+	ID                string  `bson:"_id"`
+	FirstName         string  `bson:"firstName"`
+	MiddleName        string  `bson:"middleName"`
+	LastName          string  `bson:"lastName"`
+	ProfilePictureUrl string  `bson:"profilePictureUrl"`
+	Address           string  `bson:"address"`
+	PhoneNumber       string  `bson:"phoneNumber"`
+	EmailAddress      string  `bson:"emailAddress"`
+	MaritalStatus     string  `bson:"maritalStatus"`
+	Birthday          *string `bson:"birthday"`
+	Gender            string  `bson:"gender"`
 }
 
 type personRepositoryImpl struct {
@@ -93,16 +85,6 @@ func (p *personRepositoryImpl) UpdatePerson(person entities.Person) (*entities.P
 }
 
 func toPersonMongoModel(e entities.Person) Person {
-	addresses := make([]Address, len(e.Addresses))
-	for i, address := range e.Addresses {
-		addresses[i] = Address(address)
-	}
-
-	phones := make([]string, len(e.PhoneNumbers))
-	for i, phone := range e.PhoneNumbers {
-		phones[i] = string(phone)
-	}
-
 	var birthday *string
 	if e.Birthday != nil {
 		str := fmt.Sprintf("%04d-%02d-%02d", e.Birthday.Year, e.Birthday.Month, e.Birthday.Day)
@@ -117,8 +99,8 @@ func toPersonMongoModel(e entities.Person) Person {
 		MiddleName:        e.MiddleName,
 		LastName:          e.LastName,
 		ProfilePictureUrl: e.ProfilePictureUrl,
-		Addresses:         addresses,
-		PhoneNumbers:      phones,
+		Address:           e.Address,
+		PhoneNumber:       string(e.PhoneNumber),
 		EmailAddress:      string(e.EmailAddress),
 		MaritalStatus:     e.MaritalStatus,
 		Birthday:          birthday,
@@ -128,14 +110,10 @@ func toPersonMongoModel(e entities.Person) Person {
 
 func toPersonEntities(p Person) entities.Person {
 	var birthday *entities.YearMonthDay
-	addresses := make([]entities.Address, len(p.Addresses))
-	for i, address := range p.Addresses {
-		addresses[i] = entities.Address(address)
-	}
 
-	phones := make([]entities.PhoneNumber, len(p.PhoneNumbers))
+	phones := make([]entities.PhoneNumber, len(p.PhoneNumber))
 
-	for i, phone := range p.PhoneNumbers {
+	for i, phone := range p.PhoneNumber {
 		phones[i] = entities.PhoneNumber(phone)
 	}
 
@@ -152,8 +130,8 @@ func toPersonEntities(p Person) entities.Person {
 		MiddleName:        p.MiddleName,
 		LastName:          p.LastName,
 		ProfilePictureUrl: p.ProfilePictureUrl,
-		Addresses:         addresses,
-		PhoneNumbers:      phones,
+		Address:           p.Address,
+		PhoneNumber:       entities.PhoneNumber(p.PhoneNumber),
 		EmailAddress:      entities.EmailAddress(p.EmailAddress),
 		MaritalStatus:     p.MaritalStatus,
 		Birthday:          birthday,

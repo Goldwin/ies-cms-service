@@ -22,8 +22,8 @@ type Person struct {
 	MiddleName        string        `json:"middle_name"`
 	LastName          string        `json:"last_name"`
 	ProfilePictureUrl string        `json:"profile_picture_url"`
-	Addresses         []Address     `json:"addresses"`
-	PhoneNumbers      []string      `json:"phone_numbers"`
+	Address           string        `json:"address"`
+	PhoneNumber       string        `json:"phone_number"`
 	EmailAddress      string        `json:"email_address"`
 	MaritalStatus     string        `json:"marital_status"`
 	Birthday          *YearMonthDay `json:"birthday"`
@@ -31,7 +31,7 @@ type Person struct {
 }
 
 func (y *YearMonthDay) ToEntity() *entities.YearMonthDay {
-	if y == nil {
+	if y == nil || *y == "" {
 		return nil
 	}
 	var ymd entities.YearMonthDay

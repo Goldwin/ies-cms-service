@@ -24,13 +24,9 @@ const (
 func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Person] {
 	var err error
 	c := cmd.Input
-	addresses := make([]entities.Address, len(c.Addresses))
-	for i, address := range c.Addresses {
-		addresses[i] = entities.Address(address)
-	}
 
-	phones := make([]entities.PhoneNumber, len(c.PhoneNumbers))
-	for i, phone := range c.PhoneNumbers {
+	phones := make([]entities.PhoneNumber, len(c.PhoneNumber))
+	for i, phone := range c.PhoneNumber {
 		phones[i] = entities.PhoneNumber(phone)
 	}
 
@@ -51,8 +47,8 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 		FirstName:         c.FirstName,
 		MiddleName:        c.MiddleName,
 		LastName:          c.LastName,
-		Addresses:         addresses,
-		PhoneNumbers:      phones,
+		Address:           c.Address,
+		PhoneNumber:       entities.PhoneNumber(c.PhoneNumber),
 		ProfilePictureUrl: c.ProfilePictureUrl,
 		EmailAddress:      entities.EmailAddress(c.EmailAddress),
 		MaritalStatus:     c.MaritalStatus,
