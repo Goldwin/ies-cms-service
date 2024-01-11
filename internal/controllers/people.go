@@ -160,7 +160,13 @@ func (c *peopleManagementController) viewPerson(ctx *gin.Context) {
 
 func (c *peopleManagementController) searchPerson(ctx *gin.Context) {
 	var input queries.SearchPersonQuery
-	ctx.BindQuery(&input)
+	err := ctx.BindJSON(&input)
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 	c.peopleComponent.SearchPerson(ctx, input, &outputDecorator[queries.SearchPersonResult]{
 		output: nil,
 		errFunction: func(err commands.AppErrorDetail) {
