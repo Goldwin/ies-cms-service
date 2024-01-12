@@ -6,6 +6,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	"github.com/Goldwin/ies-pik-cms/internal/config"
 	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
+	"github.com/Goldwin/ies-pik-cms/internal/data"
 	authData "github.com/Goldwin/ies-pik-cms/internal/data/auth"
 	eventData "github.com/Goldwin/ies-pik-cms/internal/data/events"
 	peopleData "github.com/Goldwin/ies-pik-cms/internal/data/people"
@@ -26,7 +27,18 @@ func main() {
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	peopleDataLayer := peopleData.NewPeopleDataLayerComponent(config.DataConfig, infraComponent)
-	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig, infraComponent)
+	authDataLayer := authData.NewAuthDataLayerComponent(data.DataLayerConfig{
+		CommandConfig: &data.WorkerConfig{
+			Mode:           "redis",
+			DB:             "",
+			UseTransaction: true,
+		},
+		QueryConfig: &data.WorkerConfig{
+			Mode:           "redis",
+			DB:             "",
+			UseTransaction: true,
+		},
+	}, infraComponent)
 	eventDataLayer := eventData.NewChurchEventDataLayerComponent(config.DataConfig, infraComponent)
 
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
