@@ -1,0 +1,55 @@
+package main
+
+import (
+	"net/http"
+
+	"github.com/Goldwin/ies-pik-cms/internal/bus"
+	"github.com/Goldwin/ies-pik-cms/internal/config"
+	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
+	authData "github.com/Goldwin/ies-pik-cms/internal/data/auth"
+	eventData "github.com/Goldwin/ies-pik-cms/internal/data/events"
+	peopleData "github.com/Goldwin/ies-pik-cms/internal/data/people"
+
+	out "github.com/Goldwin/ies-pik-cms/internal/out/auth"
+
+	"github.com/Goldwin/ies-pik-cms/internal/infra"
+	"github.com/Goldwin/ies-pik-cms/internal/middleware"
+
+	"github.com/Goldwin/ies-pik-cms/pkg/auth"
+	"github.com/Goldwin/ies-pik-cms/pkg/events"
+	"github.com/Goldwin/ies-pik-cms/pkg/people"
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	config := config.LoadConfig("cms")
+
+	infraComponent := infra.NewInfraComponent(config.InfraConfig)
+	peopleDataLayer := peopleData.NewPeopleDataLayerComponent(config.DataConfig, infraComponent)
+	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig, infraComponent)
+	eventDataLayer := eventData.NewChurchEventDataLayerComponent(config.DataConfig, infraComponent)
+
+	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
+	peopleManagementComponent := people.NewPeopleManagementComponent(peopleDataLayer)
+	churchEventComponent := events.NewChurchEventComponent(eventDataLayer)
+
+	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
+	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)
+
+	authOutputComponent := out.NewAuthOutputComponent(eventBusComponent)
+
+	r := gin.Default()
+	r.Use(middlewareComponent.Cors())
+
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent, eventBusComponent)
+	controller.InitializeAuthController(r, authComponent, eventBusComponent, authOutputComponent, middlewareComponent)
+	controller.InitializeEventsController(r, middlewareComponent, churchEventComponent, eventBusComponent)
+
+	r.Run()
+}
