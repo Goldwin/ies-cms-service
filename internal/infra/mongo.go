@@ -10,9 +10,9 @@ import (
 )
 
 type MongoConfig struct {
-	Hosts    string `yaml:"hosts" default:"127.0.0.1:27017"`
-	Username string `yaml:"username" default:""`
-	Password string `yaml:"password" default:""`
+	Hosts    string `env:"MONGO_URL" yaml:"hosts" default:"127.0.0.1:27017"`
+	Username string `env:"MONGO_USERNAME" yaml:"username" default:""`
+	Password string `env:"MONGO_PASSWORD" yaml:"password" default:""`
 }
 
 func NewMongoClient(m *MongoConfig) *mongo.Client {

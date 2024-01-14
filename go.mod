@@ -3,6 +3,7 @@ module github.com/Goldwin/ies-pik-cms
 go 1.21.1
 
 require (
+	github.com/caarlos0/env/v10 v10.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.5.0

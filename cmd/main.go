@@ -23,10 +23,10 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig("cms")
+	config := config.LoadConfigEnv()
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
-	peopleDataLayer := peopleData.NewPeopleDataLayerComponent(config.DataConfig, infraComponent)
+	peopleDataLayer := peopleData.NewPeopleDataLayerComponent(config.DataConfig["PEOPLE"], infraComponent)
 	authDataLayer := authData.NewAuthDataLayerComponent(data.DataLayerConfig{
 		CommandConfig: &data.WorkerConfig{
 			Mode:           "redis",
@@ -39,7 +39,7 @@ func main() {
 			UseTransaction: true,
 		},
 	}, infraComponent)
-	eventDataLayer := eventData.NewChurchEventDataLayerComponent(config.DataConfig, infraComponent)
+	eventDataLayer := eventData.NewChurchEventDataLayerComponent(config.DataConfig["EVENTS"], infraComponent)
 
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
 	peopleManagementComponent := people.NewPeopleManagementComponent(peopleDataLayer)

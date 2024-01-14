@@ -18,7 +18,7 @@ func main() {
 	config := config.LoadConfig("events")
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
-	dataLayerComponent := data.NewChurchEventDataLayerComponent(config.DataConfig, infraComponent)
+	dataLayerComponent := data.NewChurchEventDataLayerComponent(config.DataConfig["EVENTS"], infraComponent)
 	churchEventComponent := events.NewChurchEventComponent(dataLayerComponent)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)

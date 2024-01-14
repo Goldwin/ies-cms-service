@@ -10,13 +10,13 @@ import (
 )
 
 type RedisConfig struct {
-	Hosts          string        `yaml:"hosts" default:"127.0.0.1:6379"`
-	Username       string        `yaml:"username" default:""`
-	Password       string        `yaml:"password" default:""`
-	MaxRetries     int           `yaml:"maxRetries" default:"3"`
-	ReadTimeout    time.Duration `yaml:"readTimeout"`
-	WriteTimeout   time.Duration `yaml:"writeTimeout"`
-	RouteByLatency bool          `yaml:"routeByLatency"`
+	Hosts          string        `env:"REDIS_URL" yaml:"hosts" default:"127.0.0.1:6379"`
+	Username       string        `env:"REDIS_USERNAME" yaml:"username" default:""`
+	Password       string        `env:"REDIS_PASSWORD" yaml:"password" default:""`
+	MaxRetries     int           `env:"REDIS_MAX_RETRIES" yaml:"maxRetries" default:"3"`
+	ReadTimeout    time.Duration `env:"REDIS_READ_TIMEOUT" yaml:"readTimeout"`
+	WriteTimeout   time.Duration `env:"REDIS_WRITE_TIMEOUT" yaml:"writeTimeout"`
+	RouteByLatency bool          `env:"REDIS_ROUTE_BY_LATENCY" yaml:"routeByLatency"`
 }
 
 func NewRedisClient(r *RedisConfig) redis.UniversalClient {

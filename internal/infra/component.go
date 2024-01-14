@@ -6,8 +6,8 @@ import (
 )
 
 type InfraConfig struct {
-	RedisConfig *RedisConfig `yaml:"redis"`
-	MongoConfig *MongoConfig `yaml:"mongo"`
+	RedisConfig RedisConfig `yaml:"redis"`
+	MongoConfig MongoConfig `yaml:"mongo"`
 }
 
 type InfraComponent interface {
@@ -30,7 +30,7 @@ func (i *infraComponentImpl) Mongo() *mongo.Client {
 
 func NewInfraComponent(config InfraConfig) InfraComponent {
 	return &infraComponentImpl{
-		redisClient: NewRedisClient(config.RedisConfig),
-		mongoClient: NewMongoClient(config.MongoConfig),
+		redisClient: NewRedisClient(&config.RedisConfig),
+		mongoClient: NewMongoClient(&config.MongoConfig),
 	}
 }

@@ -18,7 +18,7 @@ func main() {
 	config := config.LoadConfig("people")
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
-	dataLayerComponent := peopleData.NewPeopleDataLayerComponent(config.DataConfig, infraComponent)
+	dataLayerComponent := peopleData.NewPeopleDataLayerComponent(config.DataConfig["PEOPLE"], infraComponent)
 	peopleManagementComponent := people.NewPeopleManagementComponent(dataLayerComponent)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)

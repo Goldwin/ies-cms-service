@@ -7,9 +7,9 @@ const (
 )
 
 type WorkerConfig struct {
-	Mode           string `yaml:"mode"`
-	DB             string `yaml:"db"`
-	UseTransaction bool   `yaml:"useTransaction"`
+	Mode           string `env:"WORKER_MODE" yaml:"mode"`
+	DB             string `env:"WORKER_DB" yaml:"db"`
+	UseTransaction bool   `env:"WORKER_USE_TRANSACTION" yaml:"useTransaction"`
 }
 
 type DataLayerConfig struct {
