@@ -24,7 +24,6 @@ datalayer:
   query:
     db: "church-management"
     mode: "mongo"
-
     useTransaction: false
 middleware:
   authUrl: "http://localhost:8080/auth"
