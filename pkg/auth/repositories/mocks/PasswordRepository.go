@@ -20,48 +20,6 @@ func (_m *PasswordRepository) EXPECT() *PasswordRepository_Expecter {
 	return &PasswordRepository_Expecter{mock: &_m.Mock}
 }
 
-// Add provides a mock function with given fields: _a0
-func (_m *PasswordRepository) Add(_a0 entities.PasswordDetail) error {
-	ret := _m.Called(_a0)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(entities.PasswordDetail) error); ok {
-		r0 = rf(_a0)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// PasswordRepository_Add_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Add'
-type PasswordRepository_Add_Call struct {
-	*mock.Call
-}
-
-// Add is a helper method to define mock.On call
-//   - _a0 entities.PasswordDetail
-func (_e *PasswordRepository_Expecter) Add(_a0 interface{}) *PasswordRepository_Add_Call {
-	return &PasswordRepository_Add_Call{Call: _e.mock.On("Add", _a0)}
-}
-
-func (_c *PasswordRepository_Add_Call) Run(run func(_a0 entities.PasswordDetail)) *PasswordRepository_Add_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.PasswordDetail))
-	})
-	return _c
-}
-
-func (_c *PasswordRepository_Add_Call) Return(_a0 error) *PasswordRepository_Add_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *PasswordRepository_Add_Call) RunAndReturn(run func(entities.PasswordDetail) error) *PasswordRepository_Add_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // Get provides a mock function with given fields: _a0
 func (_m *PasswordRepository) Get(_a0 entities.EmailAddress) (*entities.PasswordDetail, error) {
 	ret := _m.Called(_a0)
@@ -112,6 +70,48 @@ func (_c *PasswordRepository_Get_Call) Return(_a0 *entities.PasswordDetail, _a1 
 }
 
 func (_c *PasswordRepository_Get_Call) RunAndReturn(run func(entities.EmailAddress) (*entities.PasswordDetail, error)) *PasswordRepository_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Save provides a mock function with given fields: _a0
+func (_m *PasswordRepository) Save(_a0 entities.PasswordDetail) error {
+	ret := _m.Called(_a0)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(entities.PasswordDetail) error); ok {
+		r0 = rf(_a0)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// PasswordRepository_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
+type PasswordRepository_Save_Call struct {
+	*mock.Call
+}
+
+// Save is a helper method to define mock.On call
+//   - _a0 entities.PasswordDetail
+func (_e *PasswordRepository_Expecter) Save(_a0 interface{}) *PasswordRepository_Save_Call {
+	return &PasswordRepository_Save_Call{Call: _e.mock.On("Save", _a0)}
+}
+
+func (_c *PasswordRepository_Save_Call) Run(run func(_a0 entities.PasswordDetail)) *PasswordRepository_Save_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(entities.PasswordDetail))
+	})
+	return _c
+}
+
+func (_c *PasswordRepository_Save_Call) Return(_a0 error) *PasswordRepository_Save_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *PasswordRepository_Save_Call) RunAndReturn(run func(entities.PasswordDetail) error) *PasswordRepository_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }
