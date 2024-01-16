@@ -49,9 +49,9 @@ func (o *otpOutputHandler) OnSuccess(result dto.OtpResult) {
 func newOtpOutputHandler() out.Output[dto.OtpResult] {
 	//TODO fix this.
 	return &otpOutputHandler{
-		SenderEmail:     os.Getenv("EMAIL_ADDRESS"),
-		SenderName:      os.Getenv("no-reply <PCO@iespik.org>"),
-		SenderPassword:  []byte(os.Getenv("EMAIL_PASSWORD")),
+		SenderEmail:     os.Getenv("EMAIL_SENDER_ADDRESS"),
+		SenderName:      fmt.Sprintf("no-reply <%s>", os.Getenv("EMAIL_SENDER_ADDRESS")),
+		SenderPassword:  []byte(os.Getenv("EMAIL_SENDER_PASSWORD")),
 		SMTPHost:        "smtp.gmail.com",
 		SMTPPort:        587,
 		SubjectTemplate: "%v is your OTP for IES Pik App",
