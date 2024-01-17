@@ -13,6 +13,7 @@ type redisEventBusComponentImpl struct {
 	redisClient redis.UniversalClient
 }
 
+// TODO switch with consumer group type of pubsub when we have more than 1 service node
 func (r *redisEventBusComponentImpl) Publish(ctx context.Context, event common.Event) error {
 	bytes, err := msgpack.Marshal(event)
 	if err != nil {
