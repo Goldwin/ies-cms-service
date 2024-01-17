@@ -21,7 +21,7 @@ func main() {
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
-	eventBus := bus.NewRedisEventBusComponent(infraComponent)
+	eventBus := bus.Redis(infraComponent)
 	authOutputComponent := out.NewAuthOutputComponent(eventBus)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 

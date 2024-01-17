@@ -21,7 +21,7 @@ func main() {
 	dataLayerComponent := data.NewChurchEventDataLayerComponent(config.DataConfig["EVENTS"], infraComponent)
 	churchEventComponent := events.NewChurchEventComponent(dataLayerComponent)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
-	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)
+	eventBusComponent := bus.Redis(infraComponent)
 
 	r := gin.Default()
 

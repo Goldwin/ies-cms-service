@@ -21,7 +21,7 @@ func main() {
 	dataLayerComponent := peopleData.NewPeopleDataLayerComponent(config.DataConfig["PEOPLE"], infraComponent)
 	peopleManagementComponent := people.NewPeopleManagementComponent(dataLayerComponent)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
-	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)
+	eventBusComponent := bus.Redis(infraComponent)
 
 	r := gin.Default()
 	r.Use(middlewareComponent.Cors())

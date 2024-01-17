@@ -46,7 +46,7 @@ func main() {
 	churchEventComponent := events.NewChurchEventComponent(eventDataLayer)
 
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
-	eventBusComponent := bus.NewRedisEventBusComponent(infraComponent)
+	eventBusComponent := bus.Local()
 
 	authOutputComponent := out.NewAuthOutputComponent(eventBusComponent)
 
