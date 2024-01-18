@@ -10,7 +10,6 @@ type localEventBusComponentImpl struct {
 	subscribers map[string][]common.Consumer
 }
 
-// TODO switch with consumer group type of pubsub when we have more than 1 service node
 func (l *localEventBusComponentImpl) Publish(ctx context.Context, event common.Event) error {
 
 	if l.subscribers[event.Topic] != nil {
