@@ -87,10 +87,7 @@ func (a *authComponentImpl) CompleteRegistration(ctx context.Context, input dto.
 	var result AppExecutionResult[dto.AuthData]
 	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.CompleteRegistrationCommand{
-			FirstName:  input.FirstName,
-			MiddleName: input.MiddleName,
-			LastName:   input.LastName,
-			Email:      input.Email,
+			Input: input,
 		}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
 			return result.Error

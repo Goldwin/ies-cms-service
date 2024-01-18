@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
@@ -14,17 +15,15 @@ const (
 	CompleteRegistrationErrorAccountIsNotRegistered AppErrorCode = 20203
 	CompleteRegistrationErrorFailedToGetAccount     AppErrorCode = 20203
 	CompleteRegistrationErrorInvalidInput           AppErrorCode = 20204
+	CompleteRegistrationErrorPasswordMismatch       AppErrorCode = 20205
 )
 
 type CompleteRegistrationCommand struct {
-	FirstName  string
-	MiddleName string
-	LastName   string
-	Email      string
+	Input dto.CompleteRegistrationInput
 }
 
 func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthData] {
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
+	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Input.Email))
 	if err != nil {
 		return AppExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
@@ -54,7 +53,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 		}
 	}
 
-	if cmd.FirstName == "" || cmd.LastName == "" {
+	if cmd.Input.FirstName == "" || cmd.Input.LastName == "" {
 		return AppExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
 			Error: AppErrorDetail{
@@ -64,10 +63,20 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 		}
 	}
 
+	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
+		return AppExecutionResult[dto.AuthData]{
+			Status: ExecutionStatusFailed,
+			Error: AppErrorDetail{
+				Code:    CompleteRegistrationErrorInvalidInput,
+				Message: fmt.Sprintf("Password and Confirm Password should be same"),
+			},
+		}
+	}
+
 	account.Person = entities.Person{
-		FirstName:  cmd.FirstName,
-		MiddleName: cmd.MiddleName,
-		LastName:   cmd.LastName,
+		FirstName:  cmd.Input.FirstName,
+		MiddleName: cmd.Input.MiddleName,
+		LastName:   cmd.Input.LastName,
 	}
 	account.Roles = []entities.Role{
 		entities.ChurchMember,
@@ -82,6 +91,21 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 				Code:    CompleteRegistrationErrorUpdateFailure,
 				Message: fmt.Sprintf("Failed to Update Account: %s", err.Error()),
 			},
+		}
+	}
+
+	result := SavePasswordCommand{
+		Input: dto.PasswordInput{
+			Email:           cmd.Input.Email,
+			Password:        []byte(cmd.Input.Password),
+			ConfirmPassword: []byte(cmd.Input.ConfirmPassword),
+		},
+	}.Execute(ctx)
+
+	if result.Status != ExecutionStatusSuccess {
+		return AppExecutionResult[dto.AuthData]{
+			Status: ExecutionStatusFailed,
+			Error:  result.Error,
 		}
 	}
 

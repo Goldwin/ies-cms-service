@@ -39,7 +39,7 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto
 		}
 	}
 	//30 seconds minimum
-	ttlMillis := getMax(cmd.TTLMillis, 30000)
+	ttlMillis := max(cmd.TTLMillis, 30000)
 	password, err := rand.Int(rand.Reader, big.NewInt(999999))
 	if err != nil {
 		return AppExecutionResult[dto.OtpResult]{
@@ -98,11 +98,4 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto
 		Email: cmd.Email,
 		OTP:   passwordBytes,
 	}}
-}
-
-func getMax(a, b int64) int64 {
-	if a >= b {
-		return a
-	}
-	return b
 }
