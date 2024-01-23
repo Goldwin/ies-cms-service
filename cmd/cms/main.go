@@ -22,6 +22,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Monolithic API. This contains all modules as 1 service
 func main() {
 	config := config.LoadConfigEnv()
 

@@ -16,7 +16,7 @@ import (
 )
 
 type Config struct {
-	Secret           []byte
+	Secret           []byte                          `env:"SECRET"`
 	ServiceName      string                          `env:"SERVICE_NAME,expand"`
 	InfraConfig      infra.InfraConfig               `yaml:"infrastructure"`
 	DataConfig       map[string]data.DataLayerConfig `yaml:"datalayer"`
@@ -26,19 +26,12 @@ type Config struct {
 
 func LoadConfigEnv() Config {
 	config := Config{
-		Secret: []byte("secret"),
+		Secret: []byte(os.Getenv("SECRET_KEY")),
 	}
 	envName := os.Getenv("env")
 	serviceName := os.Getenv("SERVICE_NAME")
 	if envName == "" {
 		envName = "dev"
-	}
-
-	secretKeyFile := fmt.Sprintf("%s/configs/%s/secret.key", os.Getenv("ROOT_DIR"), envName)
-	buf, err := os.ReadFile(secretKeyFile)
-
-	if err != nil {
-		log.Fatalf("Failed to parse key file: %v", err)
 	}
 
 	opts := env.Options{
@@ -74,7 +67,6 @@ func LoadConfigEnv() Config {
 		}
 	}
 
-	config.Secret = buf
 	return config
 }
 

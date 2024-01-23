@@ -11,7 +11,7 @@ import (
 
 type RedisConfig struct {
 	Hosts          string        `env:"REDIS_URL" yaml:"hosts" default:"127.0.0.1:6379"`
-	Username       string        `env:"REDIS_USERNAME" yaml:"username" default:""`
+	Username       string        `env:"REDIS_USERNAME" yaml:"username" default:"default"`
 	Password       string        `env:"REDIS_PASSWORD" yaml:"password" default:""`
 	MaxRetries     int           `env:"REDIS_MAX_RETRIES" yaml:"maxRetries" default:"3"`
 	ReadTimeout    time.Duration `env:"REDIS_READ_TIMEOUT" yaml:"readTimeout"`
@@ -28,6 +28,7 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 	addresses := strings.Split(r.Hosts, ",")
 	option = redis.UniversalOptions{
 		Addrs:          addresses,
+		Username:       r.Username,
 		Password:       r.Password,
 		MaxRetries:     r.MaxRetries,
 		ReadTimeout:    r.ReadTimeout,
