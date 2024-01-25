@@ -59,6 +59,7 @@ func (a *authComponentImpl) Start() {
 
 // Stop implements AuthComponent.
 func (a *authComponentImpl) Stop() {
+	log.Default().Printf("Auth Component Stopped!")
 }
 
 // Auth implements AuthComponent.

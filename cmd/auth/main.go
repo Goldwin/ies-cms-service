@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig("auth")
+	config := config.LoadConfigEnv()
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)

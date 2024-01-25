@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig("events")
+	config := config.LoadConfigEnv()
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	dataLayerComponent := data.NewChurchEventDataLayerComponent(config.DataConfig["EVENTS"], infraComponent)

@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig("people")
+	config := config.LoadConfigEnv()
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	dataLayerComponent := peopleData.NewPeopleDataLayerComponent(config.DataConfig["PEOPLE"], infraComponent)
