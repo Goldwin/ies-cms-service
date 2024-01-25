@@ -67,3 +67,23 @@ jobs:
 
       - name: Verify deployment
         run: kubectl rollout status deployment/cms-service -n ies
+  clean:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.IES_PIK_TOKEN }}
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Clean Up old images from Container Registry
+        uses: ripplr-io/docr-image-remove@v1
+        with:
+          image_repository: ies-cms-service
+          buffer_size: 2
+
+      - name: Run registry garbage collector
+        run: doctl registry garbage-collection start
