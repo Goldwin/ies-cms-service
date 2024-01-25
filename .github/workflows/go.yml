@@ -86,4 +86,4 @@ jobs:
           buffer_size: 2
 
       - name: Run registry garbage collector
-        run: doctl registry garbage-collection start
+        run: doctl registry garbage-collection start --force
