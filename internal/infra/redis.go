@@ -28,9 +28,7 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 		return nil
 	}
 	addresses := strings.Split(r.Hosts, ",")
-	tlsConfig := &tls.Config{
-		MinVersion: tls.VersionTLS12,
-	}
+	tlsConfig := &tls.Config{}
 	if !r.UseTLS {
 		tlsConfig = nil
 	}
