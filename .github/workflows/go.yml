@@ -41,8 +41,7 @@ jobs:
 
       - name: Update deployment file
         run: |
-          ls
-          ls $GITHUB_WORKSPACE
+          ls deployment
           TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/brightfellow/ies-cms-service:'${TAG}'|' ./deployment/config/ies-cms-service/deployment.yml
 
       - name: Update SHA
