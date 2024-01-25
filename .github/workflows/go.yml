@@ -42,3 +42,22 @@ jobs:
 
       - name: Push image to DigitalOcean Container Registry
         run: docker push registry.digitalocean.com/brightfellow/ies-cms-service:$(echo $GITHUB_SHA | head -c7)
+
+      - name: Fetch Deployment Config
+        uses: actions/checkout@v4
+        with:
+          repository: "Goldwin/ies-cms-deployment"
+          token: ${{ secrets.IES_CMS_SECRET_KEY }}
+          path: deployment
+
+      - name: Update deployment file
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/brightfellow/ies-cms-service:'${TAG}'|' $GITHUB_WORKSPACE/deployment/config/ies-cms-service/deployment.yml
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ies-k8s-cluster
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f $GITHUB_WORKSPACE/deployment/config/ies-cms-service/deployment.yml
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/cms-service
