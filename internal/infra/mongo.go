@@ -21,6 +21,7 @@ func NewMongoClient(m *MongoConfig) *mongo.Client {
 		return nil
 	}
 
+	log.Default().Printf("Initializing Mongo. Connecting to %s", m.Hosts)
 	mongoClient, err := mongo.Connect(
 		context.Background(),
 		options.Client().SetHosts(strings.Split(m.Hosts, ",")),

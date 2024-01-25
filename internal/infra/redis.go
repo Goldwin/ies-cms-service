@@ -40,6 +40,7 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 	} else {
 		log.Fatal("Failed to parse redis config")
 	}
+	log.Default().Printf("Initializing Redis. Connecting to %s", r.Hosts)
 	str, err := redisClient.Ping(context.Background()).Result()
 	if err != nil || str != "PONG" {
 		log.Fatal("Failed to connect redis")
