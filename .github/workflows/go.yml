@@ -47,7 +47,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: "Goldwin/ies-cms-deployment"
-          token: ${{ secrets.IES_CMS_DEPLOYMENT_TOKEN }}
+          ssh-key: ${{ secrets.IES_CMS_SECRET_KEY }}
+          ref: main
           path: deployment
 
       - name: Update deployment file
