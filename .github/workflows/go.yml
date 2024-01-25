@@ -31,6 +31,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Update SHA
+        run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/_meta
+
+      - name: Build container image
+        run: docker build -t registry.digitalocean.com/brightfellow/ies-cms-service:$(echo $GITHUB_SHA | head -c7) .
+
       - name: Fetch Deployment Config
         uses: actions/checkout@v4
         with:
@@ -40,15 +46,7 @@ jobs:
           path: deployment
 
       - name: Update deployment file
-        run: |
-          ls deployment
-          TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/brightfellow/ies-cms-service:'${TAG}'|' ./deployment/config/ies-cms-service/deployment.yaml
-
-      - name: Update SHA
-        run: echo $GITHUB_SHA > $GITHUB_WORKSPACE/_meta
-
-      - name: Build container image
-        run: docker build -t registry.digitalocean.com/brightfellow/ies-cms-service:$(echo $GITHUB_SHA | head -c7) .
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/brightfellow/ies-cms-service:'${TAG}'|' ./deployment/config/ies-cms-service/deployment.yaml
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
