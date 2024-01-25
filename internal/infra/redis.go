@@ -2,6 +2,7 @@ package infra
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ type RedisConfig struct {
 	ReadTimeout    time.Duration `env:"REDIS_READ_TIMEOUT" yaml:"readTimeout"`
 	WriteTimeout   time.Duration `env:"REDIS_WRITE_TIMEOUT" yaml:"writeTimeout"`
 	RouteByLatency bool          `env:"REDIS_ROUTE_BY_LATENCY" yaml:"routeByLatency"`
+	UseTLS         bool          `env:"REDIS_USE_TLS" yaml:"useTLS" default:"true"`
 }
 
 func NewRedisClient(r *RedisConfig) redis.UniversalClient {
@@ -26,6 +28,12 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 		return nil
 	}
 	addresses := strings.Split(r.Hosts, ",")
+	tlsConfig := &tls.Config{
+		MinVersion: tls.VersionTLS12,
+	}
+	if !r.UseTLS {
+		tlsConfig = nil
+	}
 	option = redis.UniversalOptions{
 		Addrs:          addresses,
 		Username:       r.Username,
@@ -34,6 +42,7 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 		ReadTimeout:    r.ReadTimeout,
 		WriteTimeout:   r.WriteTimeout,
 		RouteByLatency: r.RouteByLatency,
+		TLSConfig:      tlsConfig,
 	}
 	if r != nil {
 		redisClient = redis.NewUniversalClient(&option)
