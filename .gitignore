@@ -1,3 +1,4 @@
 *.exe
 *configs/prod/*
 env.txt
+.DS_Store

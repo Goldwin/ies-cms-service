@@ -101,6 +101,7 @@
         "CMS_REDIS_URL": "localhost:6379",
         "CMS_REDIS_USERNAME": "default",
         "CMS_REDIS_PASSWORD": "",
+        "CMS_REDIS_USE_TLS": "false",
         "CMS_USE_CORS": "true",
         "CMS_DATA_MODE": "mongo",
         "CMS_CONTROLLER_PORT": "8082",

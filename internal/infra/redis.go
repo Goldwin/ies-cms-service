@@ -41,6 +41,7 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 		WriteTimeout:   r.WriteTimeout,
 		RouteByLatency: r.RouteByLatency,
 		TLSConfig:      tlsConfig,
+		DB:             0,
 	}
 	if r != nil {
 		redisClient = redis.NewUniversalClient(&option)
