@@ -90,7 +90,7 @@
         "AUTH_REDIS_URL": "localhost:6379",
         "AUTH_REDIS_USERNAME": "default",
         "AUTH_REDIS_PASSWORD": "",
-        "AUTH_REDIS_USE_TLS": "true",
+        "AUTH_REDIS_USE_TLS": "false",
         "AUTH_SERVICE_URL": "localhost:8080",
         "GLOBAL_REDIS_URL": "localhost:6379",
         "AUTH_DATA_MODE": "redis",
