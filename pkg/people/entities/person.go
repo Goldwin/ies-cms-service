@@ -59,6 +59,9 @@ func (p *Person) Validate() error {
 }
 
 func (e EmailAddress) IsValid() bool {
+	if e == "" {
+		return true
+	}
 	_, err := mail.ParseAddress(string(e))
 	if err != nil {
 		return false
