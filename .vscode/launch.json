@@ -167,7 +167,7 @@
 
         "CMS_MONGO_URL": "mongodb://localhost:27017",
         "CMS_MONGO_DB": "church-management",
-        "CMS_MONGO_USERNAME": "cms-service",
+        "CMS_MONGO_USERNAME": "ies-cms-service",
         "CMS_MONGO_PASSWORD": "abc123!",
         "CMS_MONGO_MAX_RETRY": "5",
         "CMS_MONGO_READ_TIMEOUT": "5s",
