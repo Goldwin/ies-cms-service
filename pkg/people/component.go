@@ -41,8 +41,9 @@ func (p *peopleManagementComponent) SearchPerson(ctx context.Context, input quer
 	result, err := p.queryWorker.Query(ctx).SearchPerson().Execute(input)
 	if err != nil {
 		output.OnError(AppErrorDetailWorkerFailure(err))
+	} else {
+		output.OnSuccess(result)
 	}
-	output.OnSuccess(result)
 }
 
 // ViewPerson implements PeopleManagementComponent.
@@ -50,8 +51,9 @@ func (p *peopleManagementComponent) ViewPerson(ctx context.Context, input querie
 	result, err := p.queryWorker.Query(ctx).ViewPerson().Execute(input)
 	if err != nil {
 		output.OnError(AppErrorDetailWorkerFailure(err))
+	} else {
+		output.OnSuccess(result)
 	}
-	output.OnSuccess(result)
 }
 
 // AddHousehold implements PeopleManagementComponent.

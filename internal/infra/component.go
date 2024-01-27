@@ -12,25 +12,25 @@ type InfraConfig struct {
 
 type InfraComponent interface {
 	Redis() redis.UniversalClient
-	Mongo() *mongo.Client
+	Mongo() *mongo.Database
 }
 
 type infraComponentImpl struct {
 	redisClient redis.UniversalClient
-	mongoClient *mongo.Client
+	mongoClient *mongo.Database
 }
 
 func (i *infraComponentImpl) Redis() redis.UniversalClient {
 	return i.redisClient
 }
 
-func (i *infraComponentImpl) Mongo() *mongo.Client {
+func (i *infraComponentImpl) Mongo() *mongo.Database {
 	return i.mongoClient
 }
 
 func NewInfraComponent(config InfraConfig) InfraComponent {
 	return &infraComponentImpl{
 		redisClient: NewRedisClient(&config.RedisConfig),
-		mongoClient: NewMongoClient(&config.MongoConfig),
+		mongoClient: NewMongoDatabase(&config.MongoConfig),
 	}
 }

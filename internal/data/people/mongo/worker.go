@@ -10,25 +10,25 @@ import (
 )
 
 type unitOfWorkImpl struct {
-	mongoClient    *mongo.Client
+	mongoDatabase  *mongo.Database
 	useTransaction bool
 	dbName         string
 }
 
 type queryWorkerImpl struct {
-	mongoClient    *mongo.Client
+	mongoDatabase  *mongo.Database
 	dbName         string
 	useTransaction bool
 }
 
 // Query implements worker.QueryWorker.
 func (q *queryWorkerImpl) Query(ctx context.Context) queries.QueryContext {
-	return NewQueryContext(ctx, q.mongoClient.Database(q.dbName))
+	return NewQueryContext(ctx, q.mongoDatabase)
 }
 
 // Execute implements worker.UnitOfWork.
 func (u *unitOfWorkImpl) Execute(ctx context.Context, op worker.AtomicOperation[commands.CommandContext]) error {
-	db := u.mongoClient.Database(u.dbName)
+	db := u.mongoDatabase
 	session, err := db.Client().StartSession()
 	if err != nil {
 		return err
@@ -48,18 +48,16 @@ func (u *unitOfWorkImpl) Execute(ctx context.Context, op worker.AtomicOperation[
 	return op(c)
 }
 
-func NewUnitOfWork(mongoClient *mongo.Client, databaseName string, useTransaction bool) worker.UnitOfWork[commands.CommandContext] {
+func NewUnitOfWork(mongoDatabase *mongo.Database, useTransaction bool) worker.UnitOfWork[commands.CommandContext] {
 	return &unitOfWorkImpl{
-		mongoClient:    mongoClient,
+		mongoDatabase:  mongoDatabase,
 		useTransaction: useTransaction,
-		dbName:         databaseName,
 	}
 }
 
-func NewQueryWorker(mongoClient *mongo.Client, databaseName string, useTransaction bool) worker.QueryWorker[queries.QueryContext] {
+func NewQueryWorker(mongoDatabase *mongo.Database, useTransaction bool) worker.QueryWorker[queries.QueryContext] {
 	return &queryWorkerImpl{
-		mongoClient:    mongoClient,
+		mongoDatabase:  mongoDatabase,
 		useTransaction: useTransaction,
-		dbName:         databaseName,
 	}
 }

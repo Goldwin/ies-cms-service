@@ -2,6 +2,8 @@ package mongo
 
 import (
 	"context"
+	"errors"
+	"log"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
@@ -20,7 +22,8 @@ func (s *searchPersonImpl) Execute(query queries.SearchPersonQuery) (queries.Sea
 	opts := options.Find().SetSort(bson.D{{Key: "_id", Value: 1}}).SetLimit(int64(query.Limit))
 	cursor, err := s.db.Collection("person").Find(s.ctx, bson.M{"_id": bson.M{"$gt": query.LastID}}, opts)
 	if err != nil {
-		return queries.SearchPersonResult{}, err
+		log.Default().Printf("Failed to connect to database: %s", err.Error())
+		return queries.SearchPersonResult{}, errors.New("Failed to connect to database")
 	}
 	defer cursor.Close(s.ctx)
 	var result = make([]dto.Person, 0)
@@ -28,7 +31,7 @@ func (s *searchPersonImpl) Execute(query queries.SearchPersonQuery) (queries.Sea
 	for cursor.Next(s.ctx) {
 		var person Person
 		if err := cursor.Decode(&person); err != nil {
-			return queries.SearchPersonResult{}, err
+			return queries.SearchPersonResult{}, errors.New("Failed to decode person information.")
 		}
 		result = append(result, toPersonDTO(person))
 	}

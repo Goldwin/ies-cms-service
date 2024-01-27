@@ -35,7 +35,7 @@ func NewChurchEventDataLayerComponent(config data.DataLayerConfig, infra infra.I
 		log.Fatalf("Command mode %s is not supported for People Management Data Layer Component", config.CommandConfig.Mode)
 	}
 	return &churchEventDataLayerComponentImpl{
-		commandWorker: mongo.NewUnitOfWork(infra.Mongo(), config.CommandConfig.DB, config.CommandConfig.UseTransaction),
-		queryWorker:   mongo.NewQueryWorker(infra.Mongo(), config.QueryConfig.DB, config.QueryConfig.UseTransaction),
+		commandWorker: mongo.NewUnitOfWork(infra.Mongo(), config.CommandConfig.UseTransaction),
+		queryWorker:   mongo.NewQueryWorker(infra.Mongo(), config.QueryConfig.UseTransaction),
 	}
 }
