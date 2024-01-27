@@ -28,9 +28,8 @@ func NewMongoDatabase(m *MongoConfig) *mongo.Database {
 		context.Background(),
 		options.Client().ApplyURI(m.URI),
 		options.Client().SetAuth(options.Credential{
-			Username:   m.Username,
-			Password:   m.Password,
-			AuthSource: m.DbName,
+			Username: m.Username,
+			Password: m.Password,
 		}),
 	)
 	if err != nil {
