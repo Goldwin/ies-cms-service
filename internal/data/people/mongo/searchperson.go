@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
@@ -20,7 +21,18 @@ type searchPersonImpl struct {
 // Execute implements queries.SearchPerson.
 func (s *searchPersonImpl) Execute(query queries.SearchPersonQuery) (queries.SearchPersonResult, error) {
 	opts := options.Find().SetSort(bson.D{{Key: "_id", Value: 1}}).SetLimit(int64(query.Limit))
-	cursor, err := s.db.Collection("person").Find(s.ctx, bson.M{"_id": bson.M{"$gt": query.LastID}}, opts)
+	regexOp := "$regex"
+	cursor, err := s.db.Collection("person").Find(s.ctx,
+		bson.M{
+			"_id": bson.M{"$gt": query.LastID},
+			"$or": []interface{}{
+				bson.M{"firstName": bson.M{regexOp: fmt.Sprintf("^%s", query.NamePrefix)}},
+				bson.M{"middleName": bson.M{regexOp: fmt.Sprintf("^%s", query.NamePrefix)}},
+				bson.M{"lastName": bson.M{regexOp: fmt.Sprintf("^%s", query.NamePrefix)}},
+			},
+		},
+		opts,
+	)
 	if err != nil {
 		log.Default().Printf("Failed to connect to database: %s", err.Error())
 		return queries.SearchPersonResult{}, errors.New("Failed to connect to database")

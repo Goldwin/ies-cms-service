@@ -4,11 +4,10 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 )
 
-//TODO: implement
-
 type SearchPersonQuery struct {
-	LastID string `json:"last_id"`
-	Limit  int    `json:"limit"`
+	LastID     string `json:"last_id"`
+	NamePrefix string `json:"name_prefix"`
+	Limit      int    `json:"limit"`
 }
 
 type SearchPersonResult struct {
