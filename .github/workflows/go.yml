@@ -66,7 +66,7 @@ jobs:
         run: kubectl apply -f $GITHUB_WORKSPACE/deployment/config/ies-cms-service/deployment.yaml
 
       - name: Verify deployment
-        run: kubectl rollout status deployment/cms-service -n ies
+        run: kubectl rollout status deployment/cms-service -n iespik
   clean:
     runs-on: ubuntu-latest
     needs: deploy
