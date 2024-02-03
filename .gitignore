@@ -2,3 +2,4 @@
 *configs/prod/*
 env.txt
 .DS_Store
+*__debug*
