@@ -22,6 +22,5 @@ type HouseHoldInput struct {
 	ID                    string   `json:"id"`
 	Name                  string   `json:"name"`
 	HouseholdHeadPersonId string   `json:"head_person_id"`
-	PictureUrl            string   `json:"picture_url"`
 	MemberPersonsIds      []string `json:"member_person_ids"`
 }

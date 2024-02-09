@@ -73,7 +73,6 @@ func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) CommandExecutionRe
 		HouseholdHead: *householdHead,
 		Members:       persons,
 		Name:          cmd.Input.Name,
-		PictureUrl:    cmd.Input.PictureUrl,
 		ID:            cmd.Input.ID,
 	}
 

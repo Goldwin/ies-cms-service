@@ -73,7 +73,6 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) CommandExecutionResul
 		HouseholdHead: *householdHead,
 		Members:       persons,
 		Name:          cmd.Input.Name,
-		PictureUrl:    cmd.Input.PictureUrl,
 	}
 
 	result, err := ctx.HouseholdRepository().AddHousehold(household)
