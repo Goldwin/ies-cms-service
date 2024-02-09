@@ -61,6 +61,9 @@ func (p *personRepositoryImpl) Get(id string) (*entities.Person, error) {
 // ListByID implements repositories.PersonRepository.
 func (p *personRepositoryImpl) ListByID(id []string) ([]entities.Person, error) {
 	models := make([]Person, 0)
+	if len(id) == 0 {
+		return make([]entities.Person, 0), nil
+	}
 	result, err := p.collection.Find(p.ctx, bson.M{"_id": bson.M{"$in": id}})
 	if err != nil {
 		return nil, err
