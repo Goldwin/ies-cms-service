@@ -42,11 +42,9 @@ func (h *householdRepositoryImpl) AddHousehold(e entities.Household) (*entities.
 	}
 	personIds[totalMembers-1] = e.HouseholdHead.ID
 
-	h.personHouseholdCollection.UpdateMany(h.ctx,
-		bson.M{"personID": bson.M{"$in": personIds}},
-		bson.M{"$set": bson.M{"householdID": e.ID}},
-		options.Update().SetUpsert(true),
-	)
+	for _, id := range personIds {
+		h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
+	}
 
 	if err != nil {
 		return nil, err
@@ -74,7 +72,7 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 		return nil, err
 	}
 
-	_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": toHouseholdModel(e)})
+	_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": newHousehold})
 
 	totalMembers := len(e.Members) + 1
 
@@ -96,21 +94,21 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 	personIds[totalMembers-1] = e.HouseholdHead.ID
 
 	//replace member's household id with new ids
-	_, err = h.personHouseholdCollection.UpdateMany(h.ctx,
-		bson.M{"personID": bson.M{"$in": personIds}},
-		bson.M{"$set": bson.M{"householdID": newHousehold.ID}},
-		options.Update().SetUpsert(true),
-	)
+	for _, member := range e.Members {
+		h.personHouseholdCollection.UpdateByID(h.ctx, member.ID, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = h.personHouseholdCollection.UpdateMany(h.ctx,
-		bson.M{"personID": bson.M{"$in": personIds}},
-		bson.M{"$set": bson.M{"householdID": ""}},
-		options.Update().SetUpsert(true),
-	)
+	for _, id := range oldPersonIds {
+		h.personHouseholdCollection.UpdateByID(h.ctx,
+			id,
+			bson.M{"$set": bson.M{"householdID": ""}},
+			options.Update().SetUpsert(true),
+		)
+	}
 
 	return &e, nil
 }
