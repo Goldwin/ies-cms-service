@@ -5,11 +5,11 @@ import (
 
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
+	q "github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
-	q "github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
 type PeopleDataLayerComponent interface {
@@ -21,9 +21,10 @@ type PeopleManagementComponent interface {
 	ViewPerson(context.Context, queries.ViewPersonQuery, out.Output[queries.ViewPersonResult])
 	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
 	AddPerson(context.Context, dto.Person, out.Output[dto.Person])
-	AddHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	UpdatePerson(context.Context, dto.Person, out.Output[dto.Person])
+	AddHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	UpdateHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
+	ViewHouseholdByPerson(context.Context, queries.ViewHouseholdByPersonQuery, out.Output[queries.ViewHouseholdByPersonResult])
 }
 
 func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext]) PeopleManagementComponent {
@@ -35,6 +36,16 @@ func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext
 type peopleManagementComponent struct {
 	worker      worker.UnitOfWork[commands.CommandContext]
 	queryWorker worker.QueryWorker[queries.QueryContext]
+}
+
+// ViewHouseholdByPerson implements PeopleManagementComponent.
+func (p *peopleManagementComponent) ViewHouseholdByPerson(ctx context.Context, input queries.ViewHouseholdByPersonQuery, output out.Output[queries.ViewHouseholdByPersonResult]) {
+	result, err := p.queryWorker.Query(ctx).ViewHouseholdByPerson().Execute(input)
+	if err != q.NoQueryError {
+		output.OnError(out.ConvertQueryErrorDetail(err))
+	} else {
+		output.OnSuccess(result)
+	}
 }
 
 // SearchPerson implements PeopleManagementComponent.

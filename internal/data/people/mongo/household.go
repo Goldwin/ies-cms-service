@@ -10,28 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Household struct {
-	ID               string            `bson:"_id"`
-	Name             string            `bson:"name"`
-	HouseholdHead    HouseholdMember   `bson:"householdHead"`
-	PictureUrl       string            `bson:"pictureUrl"`
-	HouseholdMembers []HouseholdMember `bson:"householdMembers"`
-}
-
-type HouseholdMember struct {
-	PersonID          string `bson:"personID"`
-	FirstName         string `bson:"firstName"`
-	LastName          string `bson:"lastName"`
-	ProfilePictureUrl string `bson:"profilePictureUrl"`
-	Email             string `bson:"email"`
-	PhoneNumber       string `bson:"phoneNumber"`
-}
-
-type PersonHousehold struct {
-	ID          string `bson:"_id"`
-	HouseholdID string `bson:"householdID"`
-}
-
 type householdRepositoryImpl struct {
 	ctx                       context.Context
 	db                        *mongo.Database
@@ -132,63 +110,4 @@ func NewHouseholdRepository(ctx context.Context, db *mongo.Database) repositorie
 		householdCollection:       db.Collection("household"),
 		personHouseholdCollection: db.Collection("personHousehold"),
 	}
-}
-
-func toHouseholdEntities(householdModel Household) entities.Household {
-	return entities.Household{
-		ID:            householdModel.ID,
-		Name:          householdModel.Name,
-		HouseholdHead: toHouseholdMemberEntities(householdModel.HouseholdHead),
-		PictureUrl:    householdModel.PictureUrl,
-		Members:       getMembersEntities(householdModel),
-	}
-}
-
-func toHouseholdMemberEntities(e HouseholdMember) entities.Person {
-	return entities.Person{
-		ID:                e.PersonID,
-		FirstName:         e.FirstName,
-		LastName:          e.LastName,
-		ProfilePictureUrl: e.ProfilePictureUrl,
-		EmailAddress:      entities.EmailAddress(e.Email),
-		PhoneNumber:       entities.PhoneNumber(e.PhoneNumber),
-	}
-}
-
-func toHouseholdModel(e entities.Household) *Household {
-	householdMembers := getMembersModel(e)
-	return &Household{
-		ID:               e.ID,
-		Name:             e.Name,
-		HouseholdHead:    toHouseholdMemberModel(e.HouseholdHead),
-		PictureUrl:       e.PictureUrl,
-		HouseholdMembers: householdMembers,
-	}
-}
-
-func toHouseholdMemberModel(e entities.Person) HouseholdMember {
-	return HouseholdMember{
-		PersonID:          e.ID,
-		FirstName:         e.FirstName,
-		LastName:          e.LastName,
-		ProfilePictureUrl: e.ProfilePictureUrl,
-		Email:             string(e.EmailAddress),
-		PhoneNumber:       string(e.PhoneNumber),
-	}
-}
-
-func getMembersEntities(e Household) []entities.Person {
-	householdMembers := make([]entities.Person, 0)
-	for _, member := range e.HouseholdMembers {
-		householdMembers = append(householdMembers, toHouseholdMemberEntities(member))
-	}
-	return householdMembers
-}
-
-func getMembersModel(e entities.Household) []HouseholdMember {
-	householdMembers := make([]HouseholdMember, 0)
-	for _, member := range e.Members {
-		householdMembers = append(householdMembers, toHouseholdMemberModel(member))
-	}
-	return householdMembers
 }

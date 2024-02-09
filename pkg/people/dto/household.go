@@ -1,12 +1,13 @@
 package dto
 
 type HouseholdPerson struct {
-	ID           string
-	FirstName    string
-	MiddleName   string
-	LastName     string
-	PhoneNumber  string
-	EmailAddress string
+	ID                string
+	FirstName         string
+	MiddleName        string
+	LastName          string
+	PhoneNumber       string
+	EmailAddress      string
+	ProfilePictureUrl string
 }
 
 type Household struct {

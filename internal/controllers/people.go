@@ -35,6 +35,7 @@ func InitializePeopleManagementController(
 	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
 	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
 	rg.GET("person/:id", middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
+	rg.GET("person/:id/household", middlewareComponent.Auth("PERSON_VIEW"), c.viewPersonHousehold)
 	rg.POST("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
 	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
@@ -153,6 +154,23 @@ func (c *peopleManagementController) viewPerson(ctx *gin.Context) {
 			})
 		},
 		successFunc: func(result queries.ViewPersonResult) {
+			ctx.JSON(200, result)
+		},
+	})
+}
+
+func (c *peopleManagementController) viewPersonHousehold(ctx *gin.Context) {
+	id := ctx.Param("id")
+	c.peopleComponent.ViewHouseholdByPerson(ctx, queries.ViewHouseholdByPersonQuery{
+		PersonID: id,
+	}, &outputDecorator[queries.ViewHouseholdByPersonResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(err.Code, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(result queries.ViewHouseholdByPersonResult) {
 			ctx.JSON(200, result)
 		},
 	})
