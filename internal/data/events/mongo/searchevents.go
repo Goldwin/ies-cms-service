@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 
+	. "github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/queries"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,23 +17,29 @@ type searchEventImpl struct {
 }
 
 // Execute implements queries.SearchEvent.
-func (s *searchEventImpl) Execute(query queries.SearchEventQuery) (queries.SearchEventResult, error) {
+func (s *searchEventImpl) Execute(query queries.SearchEventQuery) (queries.SearchEventResult, QueryErrorDetail) {
 	opts := options.Find().SetSort(bson.D{{Key: "_id", Value: 1}}).SetLimit(int64(query.Limit))
 	cursor, err := s.db.Collection("event").Find(s.ctx, bson.M{"_id": bson.M{"$gt": query.LastID}}, opts)
 	if err != nil {
-		return queries.SearchEventResult{}, err
+		return queries.SearchEventResult{}, QueryErrorDetail{
+			Code:    500,
+			Message: "Failed to connect to database",
+		}
 	}
 	events := make([]dto.ChurchEvent, 0)
 	defer cursor.Close(s.ctx)
 	for cursor.Next(s.ctx) {
 		var event ChurchEvent
 		if err := cursor.Decode(&event); err != nil {
-			return queries.SearchEventResult{}, err
+			return queries.SearchEventResult{}, QueryErrorDetail{
+				Code:    500,
+				Message: "Failed to Decode Event Information",
+			}
 		}
 		events = append(events, toEventDTO(event))
 	}
 
-	return queries.SearchEventResult{}, nil
+	return queries.SearchEventResult{}, NoQueryError
 }
 
 func toEventDTO(event ChurchEvent) dto.ChurchEvent {

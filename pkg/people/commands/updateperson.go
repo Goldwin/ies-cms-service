@@ -16,12 +16,12 @@ type UpdatePersonCommand struct {
 }
 
 const (
-	UpdatePersonErrorCodeUserNotExist AppErrorCode = 10102
-	UpdatePersonErrorCodeEmailsExist  AppErrorCode = 10102
-	UpdatePersonErrorCodeInvalidInput AppErrorCode = 10103
+	UpdatePersonErrorCodeUserNotExist CommandErrorCode = 10102
+	UpdatePersonErrorCodeEmailsExist  CommandErrorCode = 10102
+	UpdatePersonErrorCodeInvalidInput CommandErrorCode = 10103
 )
 
-func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Person] {
+func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Person] {
 	var err error
 	c := cmd.Input
 
@@ -33,9 +33,9 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 	personResult, err := ctx.PersonRepository().Get(c.ID)
 
 	if personResult == nil {
-		return AppExecutionResult[dto.Person]{
+		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    UpdatePersonErrorCodeUserNotExist,
 				Message: fmt.Sprintf("Can't Update Person Info, Error: Person with id %s does not exist", c.ID),
 			},
@@ -59,9 +59,9 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 	err = person.Validate()
 
 	if err != nil {
-		return AppExecutionResult[dto.Person]{
+		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddPersonErrorCodeInvalidInput,
 				Message: fmt.Sprintf("Can't Update Person Info, Error: %s", err.Error()),
 			},
@@ -71,9 +71,9 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 	result, err := ctx.PersonRepository().UpdatePerson(person)
 
 	if err != nil {
-		return AppExecutionResult[dto.Person]{
+		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddHouseholdErrorCodeDBError,
 				Message: fmt.Sprintf("Can't Add Update Person Info, Error: %s", err.Error()),
 			},
@@ -83,9 +83,9 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 	output := cmd.Input
 	output.ID = result.ID
 
-	return AppExecutionResult[dto.Person]{
+	return CommandExecutionResult[dto.Person]{
 		Status: ExecutionStatusSuccess,
-		Error:  AppErrorDetailNone,
+		Error:  CommandErrorDetailNone,
 		Result: output,
 	}
 }

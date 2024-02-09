@@ -18,20 +18,20 @@ type GenerateOtpCommand struct {
 }
 
 const (
-	GenerateOtpErrorInvalidEmail     AppErrorCode = 20001
-	GenerateOtpErrorFailedToGenOtp   AppErrorCode = 20002
-	GenerateOtpErrorFailedToStoreOtp AppErrorCode = 20003
-	GenerateOtpErrorOtpExists        AppErrorCode = 20004
+	GenerateOtpErrorInvalidEmail     CommandErrorCode = 20001
+	GenerateOtpErrorFailedToGenOtp   CommandErrorCode = 20002
+	GenerateOtpErrorFailedToStoreOtp CommandErrorCode = 20003
+	GenerateOtpErrorOtpExists        CommandErrorCode = 20004
 )
 
-func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto.OtpResult] {
+func (cmd GenerateOtpCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.OtpResult] {
 	otp, _ := ctx.OtpRepository().GetOtp(entities.EmailAddress(cmd.Email))
 	if otp != nil {
 		expireSecond := otp.ExpiredTime.Sub(time.Now()).Seconds()
 		if expireSecond > 0 {
-			return AppExecutionResult[dto.OtpResult]{
+			return CommandExecutionResult[dto.OtpResult]{
 				Status: ExecutionStatusFailed,
-				Error: AppErrorDetail{
+				Error: CommandErrorDetail{
 					Code:    GenerateOtpErrorOtpExists,
 					Message: fmt.Sprintf("OTP Already Exists. Please wait for %.0f seconds and try again.", expireSecond),
 				},
@@ -42,9 +42,9 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto
 	ttlMillis := max(cmd.TTLMillis, 30000)
 	password, err := rand.Int(rand.Reader, big.NewInt(999999))
 	if err != nil {
-		return AppExecutionResult[dto.OtpResult]{
+		return CommandExecutionResult[dto.OtpResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorFailedToGenOtp,
 				Message: fmt.Sprintf("Failed to Generate OTP: %s", err.Error()),
 			},
@@ -53,11 +53,11 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto
 
 	salt, err := rand.Int(rand.Reader, big.NewInt(999999))
 	if err != nil {
-		return AppExecutionResult[dto.OtpResult]{
+		return CommandExecutionResult[dto.OtpResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorFailedToGenOtp,
-				Message: fmt.Sprintf("Failed to Generate OTP: %s", err.Error()),
+				Message: fmt.Sprintf("Failed to Generate OTP's Salt: %s", err.Error()),
 			},
 		}
 	}
@@ -75,9 +75,9 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto
 	}
 
 	if !result.EmailAddress.IsValid() {
-		return AppExecutionResult[dto.OtpResult]{
+		return CommandExecutionResult[dto.OtpResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorInvalidEmail,
 				Message: "Invalid Email Address",
 			},
@@ -86,15 +86,15 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) AppExecutionResult[dto
 
 	err = ctx.OtpRepository().AddOtp(result)
 	if err != nil {
-		return AppExecutionResult[dto.OtpResult]{
+		return CommandExecutionResult[dto.OtpResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorFailedToStoreOtp,
 				Message: fmt.Sprintf("Failed to Generate OTP: %s", err.Error()),
 			},
 		}
 	}
-	return AppExecutionResult[dto.OtpResult]{Status: ExecutionStatusSuccess, Result: dto.OtpResult{
+	return CommandExecutionResult[dto.OtpResult]{Status: ExecutionStatusSuccess, Result: dto.OtpResult{
 		Email: cmd.Email,
 		OTP:   passwordBytes,
 	}}

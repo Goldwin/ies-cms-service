@@ -8,7 +8,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/bus/common"
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	auth "github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
@@ -49,7 +49,7 @@ func InitializePeopleManagementController(
 			LastName:     authData.LastName,
 		}, &outputDecorator[dto.Person]{
 			output: nil,
-			errFunction: func(err commands.AppErrorDetail) {
+			errFunction: func(err out.AppErrorDetail) {
 				log.Printf("Consuming topic %v failed. Error: %s", event.Topic, err.Error())
 			},
 			successFunc: func(person dto.Person) {
@@ -71,7 +71,7 @@ func (c *peopleManagementController) addPersonInfo(ctx *gin.Context) {
 	input.ID = ""
 	c.peopleComponent.AddPerson(ctx, input, &outputDecorator[dto.Person]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})
@@ -90,7 +90,7 @@ func (c *peopleManagementController) addHousehold(ctx *gin.Context) {
 	input.ID = ""
 	c.peopleComponent.AddHousehold(ctx, input, &outputDecorator[dto.Household]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})
@@ -109,7 +109,7 @@ func (c *peopleManagementController) updateHousehold(ctx *gin.Context) {
 	input.ID = ctx.Param("id")
 	c.peopleComponent.UpdateHousehold(ctx, input, &outputDecorator[dto.Household]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})
@@ -128,7 +128,7 @@ func (c *peopleManagementController) updatePersonInfo(ctx *gin.Context) {
 	input.ID = ctx.Param("id")
 	c.peopleComponent.UpdatePerson(ctx, input, &outputDecorator[dto.Person]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})
@@ -147,8 +147,8 @@ func (c *peopleManagementController) viewPerson(ctx *gin.Context) {
 		ID: id,
 	}, &outputDecorator[queries.ViewPersonResult]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
-			ctx.AbortWithStatusJSON(500, gin.H{
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(err.Code, gin.H{
 				"error": err.Error(),
 			})
 		},
@@ -169,8 +169,8 @@ func (c *peopleManagementController) searchPerson(ctx *gin.Context) {
 	}
 	c.peopleComponent.SearchPerson(ctx, input, &outputDecorator[queries.SearchPersonResult]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
-			ctx.AbortWithStatusJSON(500, gin.H{
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(err.Code, gin.H{
 				"error": err.Error(),
 			})
 		},

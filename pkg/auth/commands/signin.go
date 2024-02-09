@@ -18,14 +18,14 @@ const (
 	SigninMethodPassword SigninMethod = "password"
 	SigninMethodOTP      SigninMethod = "otp"
 
-	SigninErrorFailedToGetOtp                   AppErrorCode = 20101
-	SigninErrorOtpExired                        AppErrorCode = 20102
-	SigninErrorWrongOtp                         AppErrorCode = 20103
-	SigninErrorFailedToCreateToken              AppErrorCode = 20104
-	SigninErrorOTPNotFound                      AppErrorCode = 20105
-	SigninErrorOTPFailedToInvalidateOTP         AppErrorCode = 20106
-	SignInErrorPasswordFailedToGetAccountDetail AppErrorCode = 20107
-	SignInErrorFailedToCreateNewAccount         AppErrorCode = 20108
+	SigninErrorFailedToGetOtp                   CommandErrorCode = 20101
+	SigninErrorOtpExired                        CommandErrorCode = 20102
+	SigninErrorWrongOtp                         CommandErrorCode = 20103
+	SigninErrorFailedToCreateToken              CommandErrorCode = 20104
+	SigninErrorOTPNotFound                      CommandErrorCode = 20105
+	SigninErrorOTPFailedToInvalidateOTP         CommandErrorCode = 20106
+	SignInErrorPasswordFailedToGetAccountDetail CommandErrorCode = 20107
+	SignInErrorFailedToCreateNewAccount         CommandErrorCode = 20108
 )
 
 type SigninCommand struct {
@@ -35,29 +35,29 @@ type SigninCommand struct {
 	SecretKey []byte
 }
 
-func (cmd SigninCommand) Execute(ctx CommandContext) AppExecutionResult[dto.SignInResult] {
+func (cmd SigninCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.SignInResult] {
 	if cmd.Method == SigninMethodPassword {
 		return cmd.passwordLogin(ctx)
 	}
 	return cmd.otpSignIn(ctx)
 }
 
-func (cmd SigninCommand) passwordLogin(ctx CommandContext) AppExecutionResult[dto.SignInResult] {
+func (cmd SigninCommand) passwordLogin(ctx CommandContext) CommandExecutionResult[dto.SignInResult] {
 	passwordRepository := ctx.PasswordRepository()
 	password, err := passwordRepository.Get(entities.EmailAddress(cmd.Email))
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SignInErrorPasswordFailedToGetAccountDetail,
 				Message: fmt.Sprintf("Failed to Get Account Detail: %s", err.Error()),
 			},
 		}
 	}
 	if password == nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorOTPNotFound,
 				Message: "Wrong Email or Password. Please try again.",
 			},
@@ -67,9 +67,9 @@ func (cmd SigninCommand) passwordLogin(ctx CommandContext) AppExecutionResult[dt
 	passwordHash := sha256.Sum256(append(cmd.Password, password.Salt...))
 
 	if !bytes.Equal(password.PasswordHash, passwordHash[:]) {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorWrongOtp,
 				Message: "Wrong Email or Password. Please try again.",
 			},
@@ -79,11 +79,11 @@ func (cmd SigninCommand) passwordLogin(ctx CommandContext) AppExecutionResult[dt
 	tokenString, err := cmd.createToken()
 
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorFailedToCreateToken,
-				Message: fmt.Sprintf("Error When Requesting Access Token: %s", err.Error()),
+				Message: fmt.Sprintf("Error When Creating Access Token: %s", err.Error()),
 			},
 		}
 	}
@@ -91,16 +91,16 @@ func (cmd SigninCommand) passwordLogin(ctx CommandContext) AppExecutionResult[dt
 	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
 
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SignInErrorPasswordFailedToGetAccountDetail,
 				Message: fmt.Sprintf("Failed to Get Account Detail: %s", err.Error()),
 			},
 		}
 	}
 
-	return AppExecutionResult[dto.SignInResult]{
+	return CommandExecutionResult[dto.SignInResult]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.SignInResult{
 			AccessToken: tokenString,
@@ -109,23 +109,23 @@ func (cmd SigninCommand) passwordLogin(ctx CommandContext) AppExecutionResult[dt
 	}
 }
 
-func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.SignInResult] {
+func (cmd SigninCommand) otpSignIn(ctx CommandContext) CommandExecutionResult[dto.SignInResult] {
 	otpRepository := ctx.OtpRepository()
 	accountRepository := ctx.AccountRepository()
 	otp, err := otpRepository.GetOtp(entities.EmailAddress(cmd.Email))
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorFailedToGetOtp,
 				Message: fmt.Sprintf("Failed to Get OTP: %s", err.Error()),
 			},
 		}
 	}
 	if otp == nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorOTPNotFound,
 				Message: "OTP Not Found. Please try again.",
 			},
@@ -133,9 +133,9 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 	}
 
 	if otp.ExpiredTime.Before(time.Now()) {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorOtpExired,
 				Message: "OTP Expired. Please try again.",
 			},
@@ -148,9 +148,9 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 	isMatching := bytes.Equal(passwordHash[:], otp.PasswordHash[:])
 
 	if !isMatching {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorWrongOtp,
 				Message: "Wrong Email Or Wrong Password. Please try again.",
 			},
@@ -160,9 +160,9 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 	tokenString, err := cmd.createToken()
 
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorFailedToGetOtp,
 				Message: fmt.Sprintf("Error When Requesting Access Token: %s", err.Error()),
 			},
@@ -171,9 +171,9 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 
 	err = otpRepository.RemoveOtp(*otp)
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorOTPFailedToInvalidateOTP,
 				Message: fmt.Sprintf("Failed to invalidate OTP: %s", err.Error()),
 			},
@@ -185,9 +185,9 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 	account, err := accountRepository.GetAccount(entities.EmailAddress(cmd.Email))
 
 	if err != nil {
-		return AppExecutionResult[dto.SignInResult]{
+		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    SigninErrorFailedToGetOtp,
 				Message: fmt.Sprintf("Error When Requesting Access Token: %s", err.Error()),
 			},
@@ -197,9 +197,9 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 	if account == nil {
 		account, err = accountRepository.AddAccount(entities.Account{Email: entities.EmailAddress(cmd.Email)})
 		if err != nil {
-			return AppExecutionResult[dto.SignInResult]{
+			return CommandExecutionResult[dto.SignInResult]{
 				Status: ExecutionStatusFailed,
-				Error: AppErrorDetail{
+				Error: CommandErrorDetail{
 					Code:    SignInErrorFailedToCreateNewAccount,
 					Message: fmt.Sprintf("Failed to create new account: %s", err.Error()),
 				},
@@ -207,7 +207,7 @@ func (cmd SigninCommand) otpSignIn(ctx CommandContext) AppExecutionResult[dto.Si
 		}
 	}
 
-	return AppExecutionResult[dto.SignInResult]{
+	return CommandExecutionResult[dto.SignInResult]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.SignInResult{
 			AccessToken: tokenString,

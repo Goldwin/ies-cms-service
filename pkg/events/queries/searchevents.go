@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
 )
 
@@ -14,5 +15,5 @@ type SearchEventResult struct {
 }
 
 type SearchEvent interface {
-	Execute(query SearchEventQuery) (SearchEventResult, error)
+	Execute(query SearchEventQuery) (SearchEventResult, queries.QueryErrorDetail)
 }

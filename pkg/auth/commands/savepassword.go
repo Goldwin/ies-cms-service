@@ -13,20 +13,20 @@ import (
 )
 
 const (
-	AddPasswordErrorInvalidInput          AppErrorCode = 20401
-	AddPasswordErrorFailedToVerifyAccount AppErrorCode = 20402
+	AddPasswordErrorInvalidInput          CommandErrorCode = 20401
+	AddPasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
 )
 
 type SavePasswordCommand struct {
 	Input dto.PasswordInput
 }
 
-func (cmd SavePasswordCommand) Execute(ctx CommandContext) AppExecutionResult[dto.PasswordResult] {
+func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
 	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
-		return AppExecutionResult[dto.PasswordResult]{
+		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddPasswordErrorInvalidInput,
 				Message: "Password and Confirm Password should be same",
 			},
@@ -37,9 +37,9 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 	if err != nil {
 
-		return AppExecutionResult[dto.PasswordResult]{
+		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddPasswordErrorFailedToVerifyAccount,
 				Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 			},
@@ -55,9 +55,9 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 		if err != nil {
 
-			return AppExecutionResult[dto.PasswordResult]{
+			return CommandExecutionResult[dto.PasswordResult]{
 				Status: ExecutionStatusFailed,
-				Error: AppErrorDetail{
+				Error: CommandErrorDetail{
 					Code:    AddPasswordErrorFailedToVerifyAccount,
 					Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 				},
@@ -71,9 +71,9 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 	salt, err := rand.Int(rand.Reader, big.NewInt(999999))
 	if err != nil {
-		return AppExecutionResult[dto.PasswordResult]{
+		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorFailedToGenOtp,
 				Message: fmt.Sprintf("Failed to Save Password: %s", err.Error()),
 			},
@@ -87,7 +87,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 	err = ctx.PasswordRepository().Save(password)
 
-	return AppExecutionResult[dto.PasswordResult]{
+	return CommandExecutionResult[dto.PasswordResult]{
 		Status: ExecutionStatusSuccess,
 	}
 }

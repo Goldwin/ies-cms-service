@@ -10,33 +10,33 @@ import (
 )
 
 const (
-	CompleteRegistrationErrorAlreadyCompleted       AppErrorCode = 20201
-	CompleteRegistrationErrorUpdateFailure          AppErrorCode = 20202
-	CompleteRegistrationErrorAccountIsNotRegistered AppErrorCode = 20203
-	CompleteRegistrationErrorFailedToGetAccount     AppErrorCode = 20203
-	CompleteRegistrationErrorInvalidInput           AppErrorCode = 20204
-	CompleteRegistrationErrorPasswordMismatch       AppErrorCode = 20205
+	CompleteRegistrationErrorAlreadyCompleted       CommandErrorCode = 20201
+	CompleteRegistrationErrorUpdateFailure          CommandErrorCode = 20202
+	CompleteRegistrationErrorAccountIsNotRegistered CommandErrorCode = 20203
+	CompleteRegistrationErrorFailedToGetAccount     CommandErrorCode = 20203
+	CompleteRegistrationErrorInvalidInput           CommandErrorCode = 20204
+	CompleteRegistrationErrorPasswordMismatch       CommandErrorCode = 20205
 )
 
 type CompleteRegistrationCommand struct {
 	Input dto.CompleteRegistrationInput
 }
 
-func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthData] {
+func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.AuthData] {
 	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Input.Email))
 	if err != nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorFailedToGetAccount,
 				Message: fmt.Sprintf("Failed to Get Account: %s", err.Error()),
 			},
 		}
 	}
 	if account == nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorAccountIsNotRegistered,
 				Message: fmt.Sprintf("Account Is Not Registered"),
 			},
@@ -44,9 +44,9 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 	}
 
 	if len(account.Roles) > 0 {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorAlreadyCompleted,
 				Message: fmt.Sprintf("Account Already Completed Registration"),
 			},
@@ -54,9 +54,9 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 	}
 
 	if cmd.Input.FirstName == "" || cmd.Input.LastName == "" {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorInvalidInput,
 				Message: fmt.Sprintf("First Name and Last Name must be filled"),
 			},
@@ -64,9 +64,9 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 	}
 
 	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorInvalidInput,
 				Message: fmt.Sprintf("Password and Confirm Password should be same"),
 			},
@@ -85,9 +85,9 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 	account, err = ctx.AccountRepository().UpdateAccount(*account)
 
 	if err != nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorUpdateFailure,
 				Message: fmt.Sprintf("Failed to Update Account: %s", err.Error()),
 			},
@@ -103,7 +103,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 	}.Execute(ctx)
 
 	if result.Status != ExecutionStatusSuccess {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
 			Error:  result.Error,
 		}
@@ -117,7 +117,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) AppExecutionR
 		}
 	}
 
-	return AppExecutionResult[dto.AuthData]{
+	return CommandExecutionResult[dto.AuthData]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.AuthData{
 			ID:         account.Person.ID,

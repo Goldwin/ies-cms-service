@@ -10,19 +10,19 @@ import (
 )
 
 const (
-	FetchSessionErrorFailedToCreateSession AppErrorCode = 30201
+	FetchSessionErrorFailedToCreateSession CommandErrorCode = 30201
 )
 
 type CreateChurchEventSessionCommand struct {
 	EventID string
 }
 
-func (cmd CreateChurchEventSessionCommand) Execute(ctx CommandContext) AppExecutionResult[dto.ChurchEventSession] {
+func (cmd CreateChurchEventSessionCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.ChurchEventSession] {
 	events, err := ctx.ChurchEventRepository().Get(cmd.EventID)
 	if err != nil {
-		return AppExecutionResult[dto.ChurchEventSession]{
+		return CommandExecutionResult[dto.ChurchEventSession]{
 			Status: ExecutionStatusFailed,
-			Error:  AppErrorDetail{Code: FetchSessionErrorFailedToCreateSession, Message: err.Error()}}
+			Error:  CommandErrorDetail{Code: FetchSessionErrorFailedToCreateSession, Message: err.Error()}}
 	}
 
 	dayAddition := 1
@@ -39,9 +39,9 @@ func (cmd CreateChurchEventSessionCommand) Execute(ctx CommandContext) AppExecut
 
 	err = ctx.ChurchEventSessionRepository().Save(session)
 	if err != nil {
-		return AppExecutionResult[dto.ChurchEventSession]{
+		return CommandExecutionResult[dto.ChurchEventSession]{
 			Status: ExecutionStatusFailed,
-			Error:  AppErrorDetail{Code: FetchSessionErrorFailedToCreateSession, Message: err.Error()}}
+			Error:  CommandErrorDetail{Code: FetchSessionErrorFailedToCreateSession, Message: err.Error()}}
 	}
 
 	events.LatestHideAt = session.HideAt
@@ -51,7 +51,7 @@ func (cmd CreateChurchEventSessionCommand) Execute(ctx CommandContext) AppExecut
 
 	err = ctx.ChurchEventRepository().Save(*events)
 
-	return AppExecutionResult[dto.ChurchEventSession]{
+	return CommandExecutionResult[dto.ChurchEventSession]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.ChurchEventSession{
 			ID:        session.ID,

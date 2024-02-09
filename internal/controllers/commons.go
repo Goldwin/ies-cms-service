@@ -1,18 +1,17 @@
 package controllers
 
 import (
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 )
 
 type outputDecorator[T any] struct {
 	output      out.Output[T]
-	errFunction func(commands.AppErrorDetail)
+	errFunction func(out.AppErrorDetail)
 	successFunc func(T)
 }
 
 // OnError implements out.Output.
-func (o *outputDecorator[T]) OnError(err commands.AppErrorDetail) {
+func (o *outputDecorator[T]) OnError(err out.AppErrorDetail) {
 	if o.output != nil {
 		o.output.OnError(err)
 	}

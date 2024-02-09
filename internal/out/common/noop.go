@@ -1,11 +1,11 @@
 package common
 
-import "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
+import "github.com/Goldwin/ies-pik-cms/pkg/common/out"
 
 type NoopOutput[T any] struct{}
 
 // OnError implements out.Output.
-func (*NoopOutput[T]) OnError(err commands.AppErrorDetail) {
+func (*NoopOutput[T]) OnError(err out.AppErrorDetail) {
 	//noop
 }
 

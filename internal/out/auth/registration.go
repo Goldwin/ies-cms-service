@@ -7,7 +7,6 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	"github.com/Goldwin/ies-pik-cms/internal/bus/common"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -17,7 +16,7 @@ type registerOutputHandler struct {
 }
 
 // OnError implements out.Output.
-func (*registerOutputHandler) OnError(err commands.AppErrorDetail) {
+func (*registerOutputHandler) OnError(err out.AppErrorDetail) {
 }
 
 // OnSuccess implements out.Output.

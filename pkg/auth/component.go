@@ -64,7 +64,7 @@ func (a *authComponentImpl) Stop() {
 
 // Auth implements AuthComponent.
 func (a *authComponentImpl) Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData]) {
-	var result AppExecutionResult[dto.AuthData]
+	var result CommandExecutionResult[dto.AuthData]
 	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.AuthCommand{
 			Token:     input.Token,
@@ -78,14 +78,14 @@ func (a *authComponentImpl) Auth(ctx context.Context, input dto.AuthInput, outpu
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 
 }
 
 // CompleteRegistration implements AuthComponent.
 func (a *authComponentImpl) CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData]) {
-	var result AppExecutionResult[dto.AuthData]
+	var result CommandExecutionResult[dto.AuthData]
 	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.CompleteRegistrationCommand{
 			Input: input,
@@ -98,13 +98,13 @@ func (a *authComponentImpl) CompleteRegistration(ctx context.Context, input dto.
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 }
 
 // GenerateOtp implements AuthComponent.
 func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput, output out.Output[dto.OtpResult]) {
-	var result AppExecutionResult[dto.OtpResult]
+	var result CommandExecutionResult[dto.OtpResult]
 	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.GenerateOtpCommand{
 			Email: input.Email,
@@ -117,13 +117,13 @@ func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput,
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 }
 
 // SignIn implements AuthComponent.
 func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, output out.Output[dto.SignInResult]) {
-	var result AppExecutionResult[dto.SignInResult]
+	var result CommandExecutionResult[dto.SignInResult]
 	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.SigninCommand{
 			Email:     input.Email,
@@ -139,7 +139,7 @@ func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, o
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 }
 

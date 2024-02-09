@@ -1,35 +1,35 @@
 package commands
 
 type ExecutionStatus string
-type AppErrorCode int
+type CommandErrorCode int
 
-type AppExecutionResult[T any] struct {
+type CommandExecutionResult[T any] struct {
 	Status ExecutionStatus
-	Error  AppErrorDetail
+	Error  CommandErrorDetail
 	Result T
 }
 
-type AppErrorDetail struct {
-	Code    AppErrorCode `json:"code"`
-	Message string       `json:"message"`
+type CommandErrorDetail struct {
+	Code    CommandErrorCode `json:"code"`
+	Message string           `json:"message"`
 }
 
-func (e AppErrorDetail) Error() string {
+func (e CommandErrorDetail) Error() string {
 	return e.Message
 }
 
-func AppErrorDetailWorkerFailure(err error) AppErrorDetail {
-	return AppErrorDetail{Code: AppErrorCodeWorkerFailure, Message: err.Error()}
+func CommandErrorDetailWorkerFailure(err error) CommandErrorDetail {
+	return CommandErrorDetail{Code: CommandErrorCodeWorkerFailure, Message: err.Error()}
 }
 
 const (
 	ExecutionStatusSuccess ExecutionStatus = "SUCCESS"
 	ExecutionStatusFailed  ExecutionStatus = "FAILED"
 
-	AppErrorCodeNone          AppErrorCode = 0
-	AppErrorCodeWorkerFailure AppErrorCode = 1
+	CommandErrorCodeNone          CommandErrorCode = 0
+	CommandErrorCodeWorkerFailure CommandErrorCode = 1
 )
 
 var (
-	AppErrorDetailNone = AppErrorDetail{Code: AppErrorCodeNone, Message: ""}
+	CommandErrorDetailNone = CommandErrorDetail{Code: CommandErrorCodeNone, Message: ""}
 )

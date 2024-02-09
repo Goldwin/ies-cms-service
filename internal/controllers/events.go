@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/events"
 	"github.com/Goldwin/ies-pik-cms/pkg/events/dto"
 	"github.com/gin-gonic/gin"
@@ -36,7 +36,7 @@ func (c *churchEventController) checkIn(ctx *gin.Context) {
 	ctx.BindJSON(&input)
 	c.churchEventComponent.CheckIn(ctx, input, &outputDecorator[[]dto.CheckInEvent]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})
@@ -54,7 +54,7 @@ func (c *churchEventController) createEvent(ctx *gin.Context) {
 	ctx.BindJSON(&input)
 	c.churchEventComponent.CreateEvent(ctx, input, &outputDecorator[dto.ChurchEvent]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})
@@ -72,7 +72,7 @@ func (c *churchEventController) createNewSession(ctx *gin.Context) {
 	ctx.BindJSON(&input)
 	c.churchEventComponent.CreateSession(ctx, input, &outputDecorator[dto.ChurchEventSession]{
 		output: nil,
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			ctx.AbortWithStatusJSON(400, gin.H{
 				"error": err.Error(),
 			})

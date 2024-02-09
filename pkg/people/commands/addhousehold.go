@@ -9,22 +9,22 @@ import (
 )
 
 const (
-	AddHouseholdErrorCodeDBError                          AppErrorCode = 10201
-	AddHouseholdErrorCodePersonNotExistsError             AppErrorCode = 10202
-	AddHouseholdErrorCodeOneOrMorePersonHasHouseholdError AppErrorCode = 10203
+	AddHouseholdErrorCodeDBError                          CommandErrorCode = 10201
+	AddHouseholdErrorCodePersonNotExistsError             CommandErrorCode = 10202
+	AddHouseholdErrorCodeOneOrMorePersonHasHouseholdError CommandErrorCode = 10203
 )
 
 type AddHouseholdCommand struct {
 	Input dto.HouseHoldInput
 }
 
-func (cmd AddHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Household] {
+func (cmd AddHouseholdCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Household] {
 	householdHead, err := ctx.PersonRepository().Get(cmd.Input.HouseholdHeadPersonId)
 
 	if err != nil {
-		return AppExecutionResult[dto.Household]{
+		return CommandExecutionResult[dto.Household]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddHouseholdErrorCodeDBError,
 				Message: fmt.Sprintf("Can't Add New Household Info, Error: %s", err.Error()),
 			},
@@ -32,9 +32,9 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 	}
 
 	if householdHead == nil {
-		return AppExecutionResult[dto.Household]{
+		return CommandExecutionResult[dto.Household]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddHouseholdErrorCodeDBError,
 				Message: fmt.Sprintf("Can't Add New Household Info, Error: Person with id %s does not exist", cmd.Input.HouseholdHeadPersonId),
 			},
@@ -43,9 +43,9 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 	persons, err := ctx.PersonRepository().ListByID(cmd.Input.MemberPersonsIds)
 	if err != nil {
-		return AppExecutionResult[dto.Household]{
+		return CommandExecutionResult[dto.Household]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddHouseholdErrorCodeDBError,
 				Message: fmt.Sprintf("Can't Add New Household Info, Error: %s", err.Error()),
 			},
@@ -59,9 +59,9 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 
 	for _, person := range persons {
 		if _, ok := personIdMap[person.ID]; !ok {
-			return AppExecutionResult[dto.Household]{
+			return CommandExecutionResult[dto.Household]{
 				Status: ExecutionStatusFailed,
-				Error: AppErrorDetail{
+				Error: CommandErrorDetail{
 					Code:    AddHouseholdErrorCodeDBError,
 					Message: fmt.Sprintf("Can't Add New Household Info, Error: Person with id %s does not exist", person.ID),
 				},
@@ -100,9 +100,9 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) AppExecutionResult[dt
 		}
 	}
 
-	return AppExecutionResult[dto.Household]{
+	return CommandExecutionResult[dto.Household]{
 		Status: ExecutionStatusSuccess,
-		Error:  AppErrorDetailNone,
+		Error:  CommandErrorDetailNone,
 		Result: dto.Household{
 			ID:            result.ID,
 			HouseholdHead: householdHeadDto,

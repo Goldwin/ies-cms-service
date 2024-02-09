@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 )
 
@@ -15,5 +16,5 @@ type SearchPersonResult struct {
 }
 
 type SearchPerson interface {
-	Execute(query SearchPersonQuery) (SearchPersonResult, error)
+	Execute(query SearchPersonQuery) (SearchPersonResult, queries.QueryErrorDetail)
 }

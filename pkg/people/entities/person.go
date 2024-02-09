@@ -74,7 +74,7 @@ func (p PhoneNumber) IsValid() bool {
 		return true
 	}
 	// Regular expression pattern for a phone number
-	pattern := `^\+?[1-9]\d{1,14}$`
+	pattern := `^\+?[1-9]\d{1,14}$|^0[1-9]\d{1,14}$`
 
 	regex := regexp.MustCompile(pattern)
 	return regex.MatchString(string(p))

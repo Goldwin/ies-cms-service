@@ -11,7 +11,7 @@ import (
 	output "github.com/Goldwin/ies-pik-cms/internal/out/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	people "github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/vmihailenco/msgpack/v5"
@@ -78,7 +78,7 @@ func (a *authController) completeRegistration(c *gin.Context) {
 
 	output := &outputDecorator[dto.AuthData]{
 		output: a.authOutputComponent.RegistrationOutput(),
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err,
 			})
@@ -111,7 +111,7 @@ func (a *authController) auth(c *gin.Context) {
 
 	output := &outputDecorator[dto.AuthData]{
 		output: a.authOutputComponent.AuthOutput(),
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			c.AbortWithStatusJSON(400, gin.H{
 				"error": err,
 			})
@@ -139,7 +139,7 @@ func (a *authController) otpSignIn(c *gin.Context) {
 	input.Method = "otp"
 	output := &outputDecorator[dto.SignInResult]{
 		output: a.authOutputComponent.SignInOutput(),
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err,
 			})
@@ -159,7 +159,7 @@ func (a *authController) passwordSignIn(c *gin.Context) {
 	input.Method = "password"
 	output := &outputDecorator[dto.SignInResult]{
 		output: a.authOutputComponent.SignInOutput(),
-		errFunction: func(err commands.AppErrorDetail) {
+		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err,
 			})

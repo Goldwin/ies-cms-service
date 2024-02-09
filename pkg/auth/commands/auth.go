@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	AuthErrorInvalidToken            AppErrorCode = 20301
-	AuthErrorFailedToRetrieveAccount AppErrorCode = 20302
-	AuthErrorAccountDoesNotExist     AppErrorCode = 20303
-	AuthErrorOtpExists               AppErrorCode = 20304
+	AuthErrorInvalidToken            CommandErrorCode = 20301
+	AuthErrorFailedToRetrieveAccount CommandErrorCode = 20302
+	AuthErrorAccountDoesNotExist     CommandErrorCode = 20303
+	AuthErrorOtpExists               CommandErrorCode = 20304
 )
 
 type AuthCommand struct {
@@ -21,14 +21,14 @@ type AuthCommand struct {
 	SecretKey []byte
 }
 
-func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthData] {
+func (cmd AuthCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.AuthData] {
 
 	claims, err := cmd.extractClaims()
 
 	if err != nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AuthErrorInvalidToken,
 				Message: fmt.Sprintf("Invalid Token: %s", err.Error()),
 			},
@@ -37,9 +37,9 @@ func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthDa
 
 	emailStr, ok := claims["email"].(string)
 	if !ok {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AuthErrorInvalidToken,
 				Message: fmt.Sprintf("Invalid Token: Malformed Token"),
 			},
@@ -48,9 +48,9 @@ func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthDa
 	email := entities.EmailAddress(emailStr)
 
 	if !email.IsValid() {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AuthErrorInvalidToken,
 				Message: "Invalid Token: Invalid Email",
 			},
@@ -60,9 +60,9 @@ func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthDa
 	account, err := ctx.AccountRepository().GetAccount(email)
 
 	if err != nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AuthErrorFailedToRetrieveAccount,
 				Message: fmt.Sprintf("Invalid Token: %s", err.Error()),
 			},
@@ -70,9 +70,9 @@ func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthDa
 	}
 
 	if account == nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AuthErrorAccountDoesNotExist,
 				Message: "Account Does not exists",
 			},
@@ -92,9 +92,9 @@ func (cmd AuthCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthDa
 		scopes = append(scopes, string(scope))
 	}
 
-	return AppExecutionResult[dto.AuthData]{
+	return CommandExecutionResult[dto.AuthData]{
 		Status: ExecutionStatusSuccess,
-		Error:  AppErrorDetail{},
+		Error:  CommandErrorDetail{},
 		Result: dto.AuthData{
 			ID:         account.Person.ID,
 			FirstName:  account.Person.FirstName,

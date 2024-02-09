@@ -2,7 +2,6 @@ package auth
 
 import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 )
 
@@ -10,7 +9,7 @@ type signInOutputHandler struct {
 }
 
 // OnError implements out.Output.
-func (*signInOutputHandler) OnError(err commands.AppErrorDetail) {
+func (*signInOutputHandler) OnError(err out.AppErrorDetail) {
 }
 
 // OnSuccess implements out.Output.

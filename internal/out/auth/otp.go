@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
-	"github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 )
 
@@ -22,7 +21,7 @@ type otpOutputHandler struct {
 }
 
 // OnError implements out.Output.
-func (*otpOutputHandler) OnError(err commands.AppErrorDetail) {
+func (*otpOutputHandler) OnError(err out.AppErrorDetail) {
 	fmt.Println(err.Error())
 }
 

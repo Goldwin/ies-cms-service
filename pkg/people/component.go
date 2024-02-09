@@ -9,6 +9,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
+	q "github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
 type PeopleDataLayerComponent interface {
@@ -39,8 +40,8 @@ type peopleManagementComponent struct {
 // SearchPerson implements PeopleManagementComponent.
 func (p *peopleManagementComponent) SearchPerson(ctx context.Context, input queries.SearchPersonQuery, output out.Output[queries.SearchPersonResult]) {
 	result, err := p.queryWorker.Query(ctx).SearchPerson().Execute(input)
-	if err != nil {
-		output.OnError(AppErrorDetailWorkerFailure(err))
+	if err != q.NoQueryError {
+		output.OnError(out.ConvertQueryErrorDetail(err))
 	} else {
 		output.OnSuccess(result)
 	}
@@ -49,8 +50,8 @@ func (p *peopleManagementComponent) SearchPerson(ctx context.Context, input quer
 // ViewPerson implements PeopleManagementComponent.
 func (p *peopleManagementComponent) ViewPerson(ctx context.Context, input queries.ViewPersonQuery, output out.Output[queries.ViewPersonResult]) {
 	result, err := p.queryWorker.Query(ctx).ViewPerson().Execute(input)
-	if err != nil {
-		output.OnError(AppErrorDetailWorkerFailure(err))
+	if err != q.NoQueryError {
+		output.OnError(out.ConvertQueryErrorDetail(err))
 	} else {
 		output.OnSuccess(result)
 	}
@@ -58,7 +59,7 @@ func (p *peopleManagementComponent) ViewPerson(ctx context.Context, input querie
 
 // AddHousehold implements PeopleManagementComponent.
 func (p *peopleManagementComponent) AddHousehold(ctx context.Context, input dto.HouseHoldInput, output out.Output[dto.Household]) {
-	var result AppExecutionResult[dto.Household]
+	var result CommandExecutionResult[dto.Household]
 	_ = p.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.AddHouseholdCommand{Input: input}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
@@ -69,13 +70,13 @@ func (p *peopleManagementComponent) AddHousehold(ctx context.Context, input dto.
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 }
 
 // AddPerson implements PeopleManagementComponent.
 func (p *peopleManagementComponent) AddPerson(ctx context.Context, input dto.Person, output out.Output[dto.Person]) {
-	var result AppExecutionResult[dto.Person]
+	var result CommandExecutionResult[dto.Person]
 	_ = p.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.AddPersonCommand{Input: input}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
@@ -86,14 +87,14 @@ func (p *peopleManagementComponent) AddPerson(ctx context.Context, input dto.Per
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 
 }
 
 // UpdateHousehold implements PeopleManagementComponent.
 func (p *peopleManagementComponent) UpdateHousehold(ctx context.Context, input dto.HouseHoldInput, output out.Output[dto.Household]) {
-	var result AppExecutionResult[dto.Household]
+	var result CommandExecutionResult[dto.Household]
 	_ = p.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.UpdateHouseholdCommand{Input: input}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
@@ -104,13 +105,13 @@ func (p *peopleManagementComponent) UpdateHousehold(ctx context.Context, input d
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 }
 
 // UpdatePerson implements PeopleManagementComponent.
 func (p *peopleManagementComponent) UpdatePerson(ctx context.Context, input dto.Person, output out.Output[dto.Person]) {
-	var result AppExecutionResult[dto.Person]
+	var result CommandExecutionResult[dto.Person]
 	_ = p.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.UpdatePersonCommand{Input: input}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
@@ -121,7 +122,7 @@ func (p *peopleManagementComponent) UpdatePerson(ctx context.Context, input dto.
 	if result.Status == ExecutionStatusSuccess {
 		output.OnSuccess(result.Result)
 	} else {
-		output.OnError(result.Error)
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
 	}
 }
 

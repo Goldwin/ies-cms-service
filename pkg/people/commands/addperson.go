@@ -16,11 +16,12 @@ type AddPersonCommand struct {
 }
 
 const (
-	AddPersonErrorCodeEmailsExist  AppErrorCode = 10002
-	AddPersonErrorCodeInvalidInput AppErrorCode = 10003
+	AddPersonErrorCodeEmailsExist  CommandErrorCode = 10002
+	AddPersonErrorCodeInvalidInput CommandErrorCode = 10003
+	AddPersonErrorCodeDBError      CommandErrorCode = 10004
 )
 
-func (cmd AddPersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.Person] {
+func (cmd AddPersonCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Person] {
 	var err error
 	c := cmd.Input
 
@@ -41,16 +42,36 @@ func (cmd AddPersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.P
 	err = person.Validate()
 
 	if err != nil {
-		return AppExecutionResult[dto.Person]{
+		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddPersonErrorCodeInvalidInput,
-				Message: fmt.Sprintf("Can't Add New Person Info, Error: %s", err.Error()),
+				Message: fmt.Sprintf("Invalid Person Information, Error: %s", err.Error()),
 			},
 		}
 	}
 
 	//To be determined later, whether we need to validate email or not.
+
+	isEmailExists, err := checkEmailExistence(ctx, person.EmailAddress)
+	if err != nil {
+		return CommandExecutionResult[dto.Person]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    AddPersonErrorCodeDBError,
+				Message: fmt.Sprintf("Can't Add New Person Info, Error: %s", err.Error()),
+			},
+		}
+	}
+	if isEmailExists {
+		return CommandExecutionResult[dto.Person]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    AddPersonErrorCodeEmailsExist,
+				Message: "Can't Add New Person Info, Email already used by another person",
+			},
+		}
+	}
 	// accounts, err := ctx.AccountRepository().FindAccountByEmails(emails)
 
 	// if err != nil {
@@ -76,9 +97,9 @@ func (cmd AddPersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.P
 	result, err := ctx.PersonRepository().AddPerson(person)
 
 	if err != nil {
-		return AppExecutionResult[dto.Person]{
+		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    AddHouseholdErrorCodeDBError,
 				Message: fmt.Sprintf("Can't Add New Person Info, Error: %s", err.Error()),
 			},
@@ -88,9 +109,17 @@ func (cmd AddPersonCommand) Execute(ctx CommandContext) AppExecutionResult[dto.P
 	output := cmd.Input
 	output.ID = result.ID
 
-	return AppExecutionResult[dto.Person]{
+	return CommandExecutionResult[dto.Person]{
 		Status: ExecutionStatusSuccess,
-		Error:  AppErrorDetailNone,
+		Error:  CommandErrorDetailNone,
 		Result: output,
 	}
+}
+
+func checkEmailExistence(ctx CommandContext, emailAddress entities.EmailAddress) (bool, error) {
+	person, err := ctx.PersonRepository().GetByEmail(emailAddress)
+	if err != nil {
+		return false, err
+	}
+	return person == nil, nil
 }

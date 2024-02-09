@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	GrantAdminRoleErrorFailedToVerifyAccount AppErrorCode = 20501
-	GrantAdminRoleErrorFailedToUpdateAccount AppErrorCode = 20502
+	GrantAdminRoleErrorFailedToVerifyAccount CommandErrorCode = 20501
+	GrantAdminRoleErrorFailedToUpdateAccount CommandErrorCode = 20502
 )
 
 // A hacky command to grant admin role to user
@@ -19,12 +19,12 @@ type GrantAdminRoleCommand struct {
 	Email string
 }
 
-func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) AppExecutionResult[dto.AuthData] {
+func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.AuthData] {
 	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
 	if err != nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GrantAdminRoleErrorFailedToVerifyAccount,
 				Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 			},
@@ -32,9 +32,9 @@ func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) AppExecutionResult[
 	}
 
 	if account == nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GrantAdminRoleErrorFailedToVerifyAccount,
 				Message: fmt.Sprintf("Failed to Verify Account: Account Not Found"),
 			},
@@ -45,14 +45,14 @@ func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) AppExecutionResult[
 	_, err = ctx.AccountRepository().UpdateAccount(*account)
 
 	if err != nil {
-		return AppExecutionResult[dto.AuthData]{
+		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    GrantAdminRoleErrorFailedToVerifyAccount,
 				Message: fmt.Sprintf("Failed to Update Account: %s", err.Error()),
 			},
 		}
 	}
 
-	return AppExecutionResult[dto.AuthData]{Status: ExecutionStatusSuccess}
+	return CommandExecutionResult[dto.AuthData]{Status: ExecutionStatusSuccess}
 }

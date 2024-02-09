@@ -31,6 +31,20 @@ type personRepositoryImpl struct {
 	collection *mongo.Collection
 }
 
+// GetByEmail implements repositories.PersonRepository.
+func (p *personRepositoryImpl) GetByEmail(email entities.EmailAddress) (*entities.Person, error) {
+	var person Person
+	err := p.collection.FindOne(p.ctx, bson.M{"emailAddress": string(email)}).Decode(&person)
+	if(err != nil && err == mongo.ErrNoDocuments) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	result := toPersonEntities(person)
+	return &result, nil
+}
+
 // AddPerson implements repositories.PersonRepository.
 func (p *personRepositoryImpl) AddPerson(person entities.Person) (*entities.Person, error) {
 	if person.ID == "" {
@@ -49,6 +63,9 @@ func (p *personRepositoryImpl) AddPerson(person entities.Person) (*entities.Pers
 func (p *personRepositoryImpl) Get(id string) (*entities.Person, error) {
 	var person Person
 	err := p.collection.FindOne(p.ctx, bson.M{"_id": id}).Decode(&person)
+	if(err != nil && err == mongo.ErrNoDocuments) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

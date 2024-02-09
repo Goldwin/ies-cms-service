@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	CreateEventCommandsErrorAppError AppErrorCode = 30101
+	CreateEventCommandsErrorAppError CommandErrorCode = 30101
 )
 
 type CreateEventCommands struct {
 	Input dto.ChurchEvent
 }
 
-func (c CreateEventCommands) Execute(ctx CommandContext) AppExecutionResult[dto.ChurchEvent] {
+func (c CreateEventCommands) Execute(ctx CommandContext) CommandExecutionResult[dto.ChurchEvent] {
 	c.Input.ID = uuid.NewString()
 	event := entities.ChurchEvent{
 		ID:                     c.Input.ID,
@@ -41,9 +41,9 @@ func (c CreateEventCommands) Execute(ctx CommandContext) AppExecutionResult[dto.
 
 	err := ctx.ChurchEventSessionRepository().Save(session)
 	if err != nil {
-		return AppExecutionResult[dto.ChurchEvent]{
+		return CommandExecutionResult[dto.ChurchEvent]{
 			Status: ExecutionStatusFailed,
-			Error: commands.AppErrorDetail{
+			Error: commands.CommandErrorDetail{
 				Code:    CreateEventCommandsErrorAppError,
 				Message: fmt.Sprintf("Failed to Create Event: %s", err.Error()),
 			},
@@ -52,16 +52,16 @@ func (c CreateEventCommands) Execute(ctx CommandContext) AppExecutionResult[dto.
 
 	err = ctx.ChurchEventRepository().Save(event)
 	if err != nil {
-		return AppExecutionResult[dto.ChurchEvent]{
+		return CommandExecutionResult[dto.ChurchEvent]{
 			Status: ExecutionStatusFailed,
-			Error: commands.AppErrorDetail{
+			Error: commands.CommandErrorDetail{
 				Code:    CreateEventCommandsErrorAppError,
 				Message: fmt.Sprintf("Failed to Create Event: %s", err.Error()),
 			},
 		}
 	}
 
-	return AppExecutionResult[dto.ChurchEvent]{
+	return CommandExecutionResult[dto.ChurchEvent]{
 		Status: ExecutionStatusSuccess,
 		Result: c.Input,
 	}

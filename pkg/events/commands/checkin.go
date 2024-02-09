@@ -10,23 +10,23 @@ import (
 )
 
 const (
-	CheckInCommandsFailedToFetchPerson AppErrorCode = 30001
-	CheckInCommandsErrorPersonNotFound AppErrorCode = 30002
-	CheckInCommandsFailedToFetchEvent  AppErrorCode = 30003
-	CheckInCommandsErrorEventNotFound  AppErrorCode = 30004
-	CheckInCommandsFailedToCheckIn     AppErrorCode = 30005
+	CheckInCommandsFailedToFetchPerson CommandErrorCode = 30001
+	CheckInCommandsErrorPersonNotFound CommandErrorCode = 30002
+	CheckInCommandsFailedToFetchEvent  CommandErrorCode = 30003
+	CheckInCommandsErrorEventNotFound  CommandErrorCode = 30004
+	CheckInCommandsFailedToCheckIn     CommandErrorCode = 30005
 )
 
 type CheckInCommands struct {
 	Input dto.CheckInInput
 }
 
-func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.CheckInEvent] {
+func (cmd CheckInCommands) Execute(ctx CommandContext) CommandExecutionResult[[]dto.CheckInEvent] {
 	persons, err := ctx.PersonRepository().GetByIds(cmd.Input.PersonIDs)
 	if err != nil {
-		return AppExecutionResult[[]dto.CheckInEvent]{
+		return CommandExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CheckInCommandsFailedToFetchPerson,
 				Message: fmt.Sprintf("Failed to Fetch Person: %s", err.Error()),
 			},
@@ -34,9 +34,9 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 	}
 
 	if len(persons) != len(cmd.Input.PersonIDs) {
-		return AppExecutionResult[[]dto.CheckInEvent]{
+		return CommandExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CheckInCommandsErrorPersonNotFound,
 				Message: fmt.Sprintf("Cannot fetch all person info"),
 			},
@@ -46,9 +46,9 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 	checker, err := ctx.PersonRepository().Get(cmd.Input.CheckerID)
 
 	if err != nil {
-		return AppExecutionResult[[]dto.CheckInEvent]{
+		return CommandExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CheckInCommandsFailedToFetchPerson,
 				Message: fmt.Sprintf("Failed to Fetch Person: %s", err.Error()),
 			},
@@ -56,9 +56,9 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 	}
 
 	if checker == nil {
-		return AppExecutionResult[[]dto.CheckInEvent]{
+		return CommandExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CheckInCommandsErrorPersonNotFound,
 				Message: fmt.Sprintf("Person Not Found"),
 			},
@@ -68,9 +68,9 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 	session, err := ctx.ChurchEventSessionRepository().Get(cmd.Input.EventID)
 
 	if err != nil {
-		return AppExecutionResult[[]dto.CheckInEvent]{
+		return CommandExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CheckInCommandsFailedToFetchEvent,
 				Message: fmt.Sprintf("Failed to Fetch Event: %s", err.Error()),
 			},
@@ -78,9 +78,9 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 	}
 
 	if session == nil {
-		return AppExecutionResult[[]dto.CheckInEvent]{
+		return CommandExecutionResult[[]dto.CheckInEvent]{
 			Status: ExecutionStatusFailed,
-			Error: AppErrorDetail{
+			Error: CommandErrorDetail{
 				Code:    CheckInCommandsErrorEventNotFound,
 				Message: fmt.Sprintf("Event Not Found: %s", err.Error()),
 			},
@@ -98,9 +98,9 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 		}
 		err = ctx.EventCheckInRepository().Save(checkin)
 		if err != nil {
-			return AppExecutionResult[[]dto.CheckInEvent]{
+			return CommandExecutionResult[[]dto.CheckInEvent]{
 				Status: ExecutionStatusFailed,
-				Error: AppErrorDetail{
+				Error: CommandErrorDetail{
 					Code:    CheckInCommandsFailedToCheckIn,
 					Message: fmt.Sprintf("Failed to CheckIn: %s", err.Error()),
 				},
@@ -118,7 +118,7 @@ func (cmd CheckInCommands) Execute(ctx CommandContext) AppExecutionResult[[]dto.
 		})
 	}
 
-	return AppExecutionResult[[]dto.CheckInEvent]{
+	return CommandExecutionResult[[]dto.CheckInEvent]{
 		Status: ExecutionStatusSuccess,
 		Result: result,
 	}
