@@ -117,9 +117,12 @@ func (cmd AddPersonCommand) Execute(ctx CommandContext) CommandExecutionResult[d
 }
 
 func checkEmailExistence(ctx CommandContext, emailAddress entities.EmailAddress) (bool, error) {
+	if emailAddress == "" {
+		return false, nil
+	}
 	person, err := ctx.PersonRepository().GetByEmail(emailAddress)
 	if err != nil {
 		return false, err
 	}
-	return person == nil, nil
+	return person != nil, nil
 }

@@ -19,6 +19,7 @@ const (
 	UpdatePersonErrorCodeUserNotExist CommandErrorCode = 10102
 	UpdatePersonErrorCodeEmailsExist  CommandErrorCode = 10102
 	UpdatePersonErrorCodeInvalidInput CommandErrorCode = 10103
+	UpdatePersonErrorCodeDBError CommandErrorCode = 10103
 )
 
 func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Person] {
@@ -64,6 +65,27 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 			Error: CommandErrorDetail{
 				Code:    AddPersonErrorCodeInvalidInput,
 				Message: fmt.Sprintf("Can't Update Person Info, Error: %s", err.Error()),
+			},
+		}
+	}
+
+	isEmailExist, err := checkEmailExistence(ctx, person.EmailAddress)
+	if(err != nil) {
+		return CommandExecutionResult[dto.Person]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    UpdatePersonErrorCodeDBError,
+				Message: fmt.Sprintf("Can't Update Person Info, Failed on checking email existence. Error: %s", err.Error()),
+			},
+		}
+	}
+
+	if(isEmailExist) {
+		return CommandExecutionResult[dto.Person]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    UpdatePersonErrorCodeEmailsExist,
+				Message: fmt.Sprintf("Can't Update Person Info, email has been used by someone else"),
 			},
 		}
 	}
