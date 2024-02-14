@@ -35,7 +35,7 @@ func (v *viewHouseholdByPersonImpl) Execute(query queries.ViewHouseholdByPersonQ
 		}
 	}
 	household := Household{}
-	v.householdCollection.FindOne(v.ctx, bson.M{"_id": personHousehold.HouseholdID}).Decode(&household)
+	err = v.householdCollection.FindOne(v.ctx, bson.M{"_id": personHousehold.HouseholdID}).Decode(&household)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewHouseholdByPersonResult{}, QueryErrorDetail{
 			Code:    404,

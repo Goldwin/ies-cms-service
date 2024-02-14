@@ -68,16 +68,21 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 	}
 	oldMemberIdSet[oldHousehold.HouseholdHead.ID] = true
 
+	_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": newHousehold})
+
 	if err != nil {
 		return nil, err
 	}
-
-	_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": newHousehold})
 
 	totalMembers := len(e.Members) + 1
 
 	personIds := make([]string, totalMembers)
 	oldPersonIds := make([]string, 0)
+	personIds[totalMembers-1] = e.HouseholdHead.ID
+
+	if(oldMemberIdSet[e.HouseholdHead.ID]){
+		oldMemberIdSet[e.HouseholdHead.ID] = false
+	}
 	for i, member := range e.Members {
 		personIds[i] = member.ID
 		if oldMemberIdSet[member.ID] {
@@ -91,23 +96,21 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 		}
 	}
 
-	personIds[totalMembers-1] = e.HouseholdHead.ID
-
-	//replace member's household id with new ids
-	for _, member := range e.Members {
-		h.personHouseholdCollection.UpdateByID(h.ctx, member.ID, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
 	for _, id := range oldPersonIds {
 		h.personHouseholdCollection.UpdateByID(h.ctx,
 			id,
 			bson.M{"$set": bson.M{"householdID": ""}},
 			options.Update().SetUpsert(true),
 		)
+	}
+
+	//replace member's household id with new ids
+	for _, id := range personIds {
+		h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	return &e, nil
