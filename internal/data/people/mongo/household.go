@@ -18,6 +18,12 @@ type householdRepositoryImpl struct {
 	personHouseholdCollection *mongo.Collection
 }
 
+// DeleteHousehold implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) DeleteHousehold(e entities.Household) error {
+	_, err := h.householdCollection.DeleteOne(h.ctx, bson.M{"_id": e.ID})
+	return err
+}
+
 // GetHousehold implements repositories.HouseholdRepository.
 func (h *householdRepositoryImpl) GetHousehold(id string) (*entities.Household, error) {
 	var household Household
@@ -80,7 +86,7 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 	oldPersonIds := make([]string, 0)
 	personIds[totalMembers-1] = e.HouseholdHead.ID
 
-	if(oldMemberIdSet[e.HouseholdHead.ID]){
+	if oldMemberIdSet[e.HouseholdHead.ID] {
 		oldMemberIdSet[e.HouseholdHead.ID] = false
 	}
 	for i, member := range e.Members {

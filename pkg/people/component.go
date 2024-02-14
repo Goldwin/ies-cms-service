@@ -24,6 +24,7 @@ type PeopleManagementComponent interface {
 	UpdatePerson(context.Context, dto.Person, out.Output[dto.Person])
 	AddHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	UpdateHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
+	DeleteHousehold(context.Context, dto.HouseHoldInput, out.Output[bool])
 	ViewHouseholdByPerson(context.Context, queries.ViewHouseholdByPersonQuery, out.Output[queries.ViewHouseholdByPersonResult])
 }
 
@@ -36,6 +37,26 @@ func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext
 type peopleManagementComponent struct {
 	worker      worker.UnitOfWork[commands.CommandContext]
 	queryWorker worker.QueryWorker[queries.QueryContext]
+}
+
+// DeleteHousehold implements PeopleManagementComponent.
+func (p *peopleManagementComponent) DeleteHousehold(ctx context.Context, input dto.HouseHoldInput, output out.Output[bool]) {
+	var result CommandExecutionResult[bool]
+	p.worker.Execute(ctx, func(ctx commands.CommandContext) error {
+		result = commands.DeleteHouseholdCommand{
+			Input: input,
+		}.Execute(ctx)
+		if result.Status == ExecutionStatusFailed {
+			return result.Error
+		}
+		return nil
+	})
+	if result.Status == ExecutionStatusFailed {
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
+	} else {
+		output.OnSuccess(result.Result)
+	}
+
 }
 
 // ViewHouseholdByPerson implements PeopleManagementComponent.

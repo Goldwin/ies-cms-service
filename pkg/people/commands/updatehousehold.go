@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	UpdateHouseholdErrorCodeVerifyDataError                  CommandErrorCode = 10201
-	UpdateHouseholdErrorCodePersonNotExistsError             CommandErrorCode = 10202
-	UpdateHouseholdErrorCodeOneOrMorePersonHasHouseholdError CommandErrorCode = 10203
+	UpdateHouseholdErrorCodeVerifyDataError                  CommandErrorCode = 10301
+	UpdateHouseholdErrorCodePersonNotExistsError             CommandErrorCode = 10302
+	UpdateHouseholdErrorCodeOneOrMorePersonHasHouseholdError CommandErrorCode = 10303
 )
 
 type UpdateHouseholdCommand struct {
