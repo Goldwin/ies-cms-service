@@ -31,10 +31,12 @@ func InitializePeopleManagementController(
 		peopleComponent: peopleComponent,
 		middleware:      middlewareComponent,
 	}
+	personIdUrl := "person/:id"
 	rg := r.Group("people")
 	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
-	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
-	rg.GET("person/:id", middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
+	rg.PUT(personIdUrl, middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
+	rg.DELETE(personIdUrl, middlewareComponent.Auth("PERSON_DELETE"), c.deletePersonInfo)
+	rg.GET(personIdUrl, middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
 	rg.GET("person/:id/household", middlewareComponent.Auth("PERSON_VIEW"), c.viewPersonHousehold)
 	rg.POST("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
@@ -155,6 +157,22 @@ func (c *peopleManagementController) updatePersonInfo(ctx *gin.Context) {
 			ctx.JSON(200, gin.H{
 				"data": person,
 			})
+		},
+	})
+}
+
+func (c *peopleManagementController) deletePersonInfo(ctx *gin.Context) {
+	var input dto.Person
+	input.ID = ctx.Param("id")
+	c.peopleComponent.DeletePerson(ctx, input, &outputDecorator[bool]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(400, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(person bool) {
+			ctx.JSON(204, gin.H{})
 		},
 	})
 }

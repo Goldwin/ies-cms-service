@@ -22,6 +22,7 @@ type PeopleManagementComponent interface {
 	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
 	AddPerson(context.Context, dto.Person, out.Output[dto.Person])
 	UpdatePerson(context.Context, dto.Person, out.Output[dto.Person])
+	DeletePerson(context.Context, dto.Person, out.Output[bool])
 	AddHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	UpdateHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	DeleteHousehold(context.Context, dto.HouseHoldInput, out.Output[bool])
@@ -37,6 +38,25 @@ func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext
 type peopleManagementComponent struct {
 	worker      worker.UnitOfWork[commands.CommandContext]
 	queryWorker worker.QueryWorker[queries.QueryContext]
+}
+
+// DeletePerson implements PeopleManagementComponent.
+func (p *peopleManagementComponent) DeletePerson(ctx context.Context, input dto.Person, output out.Output[bool]) {
+	var result CommandExecutionResult[bool]
+	p.worker.Execute(ctx, func(ctx commands.CommandContext) error {
+		result = commands.DeletePersonCommand{
+			Input: input,
+		}.Execute(ctx)
+		if result.Status == ExecutionStatusFailed {
+			return result.Error
+		}
+		return nil
+	})
+	if result.Status == ExecutionStatusFailed {
+		output.OnError(out.ConvertCommandErrorDetail(result.Error))
+	} else {
+		output.OnSuccess(result.Result)
+	}
 }
 
 // DeleteHousehold implements PeopleManagementComponent.
