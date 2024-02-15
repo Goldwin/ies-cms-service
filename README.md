@@ -1,4 +1,4 @@
-# IES PIK Church Management System
+# IES Church Management System
 
 ## Overview
 This is an open source alternative for church management system applications.

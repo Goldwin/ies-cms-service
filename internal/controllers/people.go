@@ -35,9 +35,11 @@ func InitializePeopleManagementController(
 	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
 	rg.PUT("person/:id", middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
 	rg.GET("person/:id", middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
+	rg.GET("person/:id/household", middlewareComponent.Auth("PERSON_VIEW"), c.viewPersonHousehold)
 	rg.POST("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
 	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
 	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
+	rg.DELETE("household/:id", middlewareComponent.Auth("HOUSEHOLD_DELETE"), c.deleteHousehold)
 
 	eventBusComponent.Subscribe("auth.registered", func(ctx context.Context, event common.Event) {
 		authData := auth.AuthData{}
@@ -122,6 +124,22 @@ func (c *peopleManagementController) updateHousehold(ctx *gin.Context) {
 	})
 }
 
+func (c *peopleManagementController) deleteHousehold(ctx *gin.Context) {
+	var input dto.HouseHoldInput
+	input.ID = ctx.Param("id")
+	c.peopleComponent.DeleteHousehold(ctx, input, &outputDecorator[bool]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(400, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(isSuccess bool) {
+			ctx.JSON(204, gin.H{})
+		},
+	})
+}
+
 func (c *peopleManagementController) updatePersonInfo(ctx *gin.Context) {
 	var input dto.Person
 	ctx.BindJSON(&input)
@@ -153,6 +171,23 @@ func (c *peopleManagementController) viewPerson(ctx *gin.Context) {
 			})
 		},
 		successFunc: func(result queries.ViewPersonResult) {
+			ctx.JSON(200, result)
+		},
+	})
+}
+
+func (c *peopleManagementController) viewPersonHousehold(ctx *gin.Context) {
+	id := ctx.Param("id")
+	c.peopleComponent.ViewHouseholdByPerson(ctx, queries.ViewHouseholdByPersonQuery{
+		PersonID: id,
+	}, &outputDecorator[queries.ViewHouseholdByPersonResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.AbortWithStatusJSON(err.Code, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(result queries.ViewHouseholdByPersonResult) {
 			ctx.JSON(200, result)
 		},
 	})

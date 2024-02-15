@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	UpdateHouseholdErrorCodeVerifyDataError                  CommandErrorCode = 10201
-	UpdateHouseholdErrorCodePersonNotExistsError             CommandErrorCode = 10202
-	UpdateHouseholdErrorCodeOneOrMorePersonHasHouseholdError CommandErrorCode = 10203
+	UpdateHouseholdErrorCodeVerifyDataError                  CommandErrorCode = 10301
+	UpdateHouseholdErrorCodePersonNotExistsError             CommandErrorCode = 10302
+	UpdateHouseholdErrorCodeOneOrMorePersonHasHouseholdError CommandErrorCode = 10303
 )
 
 type UpdateHouseholdCommand struct {
@@ -73,7 +73,6 @@ func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) CommandExecutionRe
 		HouseholdHead: *householdHead,
 		Members:       persons,
 		Name:          cmd.Input.Name,
-		PictureUrl:    cmd.Input.PictureUrl,
 		ID:            cmd.Input.ID,
 	}
 

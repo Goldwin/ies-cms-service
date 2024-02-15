@@ -15,8 +15,14 @@ type commandContextImpl struct {
 }
 
 type queryContextImpl struct {
-	searchPerson queries.SearchPerson
-	viewPerson   queries.ViewPerson
+	searchPerson          queries.SearchPerson
+	viewPerson            queries.ViewPerson
+	viewHouseholdByPerson queries.ViewHouseholdByPerson
+}
+
+// ViewHouseholdByPerson implements queries.QueryContext.
+func (q *queryContextImpl) ViewHouseholdByPerson() queries.ViewHouseholdByPerson {
+	return q.viewHouseholdByPerson
 }
 
 // SearchPerson implements queries.QueryContext.
@@ -48,7 +54,8 @@ func NewCommandContext(ctx context.Context, db *mongo.Database) commands.Command
 
 func NewQueryContext(ctx context.Context, db *mongo.Database) queries.QueryContext {
 	return &queryContextImpl{
-		searchPerson: SearchPerson(ctx, db),
-		viewPerson:   ViewPerson(ctx, db),
+		searchPerson:          SearchPerson(ctx, db),
+		viewPerson:            ViewPerson(ctx, db),
+		viewHouseholdByPerson: ViewHouseholdByPerson(ctx, db),
 	}
 }

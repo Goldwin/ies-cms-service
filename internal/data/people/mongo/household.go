@@ -5,38 +5,23 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-type Household struct {
-	ID               string            `bson:"_id"`
-	Name             string            `bson:"name"`
-	HouseholdHead    HouseholdMember   `bson:"householdHead"`
-	PictureUrl       string            `bson:"pictureUrl"`
-	HouseholdMembers []HouseholdMember `bson:"householdMembers"`
-}
-
-type HouseholdMember struct {
-	PersonID          string `bson:"personID"`
-	FirstName         string `bson:"firstName"`
-	LastName          string `bson:"lastName"`
-	ProfilePictureUrl string `bson:"profilePictureUrl"`
-	Email             string `bson:"email"`
-	PhoneNumber       string `bson:"phoneNumber"`
-}
-
-type PersonHousehold struct {
-	ID          string `bson:"_id"`
-	HouseholdID string `bson:"householdID"`
-}
 
 type householdRepositoryImpl struct {
 	ctx                       context.Context
 	db                        *mongo.Database
 	householdCollection       *mongo.Collection
 	personHouseholdCollection *mongo.Collection
+}
+
+// DeleteHousehold implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) DeleteHousehold(e entities.Household) error {
+	_, err := h.householdCollection.DeleteOne(h.ctx, bson.M{"_id": e.ID})
+	return err
 }
 
 // GetHousehold implements repositories.HouseholdRepository.
@@ -53,7 +38,7 @@ func (h *householdRepositoryImpl) GetHousehold(id string) (*entities.Household, 
 // AddHousehold implements repositories.HouseholdRepository.
 func (h *householdRepositoryImpl) AddHousehold(e entities.Household) (*entities.Household, error) {
 	//share with head's id
-	e.ID = e.HouseholdHead.ID
+	e.ID = uuid.NewString()
 	_, err := h.householdCollection.InsertOne(h.ctx, toHouseholdModel(e))
 
 	totalMembers := len(e.Members) + 1
@@ -63,11 +48,9 @@ func (h *householdRepositoryImpl) AddHousehold(e entities.Household) (*entities.
 	}
 	personIds[totalMembers-1] = e.HouseholdHead.ID
 
-	h.personHouseholdCollection.UpdateMany(h.ctx,
-		bson.M{"personID": bson.M{"$in": personIds}},
-		bson.M{"$set": bson.M{"householdID": e.ID}},
-		options.Update().SetUpsert(true),
-	)
+	for _, id := range personIds {
+		h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
+	}
 
 	if err != nil {
 		return nil, err
@@ -79,44 +62,58 @@ func (h *householdRepositoryImpl) AddHousehold(e entities.Household) (*entities.
 func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entities.Household, error) {
 	var err error
 	newHousehold := toHouseholdModel(e)
-	newHousehold.ID = newHousehold.HouseholdHead.PersonID
-
-	//replace old household's member id to no household
-	_, err = h.personHouseholdCollection.UpdateMany(h.ctx, bson.M{"householdID": e.ID}, bson.M{"$set": bson.M{"householdID": ""}})
+	oldHousehold, err := h.GetHousehold(e.ID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if e.ID == newHousehold.ID {
-		_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": toHouseholdModel(e)})
-	} else {
-		_, err = h.householdCollection.DeleteOne(h.ctx, bson.M{"_id": e.ID})
-		if err != nil {
-			return nil, err
-		}
-		_, err = h.householdCollection.InsertOne(h.ctx, newHousehold)
+	oldMemberIdSet := make(map[string]bool, len(oldHousehold.Members)+1)
+	for _, member := range oldHousehold.Members {
+		oldMemberIdSet[member.ID] = true
+	}
+	oldMemberIdSet[oldHousehold.HouseholdHead.ID] = true
 
-		if err != nil {
-			return nil, err
-		}
+	_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": newHousehold})
+
+	if err != nil {
+		return nil, err
 	}
 
 	totalMembers := len(e.Members) + 1
 
 	personIds := make([]string, totalMembers)
-	for i, member := range e.Members {
-		personIds[i] = member.ID
-	}
-
+	oldPersonIds := make([]string, 0)
 	personIds[totalMembers-1] = e.HouseholdHead.ID
 
+	if oldMemberIdSet[e.HouseholdHead.ID] {
+		oldMemberIdSet[e.HouseholdHead.ID] = false
+	}
+	for i, member := range e.Members {
+		personIds[i] = member.ID
+		if oldMemberIdSet[member.ID] {
+			oldMemberIdSet[member.ID] = false
+		}
+	}
+
+	for id, isDiscarded := range oldMemberIdSet {
+		if isDiscarded {
+			oldPersonIds = append(oldPersonIds, id)
+		}
+	}
+
+	for _, id := range oldPersonIds {
+		h.personHouseholdCollection.UpdateByID(h.ctx,
+			id,
+			bson.M{"$set": bson.M{"householdID": ""}},
+			options.Update().SetUpsert(true),
+		)
+	}
+
 	//replace member's household id with new ids
-	_, err = h.personHouseholdCollection.UpdateMany(h.ctx,
-		bson.M{"personID": bson.M{"$in": personIds}},
-		bson.M{"$set": bson.M{"householdID": newHousehold.ID}},
-		options.Update().SetUpsert(true),
-	)
+	for _, id := range personIds {
+		h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
+	}
 
 	if err != nil {
 		return nil, err
@@ -132,63 +129,4 @@ func NewHouseholdRepository(ctx context.Context, db *mongo.Database) repositorie
 		householdCollection:       db.Collection("household"),
 		personHouseholdCollection: db.Collection("personHousehold"),
 	}
-}
-
-func toHouseholdEntities(householdModel Household) entities.Household {
-	return entities.Household{
-		ID:            householdModel.ID,
-		Name:          householdModel.Name,
-		HouseholdHead: toHouseholdMemberEntities(householdModel.HouseholdHead),
-		PictureUrl:    householdModel.PictureUrl,
-		Members:       getMembersEntities(householdModel),
-	}
-}
-
-func toHouseholdMemberEntities(e HouseholdMember) entities.Person {
-	return entities.Person{
-		ID:                e.PersonID,
-		FirstName:         e.FirstName,
-		LastName:          e.LastName,
-		ProfilePictureUrl: e.ProfilePictureUrl,
-		EmailAddress:      entities.EmailAddress(e.Email),
-		PhoneNumber:       entities.PhoneNumber(e.PhoneNumber),
-	}
-}
-
-func toHouseholdModel(e entities.Household) *Household {
-	householdMembers := getMembersModel(e)
-	return &Household{
-		ID:               e.ID,
-		Name:             e.Name,
-		HouseholdHead:    toHouseholdMemberModel(e.HouseholdHead),
-		PictureUrl:       e.PictureUrl,
-		HouseholdMembers: householdMembers,
-	}
-}
-
-func toHouseholdMemberModel(e entities.Person) HouseholdMember {
-	return HouseholdMember{
-		PersonID:          e.ID,
-		FirstName:         e.FirstName,
-		LastName:          e.LastName,
-		ProfilePictureUrl: e.ProfilePictureUrl,
-		Email:             string(e.EmailAddress),
-		PhoneNumber:       string(e.PhoneNumber),
-	}
-}
-
-func getMembersEntities(e Household) []entities.Person {
-	householdMembers := make([]entities.Person, 0)
-	for _, member := range e.HouseholdMembers {
-		householdMembers = append(householdMembers, toHouseholdMemberEntities(member))
-	}
-	return householdMembers
-}
-
-func getMembersModel(e entities.Household) []HouseholdMember {
-	householdMembers := make([]HouseholdMember, 0)
-	for _, member := range e.Members {
-		householdMembers = append(householdMembers, toHouseholdMemberModel(member))
-	}
-	return householdMembers
 }
