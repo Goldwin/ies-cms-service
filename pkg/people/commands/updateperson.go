@@ -9,17 +9,17 @@ import (
 )
 
 /*
-Add Person use case, where it will create a new person's account, and link inputted emails with user account
+Update Person use case, where it will update a person's information
 */
 type UpdatePersonCommand struct {
 	Input dto.Person
 }
 
 const (
-	UpdatePersonErrorCodeUserNotExist CommandErrorCode = 10102
-	UpdatePersonErrorCodeEmailsExist  CommandErrorCode = 10102
-	UpdatePersonErrorCodeInvalidInput CommandErrorCode = 10103
-	UpdatePersonErrorCodeDBError CommandErrorCode = 10103
+	UpdatePersonErrorCodeUserNotExist CommandErrorCode = 10012
+	UpdatePersonErrorCodeEmailsExist  CommandErrorCode = 10013
+	UpdatePersonErrorCodeInvalidInput CommandErrorCode = 10014
+	UpdatePersonErrorCodeDBError      CommandErrorCode = 10015
 )
 
 func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Person] {
@@ -70,7 +70,7 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 	}
 
 	isEmailExist, err := checkEmailExistence(ctx, person.EmailAddress)
-	if(err != nil) {
+	if err != nil {
 		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
@@ -80,7 +80,7 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	if(isEmailExist) {
+	if isEmailExist {
 		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{

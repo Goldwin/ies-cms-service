@@ -16,6 +16,12 @@ type personRepositoryImpl struct {
 	collection *mongo.Collection
 }
 
+// DeletePerson implements repositories.PersonRepository.
+func (p *personRepositoryImpl) DeletePerson(e entities.Person) error {
+	_, err := p.collection.DeleteOne(p.ctx, bson.M{"_id": e.ID})
+	return err
+}
+
 // GetByEmail implements repositories.PersonRepository.
 func (p *personRepositoryImpl) GetByEmail(email entities.EmailAddress) (*entities.Person, error) {
 	var person Person
