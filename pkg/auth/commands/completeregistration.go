@@ -73,11 +73,6 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	account.Person = entities.Person{
-		FirstName:  cmd.Input.FirstName,
-		MiddleName: cmd.Input.MiddleName,
-		LastName:   cmd.Input.LastName,
-	}
 	account.Roles = []entities.Role{
 		entities.ChurchMember,
 	}
@@ -120,12 +115,8 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 	return CommandExecutionResult[dto.AuthData]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.AuthData{
-			ID:         account.Person.ID,
-			FirstName:  account.Person.FirstName,
-			MiddleName: account.Person.MiddleName,
-			LastName:   account.Person.LastName,
-			Email:      string(account.Email),
-			Scopes:     scopes,
+			Email:  string(account.Email),
+			Scopes: scopes,
 		},
 	}
 }

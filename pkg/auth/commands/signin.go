@@ -241,11 +241,7 @@ func toAuthData(account *entities.Account) dto.AuthData {
 	}
 
 	return dto.AuthData{
-		ID:         account.Person.ID,
-		FirstName:  account.Person.FirstName,
-		MiddleName: account.Person.MiddleName,
-		LastName:   account.Person.MiddleName,
-		Email:      string(account.Email),
-		Scopes:     scopes,
+		Email:  string(account.Email),
+		Scopes: scopes,
 	}
 }

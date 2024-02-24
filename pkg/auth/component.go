@@ -22,12 +22,33 @@ type AuthComponent interface {
 	GenerateOtp(ctx context.Context, input dto.OtpInput, output out.Output[dto.OtpResult])
 	CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData])
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
+	SavePassword(ctx context.Context, input dto.PasswordInput, output out.Output[dto.PasswordResult])
 	common.Component
 }
 
 type authComponentImpl struct {
 	worker    worker.UnitOfWork[commands.CommandContext]
 	secretKey []byte
+}
+
+// SavePassword implements AuthComponent.
+func (a *authComponentImpl) SavePassword(ctx context.Context, input dto.PasswordInput, output out.Output[dto.PasswordResult]) {
+	var res CommandExecutionResult[dto.PasswordResult]
+	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
+		res = commands.SavePasswordCommand{
+			Input: input,
+		}.Execute(ctx)
+		if res.Status != ExecutionStatusSuccess {
+			return res.Error
+		}
+		return nil
+	})
+
+	if res.Status == ExecutionStatusSuccess {
+		output.OnSuccess(res.Result)
+	} else {
+		output.OnError(out.ConvertCommandErrorDetail(res.Error))
+	}
 }
 
 // Start implements AuthComponent.

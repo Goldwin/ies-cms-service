@@ -6,7 +6,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -19,7 +18,6 @@ type accountRepositoryImpl struct {
 
 // AddAccount implements repositories.AccountRepository.
 func (a *accountRepositoryImpl) AddAccount(account entities.Account) (*entities.Account, error) {
-	account.Person.ID = uuid.New().String()
 	bytes, err := msgpack.Marshal(account)
 	if err != nil {
 		return nil, err
@@ -45,7 +43,6 @@ func (a *accountRepositoryImpl) GetAccount(email entities.EmailAddress) (*entiti
 
 // UpdateAccount implements repositories.AccountRepository.
 func (a *accountRepositoryImpl) UpdateAccount(account entities.Account) (*entities.Account, error) {
-	account.Person.ID = uuid.New().String()
 	bytes, err := msgpack.Marshal(account)
 	if err != nil {
 		return nil, err

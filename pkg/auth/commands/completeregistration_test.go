@@ -32,12 +32,6 @@ func (t *CompleteRegistrationCommandTest) SetupTest() {
 func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationCompletedAlready_Failed() {
 	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(&entities.Account{
 		Email: entities.EmailAddress("p6bqK@example.com"),
-		Person: entities.Person{
-			FirstName:  "firstName",
-			MiddleName: "middleName",
-			LastName:   "lastName",
-			ID:         "123",
-		},
 		Roles: []entities.Role{{ID: 1, Name: "Church Member", Scopes: []entities.Scope{
 			entities.EventCheckIn,
 			entities.EventView,
@@ -110,14 +104,12 @@ func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationFailed
 }
 
 func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistration_Success() {
-	personId := "123"
 	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(&entities.Account{
 		Email: entities.EmailAddress("p6bqK@example.com"),
 	}, nil)
 
 	t.accountRepository.EXPECT().UpdateAccount(mock.AnythingOfType("entities.Account")).RunAndReturn(
 		func(a entities.Account) (*entities.Account, error) {
-			a.Person.ID = personId
 			return &a, nil
 		},
 	)
@@ -134,7 +126,6 @@ func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistration_Succe
 	}.Execute(t.ctx)
 
 	assert.Equal(t.T(), common.ExecutionStatusSuccess, result.Status)
-	assert.Equal(t.T(), personId, result.Result.ID)
 }
 
 func TestCompleteRegistration(t *testing.T) {

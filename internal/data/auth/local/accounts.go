@@ -1,7 +1,6 @@
 package local
 
 import (
-	"fmt"
 	"sync/atomic"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
@@ -18,8 +17,6 @@ type accountRepositoryImpl struct {
 
 // AddAccount implements repositories.AccountRepository.
 func (a *accountRepositoryImpl) AddAccount(account entities.Account) (*entities.Account, error) {
-	newId := id.Add(1)
-	account.Person.ID = fmt.Sprintf("%d", newId)
 	accounts[string(account.Email)] = account
 	return &account, nil
 }
