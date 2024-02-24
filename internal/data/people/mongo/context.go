@@ -18,6 +18,12 @@ type queryContextImpl struct {
 	searchPerson          queries.SearchPerson
 	viewPerson            queries.ViewPerson
 	viewHouseholdByPerson queries.ViewHouseholdByPerson
+	viewPersonByEmail     queries.ViewPersonByEmail
+}
+
+// ViewPersonByEmail implements queries.QueryContext.
+func (q *queryContextImpl) ViewPersonByEmail() queries.ViewPersonByEmail {
+	return q.viewPersonByEmail
 }
 
 // ViewHouseholdByPerson implements queries.QueryContext.
@@ -57,5 +63,6 @@ func NewQueryContext(ctx context.Context, db *mongo.Database) queries.QueryConte
 		searchPerson:          SearchPerson(ctx, db),
 		viewPerson:            ViewPerson(ctx, db),
 		viewHouseholdByPerson: ViewHouseholdByPerson(ctx, db),
+		viewPersonByEmail:     ViewPersonByEmail(ctx, db),
 	}
 }

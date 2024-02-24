@@ -19,6 +19,7 @@ type PeopleDataLayerComponent interface {
 
 type PeopleManagementComponent interface {
 	ViewPerson(context.Context, queries.ViewPersonQuery, out.Output[queries.ViewPersonResult])
+	ViewPersonByEmail(context.Context, queries.ViewPersonByEmailQuery, out.Output[queries.ViewPersonResult])
 	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
 	AddPerson(context.Context, dto.Person, out.Output[dto.Person])
 	UpdatePerson(context.Context, dto.Person, out.Output[dto.Person])
@@ -38,6 +39,16 @@ func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext
 type peopleManagementComponent struct {
 	worker      worker.UnitOfWork[commands.CommandContext]
 	queryWorker worker.QueryWorker[queries.QueryContext]
+}
+
+// ViewPersonByEmail implements PeopleManagementComponent.
+func (p *peopleManagementComponent) ViewPersonByEmail(ctx context.Context, input queries.ViewPersonByEmailQuery, output out.Output[queries.ViewPersonResult]) {
+	result, err := p.queryWorker.Query(ctx).ViewPersonByEmail().Execute(input)
+	if err != q.NoQueryError {
+		output.OnError(out.ConvertQueryErrorDetail(err))
+	} else {
+		output.OnSuccess(result)
+	}
 }
 
 // DeletePerson implements PeopleManagementComponent.

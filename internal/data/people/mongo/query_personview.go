@@ -42,8 +42,46 @@ func (v *viewPersonImpl) Execute(query queries.ViewPersonQuery) (queries.ViewPer
 	}, QueryErrorDetail{}
 }
 
+type viewPersonByEmailImpl struct {
+	ctx context.Context
+	db  *mongo.Database
+}
+
+// Execute implements queries.ViewPersonByEmail.
+func (v *viewPersonByEmailImpl) Execute(query queries.ViewPersonByEmailQuery) (queries.ViewPersonResult, QueryErrorDetail) {
+	person := Person{}
+	err := v.db.Collection("person").FindOne(v.ctx, bson.M{"email": query.Email}).Decode(&person)
+	if err != nil && err == mongo.ErrNoDocuments {
+		return queries.ViewPersonResult{
+				Data: nil,
+			}, QueryErrorDetail{
+				Code:    ResourceNotFound,
+				Message: fmt.Sprintf("Person with id %s not found", query.Email),
+			}
+	}
+
+	if err != nil {
+		return queries.ViewPersonResult{}, QueryErrorDetail{
+			Code:    500,
+			Message: "Failed to connect to database",
+		}
+	}
+
+	data := toPersonDTO(person)
+	return queries.ViewPersonResult{
+		Data: &data,
+	}, QueryErrorDetail{}
+}
+
 func ViewPerson(ctx context.Context, db *mongo.Database) queries.ViewPerson {
 	return &viewPersonImpl{
+		ctx: ctx,
+		db:  db,
+	}
+}
+
+func ViewPersonByEmail(ctx context.Context, db *mongo.Database) queries.ViewPersonByEmail {
+	return &viewPersonByEmailImpl{
 		ctx: ctx,
 		db:  db,
 	}
