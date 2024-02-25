@@ -5,6 +5,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
+	peopleDto "github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/queries"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,11 @@ type appController struct {
 }
 
 type LoginResult struct {
+	AccessToken string `json:"token"`
+	Email       string `json:"email"`
+	FirstName   string `json:"firstName"`
+	MiddleName  string `json:"middleName"`
+	LastName    string `json:"lastName"`
 }
 
 func InitializeAppController(r *gin.Engine) {
@@ -47,7 +53,7 @@ func (a *appController) SavePassword(ctx *gin.Context) {
 
 func (a *appController) Login(ctx *gin.Context) {
 	var input dto.SignInInput
-	result := dto.SignInResult{}
+	result := &LoginResult{}
 	ctx.Bind(&input)
 
 	peopleOutput := &outputDecorator[queries.ViewPersonResult]{
@@ -72,7 +78,8 @@ func (a *appController) Login(ctx *gin.Context) {
 			})
 		},
 		successFunc: func(res dto.SignInResult) {
-			result = res
+			result.Email = res.AuthData.Email
+			result.AccessToken = res.AccessToken
 			a.peopleComponent.ViewPersonByEmail(ctx, queries.ViewPersonByEmailQuery{
 				Email: input.Email,
 			}, peopleOutput)
@@ -82,5 +89,19 @@ func (a *appController) Login(ctx *gin.Context) {
 }
 
 func (a *appController) UpdateProfile(ctx *gin.Context) {
-	//TODO
+	var input peopleDto.Person
+	ctx.Bind(&input)
+	a.peopleComponent.UpdatePerson(ctx, input, &outputDecorator[peopleDto.Person]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(person peopleDto.Person) {
+			ctx.JSON(200, gin.H{
+				"data": person,
+			})
+		},
+	})
 }
