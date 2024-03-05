@@ -63,6 +63,7 @@ func main() {
 	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent, eventBusComponent)
 	controller.InitializeAuthController(r, authComponent, eventBusComponent, authOutputComponent, middlewareComponent)
 	controller.InitializeEventsController(r, middlewareComponent, churchEventComponent, eventBusComponent)
+	controller.InitializeCMSController(r, authComponent, peopleManagementComponent, middlewareComponent)
 
 	r.Run()
 }
