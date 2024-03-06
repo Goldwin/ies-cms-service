@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
@@ -42,6 +43,16 @@ func (p *PasswordRepositoryImpl) Get(e entities.EmailAddress) (*entities.Passwor
 	return &otp, nil
 }
 
+func (p *PasswordRepositoryImpl) GetResetToken(e entities.EmailAddress) (string, error) {
+	val := p.client.Get(p.ctx, getPasswordKey(e)).String()
+	return val, nil
+}
+
+func (p *PasswordRepositoryImpl) SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error {
+	err := p.client.Set(p.ctx, getPasswordKey(e), token, ttl).Err()
+	return err
+}
+
 func NewPasswordRepository(ctx context.Context, client redis.UniversalClient, txPipeline redis.Pipeliner) repositories.PasswordRepository {
 	return &PasswordRepositoryImpl{
 		client:     client,
@@ -52,4 +63,8 @@ func NewPasswordRepository(ctx context.Context, client redis.UniversalClient, tx
 
 func getPasswordKey(email entities.EmailAddress) string {
 	return fmt.Sprintf("auth:password:email#%s", email)
+}
+
+func getPasswordResetTokenKey(email entities.EmailAddress) string {
+	return fmt.Sprintf("auth:password-reset-token:email#%s", email)
 }

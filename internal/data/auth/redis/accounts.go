@@ -18,12 +18,7 @@ type accountRepositoryImpl struct {
 
 // AddAccount implements repositories.AccountRepository.
 func (a *accountRepositoryImpl) AddAccount(account entities.Account) (*entities.Account, error) {
-	bytes, err := msgpack.Marshal(account)
-	if err != nil {
-		return nil, err
-	}
-	a.txPipeline.Set(a.ctx, getAccountKey(account.Email), bytes, 0)
-	return &account, nil
+	return a.UpdateAccount(account)
 }
 
 // GetAccount implements repositories.AccountRepository.
