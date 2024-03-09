@@ -29,6 +29,10 @@ type BasicProfile struct {
 	LastName          string `json:"last_name"`
 }
 
+type GeneratePasswordTokenInput struct {
+	EmailAddress string `json:"email"`
+}
+
 // BFF for IES Apps
 func InitializeCMSController(r *gin.Engine,
 	authComponent auth.AuthComponent,
@@ -41,6 +45,7 @@ func InitializeCMSController(r *gin.Engine,
 	}
 	appGroup := r.Group("app")
 	appGroup.POST("login", c.Login)
+	appGroup.POST("password/token", c.GetPasswordResetTokenKey)
 }
 
 func (a *cmsController) SavePassword(ctx *gin.Context) {
@@ -114,6 +119,22 @@ func (a *cmsController) Login(ctx *gin.Context) {
 		},
 	}
 	a.authComponent.SignIn(ctx, input, loginOutput)
+}
+
+func (a *cmsController) GetPasswordResetTokenKey(ctx *gin.Context) {
+	var input GeneratePasswordTokenInput
+	ctx.Bind(&input)
+	a.authComponent.GenerateResetToken(ctx, input.EmailAddress, &outputDecorator[string]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(token string) {
+			ctx.JSON(204, gin.H{})
+		},
+	})
 }
 
 func (a *cmsController) UpdateProfile(ctx *gin.Context) {

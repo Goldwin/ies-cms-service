@@ -188,7 +188,12 @@
         "CMS_COMMAND_WORKER_USE_TRANSACTION": "false",
 
         "ADMIN_EMAIL": "admin@iespik.org",
-        "ADMIN_PASSWORD": "iesadmin"
+        "ADMIN_PASSWORD": "iesadmin",
+
+        "EMAIL_HOST": "smtp.gmail.com",
+        "EMAIL_PORT": "587",
+        "EMAIL_USERNAME": "<EMAIL_USERNAME>",
+        "EMAIL_PASSWORD": "<EMAIL_PASSWORD>"
       }
     }
   ]
