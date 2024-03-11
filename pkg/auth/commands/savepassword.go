@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bytes"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
@@ -13,8 +12,8 @@ import (
 )
 
 const (
-	AddPasswordErrorInvalidInput          CommandErrorCode = 20401
-	AddPasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
+	SavePasswordErrorInvalidInput          CommandErrorCode = 20401
+	SavePasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
 )
 
 type SavePasswordCommand struct {
@@ -23,12 +22,24 @@ type SavePasswordCommand struct {
 
 func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
-	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
+	token, err := ctx.PasswordRepository().GetResetToken(entities.EmailAddress(cmd.Input.Email))
+
+	if err != nil {
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    AddPasswordErrorInvalidInput,
-				Message: "Password and Confirm Password should be same",
+				Code:    SavePasswordErrorInvalidInput,
+				Message: fmt.Sprintf("Failed to fetch Reset Token: %s", err.Error()),
+			},
+		}
+	}
+
+	if token != cmd.Input.Token {
+		return CommandExecutionResult[dto.PasswordResult]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    SavePasswordErrorInvalidInput,
+				Message: fmt.Sprintf("Reset Token Mismatched"),
 			},
 		}
 	}
@@ -40,7 +51,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    AddPasswordErrorFailedToVerifyAccount,
+				Code:    SavePasswordErrorFailedToVerifyAccount,
 				Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 			},
 		}
@@ -57,7 +68,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 			return CommandExecutionResult[dto.PasswordResult]{
 				Status: ExecutionStatusFailed,
 				Error: CommandErrorDetail{
-					Code:    AddPasswordErrorFailedToVerifyAccount,
+					Code:    SavePasswordErrorFailedToVerifyAccount,
 					Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 				},
 			}

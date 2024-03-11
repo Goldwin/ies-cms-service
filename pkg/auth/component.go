@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"log"
-	"os"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
@@ -74,29 +73,7 @@ func (a *authComponentImpl) SavePassword(ctx context.Context, input dto.Password
 
 // Start implements AuthComponent.
 func (a *authComponentImpl) Start() {
-	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
-		res := commands.SavePasswordCommand{
-			Input: dto.PasswordInput{
-				Email:           os.Getenv("ADMIN_EMAIL"),
-				Password:        []byte(os.Getenv("ADMIN_PASSWORD")),
-				ConfirmPassword: []byte(os.Getenv("ADMIN_PASSWORD")),
-			},
-		}.Execute(ctx)
-		if res.Status != ExecutionStatusSuccess {
-			log.Fatal(res.Error)
-		}
-		return nil
-	})
-	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
-		res := commands.GrantAdminRoleCommand{
-			Email: os.Getenv("ADMIN_EMAIL"),
-		}.Execute(ctx)
-
-		if res.Status != ExecutionStatusSuccess {
-			log.Fatal(res.Error)
-		}
-		return nil
-	})
+	//no op
 }
 
 // Stop implements AuthComponent.

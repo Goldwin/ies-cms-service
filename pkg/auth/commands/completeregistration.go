@@ -89,20 +89,20 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	result := SavePasswordCommand{
-		Input: dto.PasswordInput{
-			Email:           cmd.Input.Email,
-			Password:        []byte(cmd.Input.Password),
-			ConfirmPassword: []byte(cmd.Input.ConfirmPassword),
-		},
-	}.Execute(ctx)
+	// result := SavePasswordCommand{
+	// 	Input: dto.PasswordInput{
+	// 		Email:           cmd.Input.Email,
+	// 		Password:        []byte(cmd.Input.Password),
+	// 		ConfirmPassword: []byte(cmd.Input.ConfirmPassword),
+	// 	},
+	// }.Execute(ctx)
 
-	if result.Status != ExecutionStatusSuccess {
-		return CommandExecutionResult[dto.AuthData]{
-			Status: ExecutionStatusFailed,
-			Error:  result.Error,
-		}
-	}
+	// if result.Status != ExecutionStatusSuccess {
+	// 	return CommandExecutionResult[dto.AuthData]{
+	// 		Status: ExecutionStatusFailed,
+	// 		Error:  result.Error,
+	// 	}
+	// }
 
 	scopes := make([]string, 0)
 
