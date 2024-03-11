@@ -70,7 +70,7 @@ func (a *cmsController) SavePassword(ctx *gin.Context) {
 			})
 		},
 	}
-	a.authComponent.SavePassword(ctx, input, outputDecorator)
+	a.authComponent.ResetPassword(ctx, input, outputDecorator)
 }
 
 func (a *cmsController) Login(ctx *gin.Context) {

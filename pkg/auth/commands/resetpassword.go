@@ -16,11 +16,11 @@ const (
 	SavePasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
 )
 
-type SavePasswordCommand struct {
+type ResetPasswordCommand struct {
 	Input dto.PasswordInput
 }
 
-func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
+func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
 	token, err := ctx.PasswordRepository().GetResetToken(entities.EmailAddress(cmd.Input.Email))
 
