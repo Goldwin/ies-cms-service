@@ -23,7 +23,7 @@ type AuthComponent interface {
 	CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData])
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
 	SavePassword(ctx context.Context, input dto.PasswordInput, output out.Output[dto.PasswordResult])
-	GenerateResetToken(ctx context.Context, email string, output out.Output[string])
+	GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetTokenResult])
 	common.Component
 }
 
@@ -33,8 +33,8 @@ type authComponentImpl struct {
 }
 
 // GenerateResetToken implements AuthComponent.
-func (a *authComponentImpl) GenerateResetToken(ctx context.Context, email string, output out.Output[string]) {
-	var res CommandExecutionResult[string]
+func (a *authComponentImpl) GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetTokenResult]) {
+	var res CommandExecutionResult[dto.PasswordResetTokenResult]
 	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
 		res = commands.GenerateResetTokenCommand{
 			Email: email,

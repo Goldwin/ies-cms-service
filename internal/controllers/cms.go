@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
+	"github.com/Goldwin/ies-pik-cms/internal/out/cms"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
@@ -12,8 +14,9 @@ import (
 )
 
 type cmsController struct {
-	peopleComponent people.PeopleManagementComponent
-	authComponent   auth.AuthComponent
+	peopleComponent     people.PeopleManagementComponent
+	authComponent       auth.AuthComponent
+	resetPasswordOutput out.Output[dto.PasswordResetTokenResult]
 }
 
 type LoginResult struct {
@@ -38,10 +41,12 @@ func InitializeCMSController(r *gin.Engine,
 	authComponent auth.AuthComponent,
 	peopleComponent people.PeopleManagementComponent,
 	middlewareComponent middleware.MiddlewareComponent,
+	emailClient infra.EmailClient,
 ) {
 	c := &cmsController{
-		peopleComponent: peopleComponent,
-		authComponent:   authComponent,
+		peopleComponent:     peopleComponent,
+		authComponent:       authComponent,
+		resetPasswordOutput: cms.NewPasswordResetOutputHandler(emailClient),
 	}
 	appGroup := r.Group("app")
 	appGroup.POST("login", c.Login)
@@ -124,14 +129,14 @@ func (a *cmsController) Login(ctx *gin.Context) {
 func (a *cmsController) GetPasswordResetTokenKey(ctx *gin.Context) {
 	var input GeneratePasswordTokenInput
 	ctx.Bind(&input)
-	a.authComponent.GenerateResetToken(ctx, input.EmailAddress, &outputDecorator[string]{
-		output: nil,
+	a.authComponent.GenerateResetToken(ctx, input.EmailAddress, &outputDecorator[dto.PasswordResetTokenResult]{
+		output: a.resetPasswordOutput,
 		errFunction: func(err out.AppErrorDetail) {
 			ctx.JSON(400, gin.H{
 				"error": err,
 			})
 		},
-		successFunc: func(token string) {
+		successFunc: func(token dto.PasswordResetTokenResult) {
 			ctx.JSON(204, gin.H{})
 		},
 	})

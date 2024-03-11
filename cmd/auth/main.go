@@ -18,11 +18,12 @@ import (
 func main() {
 	config := config.LoadConfigEnv()
 
+	emailClient := infra.NewEmailClient(config.EmailConfig)
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
 	eventBus := bus.Redis(infraComponent)
-	authOutputComponent := out.NewAuthOutputComponent(eventBus)
+	authOutputComponent := out.NewAuthOutputComponent(emailClient, eventBus)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 
 	gin.SetMode(config.ControllerConfig.Mode)

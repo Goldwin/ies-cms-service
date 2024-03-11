@@ -17,21 +17,21 @@ type emailClientImpl struct {
 }
 
 type EmailClient interface {
-	Send(to []string, subject string, message string) error
+	Send(to []string, subject string, mime string, message string) error
 }
 
-func NewEmailSender(config EmailConfig) EmailClient {
+func NewEmailClient(config EmailConfig) EmailClient {
 	return &emailClientImpl{
 		config: config,
 	}
 }
 
-func (s *emailClientImpl) Send(to []string, subject string, message string) error {
+func (s *emailClientImpl) Send(to []string, subject string, mime string, message string) error {
 
 	hostAndPort := fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)
 
 	auth := smtp.PlainAuth("", s.config.Username, s.config.Password, s.config.Host)
 
-	msg := fmt.Sprintf("Subject: %s\n\n%s", subject, message)
+	msg := fmt.Sprintf("Subject: %s\n%s\n%s", subject, mime, message)
 	return smtp.SendMail(hostAndPort, auth, s.config.Username, to, []byte(msg))
 }
