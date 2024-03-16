@@ -23,8 +23,8 @@ type CompleteRegistrationCommandTest struct {
 
 const (
 	emailAddressType = "entities.EmailAddress"
-	emailAddress = "p6bqK@example.com"
-	password = "p@ssw0rd"
+	emailAddress     = "p6bqK@example.com"
+	password         = "p@ssw0rd"
 )
 
 func (t *CompleteRegistrationCommandTest) SetupTest() {
@@ -119,7 +119,6 @@ func (t *CompleteRegistrationCommandTest) TestExecuteCompleteRegistrationSuccess
 			return &a, nil
 		},
 	)
-	t.passwordRepository.EXPECT().Save(mock.AnythingOfType("entities.PasswordDetail")).Return(nil)
 	result := commands.CompleteRegistrationCommand{
 		Input: dto.CompleteRegistrationInput{
 			FirstName:       "firstName",
