@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"log"
-	"os"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
@@ -22,6 +21,8 @@ type AuthComponent interface {
 	GenerateOtp(ctx context.Context, input dto.OtpInput, output out.Output[dto.OtpResult])
 	CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData])
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
+	ResetPassword(ctx context.Context, input dto.PasswordResetInput, output out.Output[dto.PasswordResult])
+	GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetTokenResult])
 	common.Component
 }
 
@@ -30,31 +31,49 @@ type authComponentImpl struct {
 	secretKey []byte
 }
 
+// GenerateResetToken implements AuthComponent.
+func (a *authComponentImpl) GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetTokenResult]) {
+	var res CommandExecutionResult[dto.PasswordResetTokenResult]
+	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
+		res = commands.GenerateResetTokenCommand{
+			Email: email,
+		}.Execute(ctx)
+		if res.Status != ExecutionStatusSuccess {
+			return res.Error
+		}
+		return nil
+	})
+
+	if res.Status == ExecutionStatusSuccess {
+		output.OnSuccess(res.Result)
+	} else {
+		output.OnError(out.ConvertCommandErrorDetail(res.Error))
+	}
+}
+
+// ResetPassword implements AuthComponent.
+func (a *authComponentImpl) ResetPassword(ctx context.Context, input dto.PasswordResetInput, output out.Output[dto.PasswordResult]) {
+	var res CommandExecutionResult[dto.PasswordResult]
+	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
+		res = commands.ResetPasswordCommand{
+			Input: input,
+		}.Execute(ctx)
+		if res.Status != ExecutionStatusSuccess {
+			return res.Error
+		}
+		return nil
+	})
+
+	if res.Status == ExecutionStatusSuccess {
+		output.OnSuccess(res.Result)
+	} else {
+		output.OnError(out.ConvertCommandErrorDetail(res.Error))
+	}
+}
+
 // Start implements AuthComponent.
 func (a *authComponentImpl) Start() {
-	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
-		res := commands.SavePasswordCommand{
-			Input: dto.PasswordInput{
-				Email:           os.Getenv("ADMIN_EMAIL"),
-				Password:        []byte(os.Getenv("ADMIN_PASSWORD")),
-				ConfirmPassword: []byte(os.Getenv("ADMIN_PASSWORD")),
-			},
-		}.Execute(ctx)
-		if res.Status != ExecutionStatusSuccess {
-			log.Fatal(res.Error)
-		}
-		return nil
-	})
-	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
-		res := commands.GrantAdminRoleCommand{
-			Email: os.Getenv("ADMIN_EMAIL"),
-		}.Execute(ctx)
-
-		if res.Status != ExecutionStatusSuccess {
-			log.Fatal(res.Error)
-		}
-		return nil
-	})
+	//no op
 }
 
 // Stop implements AuthComponent.

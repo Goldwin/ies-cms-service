@@ -2,6 +2,7 @@ package auth
 
 import (
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
+	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/internal/out/common"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
@@ -41,9 +42,9 @@ func (a *authOutputComponentImpl) OTPOutput() out.Output[dto.OtpResult] {
 	return a.otpOutput
 }
 
-func NewAuthOutputComponent(eventBus bus.EventBusComponent) AuthOutputComponent {
+func NewAuthOutputComponent(emailClient infra.EmailClient, eventBus bus.EventBusComponent) AuthOutputComponent {
 	return &authOutputComponentImpl{
-		otpOutput:             newOtpOutputHandler(),
+		otpOutput:             newOtpOutputHandler(emailClient),
 		signInOutputHandler:   newSampleSignInOutputHandler(),
 		registerOutputHandler: newRegisterOutputHandler(eventBus),
 	}

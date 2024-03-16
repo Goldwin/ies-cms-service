@@ -96,12 +96,8 @@ func (cmd AuthCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Au
 		Status: ExecutionStatusSuccess,
 		Error:  CommandErrorDetail{},
 		Result: dto.AuthData{
-			ID:         account.Person.ID,
-			FirstName:  account.Person.FirstName,
-			MiddleName: account.Person.MiddleName,
-			LastName:   account.Person.LastName,
-			Email:      string(email),
-			Scopes:     scopes,
+			Email:  string(email),
+			Scopes: scopes,
 		},
 	}
 }

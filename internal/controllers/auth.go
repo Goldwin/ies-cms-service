@@ -138,7 +138,6 @@ func (a *authController) otpSignIn(c *gin.Context) {
 	c.BindJSON(&input)
 	input.Method = "otp"
 	output := &outputDecorator[dto.SignInResult]{
-		output: a.authOutputComponent.SignInOutput(),
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err,

@@ -1,15 +1,35 @@
 package local
 
 import (
+	"time"
+
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 )
 
 var (
 	passwordMap map[string]entities.PasswordDetail = make(map[string]entities.PasswordDetail)
+	resetToken  map[string]string                  = make(map[string]string)
 )
 
 type localPasswordRepository struct {
+}
+
+// DeleteResetToken implements repositories.PasswordRepository.
+func (l *localPasswordRepository) DeleteResetToken(e entities.EmailAddress) error {
+	delete(resetToken, string(e))
+	return nil
+}
+
+// GetResetToken implements repositories.PasswordRepository.
+func (l *localPasswordRepository) GetResetToken(e entities.EmailAddress) (string, error) {
+	return resetToken[string(e)], nil
+}
+
+// SaveResetToken implements repositories.PasswordRepository.
+func (l *localPasswordRepository) SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error {
+	resetToken[string(e)] = token
+	return nil
 }
 
 // Save implements repositories.PasswordRepository.

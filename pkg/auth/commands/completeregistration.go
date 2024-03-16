@@ -73,11 +73,6 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	account.Person = entities.Person{
-		FirstName:  cmd.Input.FirstName,
-		MiddleName: cmd.Input.MiddleName,
-		LastName:   cmd.Input.LastName,
-	}
 	account.Roles = []entities.Role{
 		entities.ChurchMember,
 	}
@@ -94,20 +89,20 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	result := SavePasswordCommand{
-		Input: dto.PasswordInput{
-			Email:           cmd.Input.Email,
-			Password:        []byte(cmd.Input.Password),
-			ConfirmPassword: []byte(cmd.Input.ConfirmPassword),
-		},
-	}.Execute(ctx)
+	// result := SavePasswordCommand{
+	// 	Input: dto.PasswordInput{
+	// 		Email:           cmd.Input.Email,
+	// 		Password:        []byte(cmd.Input.Password),
+	// 		ConfirmPassword: []byte(cmd.Input.ConfirmPassword),
+	// 	},
+	// }.Execute(ctx)
 
-	if result.Status != ExecutionStatusSuccess {
-		return CommandExecutionResult[dto.AuthData]{
-			Status: ExecutionStatusFailed,
-			Error:  result.Error,
-		}
-	}
+	// if result.Status != ExecutionStatusSuccess {
+	// 	return CommandExecutionResult[dto.AuthData]{
+	// 		Status: ExecutionStatusFailed,
+	// 		Error:  result.Error,
+	// 	}
+	// }
 
 	scopes := make([]string, 0)
 
@@ -120,12 +115,8 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 	return CommandExecutionResult[dto.AuthData]{
 		Status: ExecutionStatusSuccess,
 		Result: dto.AuthData{
-			ID:         account.Person.ID,
-			FirstName:  account.Person.FirstName,
-			MiddleName: account.Person.MiddleName,
-			LastName:   account.Person.LastName,
-			Email:      string(account.Email),
-			Scopes:     scopes,
+			Email:  string(account.Email),
+			Scopes: scopes,
 		},
 	}
 }

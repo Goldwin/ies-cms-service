@@ -43,11 +43,9 @@ func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 		TLSConfig:      tlsConfig,
 		DB:             0,
 	}
-	if r != nil {
-		redisClient = redis.NewUniversalClient(&option)
-	} else {
-		log.Fatal("Failed to parse redis config.")
-	}
+
+	redisClient = redis.NewUniversalClient(&option)
+
 	log.Default().Printf("Initializing Redis. Connecting to %s", r.Hosts)
 	str, err := redisClient.Ping(context.Background()).Result()
 	if err != nil {

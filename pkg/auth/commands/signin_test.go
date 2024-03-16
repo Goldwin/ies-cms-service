@@ -64,7 +64,6 @@ func (t *SignInCommandTest) TestExecute_OtpSignIn_Success() {
 }
 
 func (t *SignInCommandTest) TestExecute_OtpSignInAccountNotExists_Success() {
-	personId := "person-id-1"
 	email := "p6bqK@example.com"
 	password := []byte("password")
 	salt := []byte("salt")
@@ -81,7 +80,6 @@ func (t *SignInCommandTest) TestExecute_OtpSignInAccountNotExists_Success() {
 	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
 	t.accountRepository.EXPECT().AddAccount(mock.AnythingOfType("entities.Account")).RunAndReturn(
 		func(a entities.Account) (*entities.Account, error) {
-			a.Person.ID = personId
 			return &a, nil
 		},
 	)
@@ -94,7 +92,6 @@ func (t *SignInCommandTest) TestExecute_OtpSignInAccountNotExists_Success() {
 	}.Execute(t.ctx)
 
 	assert.Equal(t.T(), common.ExecutionStatusSuccess, result.Status)
-	assert.Equal(t.T(), personId, result.Result.AuthData.ID)
 }
 
 func (t *SignInCommandTest) TestExecute_OtpSignInAccountNotExistsFailedToCreate_Failed() {

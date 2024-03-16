@@ -97,7 +97,6 @@ func (t *AuthCommandTest) TestExecute_AccountNotExists_Failed() {
 
 func (t *AuthCommandTest) TestExecute_AccountExists_Success() {
 	secretKey := []byte("secret-key")
-	personId := "account-id"
 	token := createValidToken("example@email.com", secretKey)
 	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(
 		&entities.Account{
@@ -110,14 +109,12 @@ func (t *AuthCommandTest) TestExecute_AccountExists_Success() {
 					},
 				},
 			},
-			Person: entities.Person{ID: personId},
 		}, nil)
 	result := commands.AuthCommand{
 		Token:     token,
 		SecretKey: secretKey,
 	}.Execute(t.ctx)
 	assert.Equal(t.T(), common.ExecutionStatusSuccess, result.Status)
-	assert.Equal(t.T(), personId, result.Result.ID)
 }
 
 func TestAuth(t *testing.T) {

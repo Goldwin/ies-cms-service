@@ -26,6 +26,8 @@ import (
 func main() {
 	config := config.LoadConfigEnv()
 
+	emailClient := infra.NewEmailClient(config.EmailConfig)
+
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	peopleDataLayer := peopleData.NewPeopleDataLayerComponent(config.DataConfig["PEOPLE"], infraComponent)
 	authDataLayer := authData.NewAuthDataLayerComponent(data.DataLayerConfig{
@@ -49,7 +51,7 @@ func main() {
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 	eventBusComponent := bus.Local()
 
-	authOutputComponent := out.NewAuthOutputComponent(eventBusComponent)
+	authOutputComponent := out.NewAuthOutputComponent(emailClient, eventBusComponent)
 
 	r := gin.Default()
 	r.Use(middlewareComponent.Cors())
@@ -63,6 +65,7 @@ func main() {
 	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent, eventBusComponent)
 	controller.InitializeAuthController(r, authComponent, eventBusComponent, authOutputComponent, middlewareComponent)
 	controller.InitializeEventsController(r, middlewareComponent, churchEventComponent, eventBusComponent)
+	controller.InitializeCMSController(r, authComponent, peopleManagementComponent, middlewareComponent, emailClient)
 
 	r.Run()
 }

@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bytes"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
@@ -13,22 +12,34 @@ import (
 )
 
 const (
-	AddPasswordErrorInvalidInput          CommandErrorCode = 20401
-	AddPasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
+	SavePasswordErrorInvalidInput          CommandErrorCode = 20401
+	SavePasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
 )
 
-type SavePasswordCommand struct {
-	Input dto.PasswordInput
+type ResetPasswordCommand struct {
+	Input dto.PasswordResetInput
 }
 
-func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
+func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
-	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
+	token, err := ctx.PasswordRepository().GetResetToken(entities.EmailAddress(cmd.Input.Email))
+
+	if err != nil {
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    AddPasswordErrorInvalidInput,
-				Message: "Password and Confirm Password should be same",
+				Code:    SavePasswordErrorInvalidInput,
+				Message: fmt.Sprintf("Failed to fetch Reset Token: %s", err.Error()),
+			},
+		}
+	}
+
+	if token != cmd.Input.Token {
+		return CommandExecutionResult[dto.PasswordResult]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    SavePasswordErrorInvalidInput,
+				Message: fmt.Sprintf("Reset Token Mismatched"),
 			},
 		}
 	}
@@ -40,7 +51,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    AddPasswordErrorFailedToVerifyAccount,
+				Code:    SavePasswordErrorFailedToVerifyAccount,
 				Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 			},
 		}
@@ -48,9 +59,8 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 
 	if account == nil {
 		_, err = ctx.AccountRepository().AddAccount(entities.Account{
-			Email:  entities.EmailAddress(cmd.Input.Email),
-			Roles:  []entities.Role{},
-			Person: entities.Person{},
+			Email: entities.EmailAddress(cmd.Input.Email),
+			Roles: []entities.Role{},
 		})
 
 		if err != nil {
@@ -58,7 +68,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 			return CommandExecutionResult[dto.PasswordResult]{
 				Status: ExecutionStatusFailed,
 				Error: CommandErrorDetail{
-					Code:    AddPasswordErrorFailedToVerifyAccount,
+					Code:    SavePasswordErrorFailedToVerifyAccount,
 					Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
 				},
 			}
@@ -86,8 +96,22 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 	password.PasswordHash = passwordHash[:]
 
 	err = ctx.PasswordRepository().Save(password)
+	if(err != nil) {
+		return CommandExecutionResult[dto.PasswordResult]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    SavePasswordErrorFailedToVerifyAccount,
+				Message: fmt.Sprintf("Failed to Save Password: %s", err.Error()),
+			},
+		}
+	}
+
+	err = ctx.PasswordRepository().DeleteResetToken(entities.EmailAddress(cmd.Input.Email))
 
 	return CommandExecutionResult[dto.PasswordResult]{
 		Status: ExecutionStatusSuccess,
+		Result: dto.PasswordResult{
+			Email: string(password.EmailAddress),
+		},
 	}
 }

@@ -19,17 +19,14 @@ type Config struct {
 	DataConfig       map[string]data.DataLayerConfig `yaml:"datalayer"`
 	ControllerConfig controller.ControllerConfig     `yaml:"controller"`
 	MiddlewareConfig middleware.MiddlewareConfig     `yaml:"middleware"`
+	EmailConfig      infra.EmailConfig
 }
 
 func LoadConfigEnv() Config {
 	config := Config{
 		Secret: []byte(os.Getenv("SECRET_KEY")),
 	}
-	envName := os.Getenv("env")
 	serviceName := os.Getenv("SERVICE_NAME")
-	if envName == "" {
-		envName = "dev"
-	}
 
 	opts := env.Options{
 		Prefix: serviceName + "_",
@@ -38,6 +35,11 @@ func LoadConfigEnv() Config {
 	if err := env.ParseWithOptions(&config, opts); err != nil {
 		log.Fatal(err.Error())
 	}
+
+	if err := env.Parse(&config.EmailConfig); err != nil {
+		log.Fatal(err.Error())
+	}
+
 	config.ServiceName = serviceName
 	config.MiddlewareConfig.AuthUrl = os.Getenv("AUTH_SERVICE_URL")
 	modules := os.Getenv("SERVICE_MODULES")

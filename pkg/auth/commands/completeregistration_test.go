@@ -21,6 +21,12 @@ type CompleteRegistrationCommandTest struct {
 	suite.Suite
 }
 
+const (
+	emailAddressType = "entities.EmailAddress"
+	emailAddress = "p6bqK@example.com"
+	password = "p@ssw0rd"
+)
+
 func (t *CompleteRegistrationCommandTest) SetupTest() {
 	t.ctx = mocks.NewCommandContext(t.T())
 	t.accountRepository = mocks.NewAccountRepository(t.T())
@@ -29,15 +35,9 @@ func (t *CompleteRegistrationCommandTest) SetupTest() {
 	t.ctx.EXPECT().PasswordRepository().Maybe().Return(t.passwordRepository)
 }
 
-func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationCompletedAlready_Failed() {
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(&entities.Account{
-		Email: entities.EmailAddress("p6bqK@example.com"),
-		Person: entities.Person{
-			FirstName:  "firstName",
-			MiddleName: "middleName",
-			LastName:   "lastName",
-			ID:         "123",
-		},
+func (t *CompleteRegistrationCommandTest) TestExecuteCompleteRegistrationCompletedAlreadyFailed() {
+	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType(emailAddressType)).Return(&entities.Account{
+		Email: entities.EmailAddress(emailAddress),
 		Roles: []entities.Role{{ID: 1, Name: "Church Member", Scopes: []entities.Scope{
 			entities.EventCheckIn,
 			entities.EventView,
@@ -48,50 +48,50 @@ func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationComple
 			FirstName:       "firstName",
 			MiddleName:      "middleName",
 			LastName:        "lastName",
-			Email:           "p6bqK@example.com",
-			Password:        []byte("p@ssw0rd"),
-			ConfirmPassword: []byte("p@ssw0rd"),
+			Email:           emailAddress,
+			Password:        []byte(password),
+			ConfirmPassword: []byte(password),
 		},
 	}.Execute(t.ctx)
 	assert.Equal(t.T(), common.ExecutionStatusFailed, result.Status)
 	assert.Equal(t.T(), commands.CompleteRegistrationErrorAlreadyCompleted, result.Error.Code)
 }
 
-func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationAccountReadFailure_Failed() {
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(nil, fmt.Errorf("error"))
+func (t *CompleteRegistrationCommandTest) TestExecuteCompleteRegistrationAccountReadFailureFailed() {
+	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType(emailAddressType)).Return(nil, fmt.Errorf("error"))
 	result := commands.CompleteRegistrationCommand{
 		Input: dto.CompleteRegistrationInput{
 			FirstName:       "firstName",
 			MiddleName:      "middleName",
 			LastName:        "lastName",
-			Email:           "p6bqK@example.com",
-			Password:        []byte("p@ssw0rd"),
-			ConfirmPassword: []byte("p@ssw0rd"),
+			Email:           emailAddress,
+			Password:        []byte(password),
+			ConfirmPassword: []byte(password),
 		},
 	}.Execute(t.ctx)
 	assert.Equal(t.T(), common.ExecutionStatusFailed, result.Status)
 	assert.Equal(t.T(), commands.CompleteRegistrationErrorFailedToGetAccount, result.Error.Code)
 }
 
-func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationAccountIsNotRegistered_Failed() {
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
+func (t *CompleteRegistrationCommandTest) TestExecuteCompleteRegistrationAccountIsNotRegisteredFailed() {
+	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType(emailAddressType)).Return(nil, nil)
 	result := commands.CompleteRegistrationCommand{
 		Input: dto.CompleteRegistrationInput{
 			FirstName:       "firstName",
 			MiddleName:      "middleName",
 			LastName:        "lastName",
-			Email:           "p6bqK@example.com",
-			Password:        []byte("p@ssw0rd"),
-			ConfirmPassword: []byte("p@ssw0rd"),
+			Email:           emailAddress,
+			Password:        []byte(password),
+			ConfirmPassword: []byte(password),
 		},
 	}.Execute(t.ctx)
 	assert.Equal(t.T(), common.ExecutionStatusFailed, result.Status)
 	assert.Equal(t.T(), commands.CompleteRegistrationErrorAccountIsNotRegistered, result.Error.Code)
 }
 
-func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationFailedToUpdate_Failed() {
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(&entities.Account{
-		Email: entities.EmailAddress("p6bqK@example.com"),
+func (t *CompleteRegistrationCommandTest) TestExecuteCompleteRegistrationFailedToUpdateFailed() {
+	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType(emailAddressType)).Return(&entities.Account{
+		Email: entities.EmailAddress(emailAddress),
 	}, nil)
 
 	t.accountRepository.EXPECT().UpdateAccount(mock.AnythingOfType("entities.Account")).Return(nil, fmt.Errorf("failed to update"))
@@ -100,24 +100,22 @@ func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistrationFailed
 			FirstName:       "firstName",
 			MiddleName:      "middleName",
 			LastName:        "lastName",
-			Email:           "p6bqK@example.com",
-			Password:        []byte("p@ssw0rd"),
-			ConfirmPassword: []byte("p@ssw0rd"),
+			Email:           emailAddress,
+			Password:        []byte(password),
+			ConfirmPassword: []byte(password),
 		},
 	}.Execute(t.ctx)
 	assert.Equal(t.T(), common.ExecutionStatusFailed, result.Status)
 	assert.Equal(t.T(), commands.CompleteRegistrationErrorUpdateFailure, result.Error.Code)
 }
 
-func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistration_Success() {
-	personId := "123"
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(&entities.Account{
-		Email: entities.EmailAddress("p6bqK@example.com"),
+func (t *CompleteRegistrationCommandTest) TestExecuteCompleteRegistrationSuccess() {
+	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType(emailAddressType)).Return(&entities.Account{
+		Email: entities.EmailAddress(emailAddress),
 	}, nil)
 
 	t.accountRepository.EXPECT().UpdateAccount(mock.AnythingOfType("entities.Account")).RunAndReturn(
 		func(a entities.Account) (*entities.Account, error) {
-			a.Person.ID = personId
 			return &a, nil
 		},
 	)
@@ -127,14 +125,13 @@ func (t *CompleteRegistrationCommandTest) TestExecute_CompleteRegistration_Succe
 			FirstName:       "firstName",
 			MiddleName:      "middleName",
 			LastName:        "lastName",
-			Email:           "p6bqK@example.com",
-			Password:        []byte("p@ssw0rd"),
-			ConfirmPassword: []byte("p@ssw0rd"),
+			Email:           emailAddress,
+			Password:        []byte(password),
+			ConfirmPassword: []byte(password),
 		},
 	}.Execute(t.ctx)
 
 	assert.Equal(t.T(), common.ExecutionStatusSuccess, result.Status)
-	assert.Equal(t.T(), personId, result.Result.ID)
 }
 
 func TestCompleteRegistration(t *testing.T) {
