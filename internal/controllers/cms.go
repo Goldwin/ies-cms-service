@@ -49,12 +49,13 @@ func InitializeCMSController(r *gin.Engine,
 		resetPasswordOutput: cms.NewPasswordResetOutputHandler(emailClient),
 	}
 	appGroup := r.Group("app")
-	appGroup.POST("login", c.Login)
-	appGroup.POST("password/token", c.GetPasswordResetTokenKey)
+	appGroup.POST("login", c.login)
+	appGroup.POST("password/reset/token", c.getPasswordResetTokenKey)
+	appGroup.POST("password/reset", c.resetPassword)
 }
 
-func (a *cmsController) SavePassword(ctx *gin.Context) {
-	var input dto.PasswordInput
+func (a *cmsController) resetPassword(ctx *gin.Context) {
+	var input dto.PasswordResetInput
 	ctx.Bind(&input)
 
 	outputDecorator := &outputDecorator[dto.PasswordResult]{
@@ -73,12 +74,11 @@ func (a *cmsController) SavePassword(ctx *gin.Context) {
 	a.authComponent.ResetPassword(ctx, input, outputDecorator)
 }
 
-func (a *cmsController) Login(ctx *gin.Context) {
+func (a *cmsController) login(ctx *gin.Context) {
 	var input dto.SignInInput
 	result := &LoginResult{}
 	ctx.Bind(&input)
 
-	//TODO use enum or const
 	input.Method = "password"
 
 	peopleOutput := &outputDecorator[queries.ViewPersonResult]{
@@ -126,7 +126,7 @@ func (a *cmsController) Login(ctx *gin.Context) {
 	a.authComponent.SignIn(ctx, input, loginOutput)
 }
 
-func (a *cmsController) GetPasswordResetTokenKey(ctx *gin.Context) {
+func (a *cmsController) getPasswordResetTokenKey(ctx *gin.Context) {
 	var input GeneratePasswordTokenInput
 	ctx.Bind(&input)
 	a.authComponent.GenerateResetToken(ctx, input.EmailAddress, &outputDecorator[dto.PasswordResetTokenResult]{

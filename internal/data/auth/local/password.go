@@ -15,6 +15,12 @@ var (
 type localPasswordRepository struct {
 }
 
+// DeleteResetToken implements repositories.PasswordRepository.
+func (l *localPasswordRepository) DeleteResetToken(e entities.EmailAddress) error {
+	delete(resetToken, string(e))
+	return nil
+}
+
 // GetResetToken implements repositories.PasswordRepository.
 func (l *localPasswordRepository) GetResetToken(e entities.EmailAddress) (string, error) {
 	return resetToken[string(e)], nil

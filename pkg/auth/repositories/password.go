@@ -11,4 +11,5 @@ type PasswordRepository interface {
 	Save(entities.PasswordDetail) error
 	GetResetToken(e entities.EmailAddress) (string, error)
 	SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error
+	DeleteResetToken(e entities.EmailAddress) error
 }

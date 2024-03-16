@@ -17,7 +17,7 @@ const (
 )
 
 type ResetPasswordCommand struct {
-	Input dto.PasswordInput
+	Input dto.PasswordResetInput
 }
 
 func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
@@ -96,8 +96,22 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 	password.PasswordHash = passwordHash[:]
 
 	err = ctx.PasswordRepository().Save(password)
+	if(err != nil) {
+		return CommandExecutionResult[dto.PasswordResult]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    SavePasswordErrorFailedToVerifyAccount,
+				Message: fmt.Sprintf("Failed to Save Password: %s", err.Error()),
+			},
+		}
+	}
+
+	err = ctx.PasswordRepository().DeleteResetToken(entities.EmailAddress(cmd.Input.Email))
 
 	return CommandExecutionResult[dto.PasswordResult]{
 		Status: ExecutionStatusSuccess,
+		Result: dto.PasswordResult{
+			Email: string(password.EmailAddress),
+		},
 	}
 }

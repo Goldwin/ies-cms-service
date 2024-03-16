@@ -1,8 +1,8 @@
 package dto
 
-type PasswordInput struct {
+type PasswordResetInput struct {
 	Email    string `json:"email"`
-	Password []byte `json:"password"`
+	Password string `json:"password"`
 	Token    string `json:"token"`
 }
 

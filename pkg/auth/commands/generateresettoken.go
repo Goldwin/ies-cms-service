@@ -20,7 +20,7 @@ type GenerateResetTokenCommand struct {
 
 func (cmd GenerateResetTokenCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResetTokenResult] {
 	//30 seconds minimum
-	ttlMillis := max(cmd.TTLMillis, 30000)
+	ttlMillis := max(cmd.TTLMillis, 300000)
 	token, err := rand.Int(rand.Reader, big.NewInt(999999))
 	if err != nil {
 		return CommandExecutionResult[dto.PasswordResetTokenResult]{

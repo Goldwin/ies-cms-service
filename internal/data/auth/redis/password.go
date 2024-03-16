@@ -17,6 +17,11 @@ type PasswordRepositoryImpl struct {
 	txPipeline redis.Pipeliner
 }
 
+// DeleteResetToken implements repositories.PasswordRepository.
+func (p *PasswordRepositoryImpl) DeleteResetToken(e entities.EmailAddress) error {
+	return p.client.Del(p.ctx, getPasswordResetTokenKey(e)).Err()
+}
+
 // Save implements repositories.PasswordRepository.
 func (p *PasswordRepositoryImpl) Save(e entities.PasswordDetail) error {
 	bytes, err := msgpack.Marshal(e)
@@ -44,12 +49,12 @@ func (p *PasswordRepositoryImpl) Get(e entities.EmailAddress) (*entities.Passwor
 }
 
 func (p *PasswordRepositoryImpl) GetResetToken(e entities.EmailAddress) (string, error) {
-	val := p.client.Get(p.ctx, getPasswordKey(e)).String()
+	val := p.client.Get(p.ctx, getPasswordResetTokenKey(e)).Val()
 	return val, nil
 }
 
 func (p *PasswordRepositoryImpl) SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error {
-	err := p.client.Set(p.ctx, getPasswordKey(e), token, ttl).Err()
+	err := p.client.Set(p.ctx, getPasswordResetTokenKey(e), token, ttl).Err()
 	return err
 }
 

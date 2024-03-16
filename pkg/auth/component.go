@@ -21,7 +21,7 @@ type AuthComponent interface {
 	GenerateOtp(ctx context.Context, input dto.OtpInput, output out.Output[dto.OtpResult])
 	CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData])
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
-	ResetPassword(ctx context.Context, input dto.PasswordInput, output out.Output[dto.PasswordResult])
+	ResetPassword(ctx context.Context, input dto.PasswordResetInput, output out.Output[dto.PasswordResult])
 	GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetTokenResult])
 	common.Component
 }
@@ -52,7 +52,7 @@ func (a *authComponentImpl) GenerateResetToken(ctx context.Context, email string
 }
 
 // ResetPassword implements AuthComponent.
-func (a *authComponentImpl) ResetPassword(ctx context.Context, input dto.PasswordInput, output out.Output[dto.PasswordResult]) {
+func (a *authComponentImpl) ResetPassword(ctx context.Context, input dto.PasswordResetInput, output out.Output[dto.PasswordResult]) {
 	var res CommandExecutionResult[dto.PasswordResult]
 	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
 		res = commands.ResetPasswordCommand{
