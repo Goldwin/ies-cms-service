@@ -16,7 +16,7 @@ import (
 type cmsController struct {
 	peopleComponent     people.PeopleManagementComponent
 	authComponent       auth.AuthComponent
-	resetPasswordOutput out.Output[dto.PasswordResetTokenResult]
+	resetPasswordOutput out.Output[dto.PasswordResetCodeResult]
 }
 
 type LoginResult struct {
@@ -32,7 +32,7 @@ type BasicProfile struct {
 	LastName          string `json:"last_name"`
 }
 
-type GeneratePasswordTokenInput struct {
+type GeneratePasswordCodeInput struct {
 	EmailAddress string `json:"email"`
 }
 
@@ -50,7 +50,7 @@ func InitializeCMSController(r *gin.Engine,
 	}
 	appGroup := r.Group("app")
 	appGroup.POST("login", c.login)
-	appGroup.POST("password/reset/token", c.getPasswordResetTokenKey)
+	appGroup.POST("password/forgot", c.forgotPassword)
 	appGroup.POST("password/reset", c.resetPassword)
 }
 
@@ -126,17 +126,17 @@ func (a *cmsController) login(ctx *gin.Context) {
 	a.authComponent.SignIn(ctx, input, loginOutput)
 }
 
-func (a *cmsController) getPasswordResetTokenKey(ctx *gin.Context) {
-	var input GeneratePasswordTokenInput
+func (a *cmsController) forgotPassword(ctx *gin.Context) {
+	var input GeneratePasswordCodeInput
 	ctx.Bind(&input)
-	a.authComponent.GenerateResetToken(ctx, input.EmailAddress, &outputDecorator[dto.PasswordResetTokenResult]{
+	a.authComponent.GenerateResetToken(ctx, input.EmailAddress, &outputDecorator[dto.PasswordResetCodeResult]{
 		output: a.resetPasswordOutput,
 		errFunction: func(err out.AppErrorDetail) {
 			ctx.JSON(400, gin.H{
 				"error": err,
 			})
 		},
-		successFunc: func(token dto.PasswordResetTokenResult) {
+		successFunc: func(token dto.PasswordResetCodeResult) {
 			ctx.JSON(204, gin.H{})
 		},
 	})

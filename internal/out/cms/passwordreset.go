@@ -58,7 +58,7 @@ const (
                         <a href="mailto:{{.Email}}" target="_blank">{{.Email}}</a>.
                         Enter it
                         <a
-                          href="https://iespik.brightfellow.net/password/reset/email_code?login={{.Email}}"
+                          href="https://iespik.brightfellow.net/password/reset/email_code?login={{.Email}}&code={{.Code}}"
                           style="color: #529ff8; text-decoration: none"
                           target="_blank"
                           data-saferedirecturl=""
@@ -83,7 +83,7 @@ const (
                               bgcolor="#EAF1FC"
                             >
                               <div style="font-size: 48px" align="center">
-                                <strong>{{.Token}}</strong>
+                                <strong>{{.Code}}</strong>
                               </div>
                             </td>
                           </tr>
@@ -193,9 +193,9 @@ func (*passwordResetOutputHandler) OnError(err out.AppErrorDetail) {
 }
 
 // OnSuccess implements out.Output.
-func (o *passwordResetOutputHandler) OnSuccess(result dto.PasswordResetTokenResult) {
+func (o *passwordResetOutputHandler) OnSuccess(result dto.PasswordResetCodeResult) {
 	to := []string{result.Email}
-	subject := fmt.Sprintf(PasswordResetSubjectTemplate, string(result.Token))
+	subject := fmt.Sprintf(PasswordResetSubjectTemplate, string(result.Code))
 	buf := new(bytes.Buffer)
 	if err := o.template.Execute(buf, result); err != nil {
 		log.Default().Printf("Failed to generate email from template: %s", err.Error())
@@ -212,7 +212,7 @@ func (o *passwordResetOutputHandler) OnSuccess(result dto.PasswordResetTokenResu
 	}
 }
 
-func NewPasswordResetOutputHandler(emailClient infra.EmailClient) out.Output[dto.PasswordResetTokenResult] {
+func NewPasswordResetOutputHandler(emailClient infra.EmailClient) out.Output[dto.PasswordResetCodeResult] {
 	template, err := template.New("password-reset").Parse(PasswordResetMessageTemplate)
 	if err != nil {
 		log.Fatal(err)

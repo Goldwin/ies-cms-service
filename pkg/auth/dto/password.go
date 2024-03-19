@@ -3,14 +3,14 @@ package dto
 type PasswordResetInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Token    string `json:"token"`
+	Code     string `json:"code"`
 }
 
 type PasswordResult struct {
 	Email string `json:"email"`
 }
 
-type PasswordResetTokenResult struct {
+type PasswordResetCodeResult struct {
 	Email string `json:"email"`
-	Token string `json:"token"`
+	Code  string `json:"code"`
 }

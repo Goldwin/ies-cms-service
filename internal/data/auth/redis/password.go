@@ -19,7 +19,7 @@ type PasswordRepositoryImpl struct {
 
 // DeleteResetToken implements repositories.PasswordRepository.
 func (p *PasswordRepositoryImpl) DeleteResetToken(e entities.EmailAddress) error {
-	return p.client.Del(p.ctx, getPasswordResetTokenKey(e)).Err()
+	return p.client.Del(p.ctx, getPasswordResetCodeKey(e)).Err()
 }
 
 // Save implements repositories.PasswordRepository.
@@ -48,13 +48,13 @@ func (p *PasswordRepositoryImpl) Get(e entities.EmailAddress) (*entities.Passwor
 	return &otp, nil
 }
 
-func (p *PasswordRepositoryImpl) GetResetToken(e entities.EmailAddress) (string, error) {
-	val := p.client.Get(p.ctx, getPasswordResetTokenKey(e)).Val()
+func (p *PasswordRepositoryImpl) GetResetCode(e entities.EmailAddress) (string, error) {
+	val := p.client.Get(p.ctx, getPasswordResetCodeKey(e)).Val()
 	return val, nil
 }
 
-func (p *PasswordRepositoryImpl) SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error {
-	err := p.client.Set(p.ctx, getPasswordResetTokenKey(e), token, ttl).Err()
+func (p *PasswordRepositoryImpl) SaveResetCode(e entities.EmailAddress, token string, ttl time.Duration) error {
+	err := p.client.Set(p.ctx, getPasswordResetCodeKey(e), token, ttl).Err()
 	return err
 }
 
@@ -70,6 +70,6 @@ func getPasswordKey(email entities.EmailAddress) string {
 	return fmt.Sprintf("auth:password:email#%s", email)
 }
 
-func getPasswordResetTokenKey(email entities.EmailAddress) string {
-	return fmt.Sprintf("auth:password-reset-token:email#%s", email)
+func getPasswordResetCodeKey(email entities.EmailAddress) string {
+	return fmt.Sprintf("auth:password-reset-code:email#%s", email)
 }
