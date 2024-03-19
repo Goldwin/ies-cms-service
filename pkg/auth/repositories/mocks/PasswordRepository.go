@@ -126,12 +126,12 @@ func (_c *PasswordRepository_Get_Call) RunAndReturn(run func(entities.EmailAddre
 	return _c
 }
 
-// GetResetToken provides a mock function with given fields: e
-func (_m *PasswordRepository) GetResetToken(e entities.EmailAddress) (string, error) {
+// GetResetCode provides a mock function with given fields: e
+func (_m *PasswordRepository) GetResetCode(e entities.EmailAddress) (string, error) {
 	ret := _m.Called(e)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetResetToken")
+		panic("no return value specified for GetResetCode")
 	}
 
 	var r0 string
@@ -154,30 +154,30 @@ func (_m *PasswordRepository) GetResetToken(e entities.EmailAddress) (string, er
 	return r0, r1
 }
 
-// PasswordRepository_GetResetToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetResetToken'
-type PasswordRepository_GetResetToken_Call struct {
+// PasswordRepository_GetResetCode_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetResetCode'
+type PasswordRepository_GetResetCode_Call struct {
 	*mock.Call
 }
 
-// GetResetToken is a helper method to define mock.On call
+// GetResetCode is a helper method to define mock.On call
 //   - e entities.EmailAddress
-func (_e *PasswordRepository_Expecter) GetResetToken(e interface{}) *PasswordRepository_GetResetToken_Call {
-	return &PasswordRepository_GetResetToken_Call{Call: _e.mock.On("GetResetToken", e)}
+func (_e *PasswordRepository_Expecter) GetResetCode(e interface{}) *PasswordRepository_GetResetCode_Call {
+	return &PasswordRepository_GetResetCode_Call{Call: _e.mock.On("GetResetCode", e)}
 }
 
-func (_c *PasswordRepository_GetResetToken_Call) Run(run func(e entities.EmailAddress)) *PasswordRepository_GetResetToken_Call {
+func (_c *PasswordRepository_GetResetCode_Call) Run(run func(e entities.EmailAddress)) *PasswordRepository_GetResetCode_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(entities.EmailAddress))
 	})
 	return _c
 }
 
-func (_c *PasswordRepository_GetResetToken_Call) Return(_a0 string, _a1 error) *PasswordRepository_GetResetToken_Call {
+func (_c *PasswordRepository_GetResetCode_Call) Return(_a0 string, _a1 error) *PasswordRepository_GetResetCode_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *PasswordRepository_GetResetToken_Call) RunAndReturn(run func(entities.EmailAddress) (string, error)) *PasswordRepository_GetResetToken_Call {
+func (_c *PasswordRepository_GetResetCode_Call) RunAndReturn(run func(entities.EmailAddress) (string, error)) *PasswordRepository_GetResetCode_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -228,12 +228,12 @@ func (_c *PasswordRepository_Save_Call) RunAndReturn(run func(entities.PasswordD
 	return _c
 }
 
-// SaveResetToken provides a mock function with given fields: e, token, ttl
-func (_m *PasswordRepository) SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error {
+// SaveResetCode provides a mock function with given fields: e, token, ttl
+func (_m *PasswordRepository) SaveResetCode(e entities.EmailAddress, token string, ttl time.Duration) error {
 	ret := _m.Called(e, token, ttl)
 
 	if len(ret) == 0 {
-		panic("no return value specified for SaveResetToken")
+		panic("no return value specified for SaveResetCode")
 	}
 
 	var r0 error
@@ -246,32 +246,32 @@ func (_m *PasswordRepository) SaveResetToken(e entities.EmailAddress, token stri
 	return r0
 }
 
-// PasswordRepository_SaveResetToken_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SaveResetToken'
-type PasswordRepository_SaveResetToken_Call struct {
+// PasswordRepository_SaveResetCode_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SaveResetCode'
+type PasswordRepository_SaveResetCode_Call struct {
 	*mock.Call
 }
 
-// SaveResetToken is a helper method to define mock.On call
+// SaveResetCode is a helper method to define mock.On call
 //   - e entities.EmailAddress
 //   - token string
 //   - ttl time.Duration
-func (_e *PasswordRepository_Expecter) SaveResetToken(e interface{}, token interface{}, ttl interface{}) *PasswordRepository_SaveResetToken_Call {
-	return &PasswordRepository_SaveResetToken_Call{Call: _e.mock.On("SaveResetToken", e, token, ttl)}
+func (_e *PasswordRepository_Expecter) SaveResetCode(e interface{}, token interface{}, ttl interface{}) *PasswordRepository_SaveResetCode_Call {
+	return &PasswordRepository_SaveResetCode_Call{Call: _e.mock.On("SaveResetCode", e, token, ttl)}
 }
 
-func (_c *PasswordRepository_SaveResetToken_Call) Run(run func(e entities.EmailAddress, token string, ttl time.Duration)) *PasswordRepository_SaveResetToken_Call {
+func (_c *PasswordRepository_SaveResetCode_Call) Run(run func(e entities.EmailAddress, token string, ttl time.Duration)) *PasswordRepository_SaveResetCode_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(entities.EmailAddress), args[1].(string), args[2].(time.Duration))
 	})
 	return _c
 }
 
-func (_c *PasswordRepository_SaveResetToken_Call) Return(_a0 error) *PasswordRepository_SaveResetToken_Call {
+func (_c *PasswordRepository_SaveResetCode_Call) Return(_a0 error) *PasswordRepository_SaveResetCode_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *PasswordRepository_SaveResetToken_Call) RunAndReturn(run func(entities.EmailAddress, string, time.Duration) error) *PasswordRepository_SaveResetToken_Call {
+func (_c *PasswordRepository_SaveResetCode_Call) RunAndReturn(run func(entities.EmailAddress, string, time.Duration) error) *PasswordRepository_SaveResetCode_Call {
 	_c.Call.Return(run)
 	return _c
 }
