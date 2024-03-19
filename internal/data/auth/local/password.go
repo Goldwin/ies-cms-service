@@ -21,13 +21,13 @@ func (l *localPasswordRepository) DeleteResetToken(e entities.EmailAddress) erro
 	return nil
 }
 
-// GetResetToken implements repositories.PasswordRepository.
-func (l *localPasswordRepository) GetResetToken(e entities.EmailAddress) (string, error) {
+// GetResetCode implements repositories.PasswordRepository.
+func (l *localPasswordRepository) GetResetCode(e entities.EmailAddress) (string, error) {
 	return resetToken[string(e)], nil
 }
 
-// SaveResetToken implements repositories.PasswordRepository.
-func (l *localPasswordRepository) SaveResetToken(e entities.EmailAddress, token string, ttl time.Duration) error {
+// SaveResetCode implements repositories.PasswordRepository.
+func (l *localPasswordRepository) SaveResetCode(e entities.EmailAddress, token string, ttl time.Duration) error {
 	resetToken[string(e)] = token
 	return nil
 }

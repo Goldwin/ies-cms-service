@@ -22,7 +22,7 @@ type ResetPasswordCommand struct {
 
 func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
-	token, err := ctx.PasswordRepository().GetResetToken(entities.EmailAddress(cmd.Input.Email))
+	token, err := ctx.PasswordRepository().GetResetCode(entities.EmailAddress(cmd.Input.Email))
 
 	if err != nil {
 		return CommandExecutionResult[dto.PasswordResult]{
@@ -34,7 +34,7 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 		}
 	}
 
-	if token != cmd.Input.Token {
+	if token != cmd.Input.Code {
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
@@ -96,7 +96,7 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 	password.PasswordHash = passwordHash[:]
 
 	err = ctx.PasswordRepository().Save(password)
-	if(err != nil) {
+	if err != nil {
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{

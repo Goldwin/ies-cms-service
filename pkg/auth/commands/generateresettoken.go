@@ -18,12 +18,12 @@ type GenerateResetTokenCommand struct {
 	TTLMillis int64
 }
 
-func (cmd GenerateResetTokenCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResetTokenResult] {
+func (cmd GenerateResetTokenCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResetCodeResult] {
 	//30 seconds minimum
 	ttlMillis := max(cmd.TTLMillis, 300000)
 	token, err := rand.Int(rand.Reader, big.NewInt(999999))
 	if err != nil {
-		return CommandExecutionResult[dto.PasswordResetTokenResult]{
+		return CommandExecutionResult[dto.PasswordResetCodeResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorFailedToGenOtp,
@@ -33,9 +33,9 @@ func (cmd GenerateResetTokenCommand) Execute(ctx CommandContext) CommandExecutio
 	}
 
 	strToken := strconv.Itoa(int(token.Int64()))
-	err = ctx.PasswordRepository().SaveResetToken(entities.EmailAddress(cmd.Email), strToken, time.Duration(ttlMillis)*time.Millisecond)
+	err = ctx.PasswordRepository().SaveResetCode(entities.EmailAddress(cmd.Email), strToken, time.Duration(ttlMillis)*time.Millisecond)
 	if err != nil {
-		return CommandExecutionResult[dto.PasswordResetTokenResult]{
+		return CommandExecutionResult[dto.PasswordResetCodeResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
 				Code:    GenerateOtpErrorFailedToStoreOtp,
@@ -43,7 +43,7 @@ func (cmd GenerateResetTokenCommand) Execute(ctx CommandContext) CommandExecutio
 			},
 		}
 	}
-	return CommandExecutionResult[dto.PasswordResetTokenResult]{Status: ExecutionStatusSuccess, Result: dto.PasswordResetTokenResult{
-		Email: cmd.Email, Token: strToken,
+	return CommandExecutionResult[dto.PasswordResetCodeResult]{Status: ExecutionStatusSuccess, Result: dto.PasswordResetCodeResult{
+		Email: cmd.Email, Code: strToken,
 	}}
 }
