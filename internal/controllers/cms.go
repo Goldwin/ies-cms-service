@@ -17,6 +17,7 @@ type cmsController struct {
 	peopleComponent     people.PeopleManagementComponent
 	authComponent       auth.AuthComponent
 	resetPasswordOutput out.Output[dto.PasswordResetCodeResult]
+	otpOutput           out.Output[dto.OtpResult]
 }
 
 type LoginResult struct {
@@ -47,11 +48,21 @@ func InitializeCMSController(r *gin.Engine,
 		peopleComponent:     peopleComponent,
 		authComponent:       authComponent,
 		resetPasswordOutput: cms.NewPasswordResetOutputHandler(emailClient),
+		otpOutput:           cms.NewRegistrationOTPOutputHandler(emailClient),
 	}
 	appGroup := r.Group("app")
 	appGroup.POST("login", c.login)
 	appGroup.POST("password/forgot", c.forgotPassword)
 	appGroup.POST("password/reset", c.resetPassword)
+
+	appGroup.POST("register/otp", c.otp)
+}
+
+func (a *cmsController) otp(c *gin.Context) {
+	var input dto.OtpInput
+	c.BindJSON(&input)
+	a.authComponent.GenerateOtp(c, input, a.otpOutput)
+	c.JSON(204, gin.H{})
 }
 
 func (a *cmsController) resetPassword(ctx *gin.Context) {

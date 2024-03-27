@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	PasswordResetSubjectTemplate = "Password Reset Request %s"
-	PasswordResetMessageTemplate = `    
+	RegistrationOtpResultSubjectTemplate = "Email Confirmation for %s"
+	RegistrationOtpResultMessageTemplate = `    
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html>
@@ -51,21 +51,10 @@ const (
                           margin: 0 0 1em;
                         "
                       >
-                        A password reset has been initiated.
+                        Your Email has been confirmed.
                       </h1>
                       <p>
-                        Here’s a reset code for
-                        <a href="mailto:{{.Email}}" target="_blank">{{.Email}}</a>.
-                        Enter it
-                        <a
-                          href="https://iespik.brightfellow.net/password/reset/email_code?login={{.Email}}&code={{.Code}}"
-                          style="color: #529ff8; text-decoration: none"
-                          target="_blank"
-                          data-saferedirecturl=""
-                          >on this page</a
-                        >
-                        to reset your password.
-                      </p>
+                        Here’s the One Time Password (OTP) for the registration                                            
 
                       <table
                         cellpadding="0"
@@ -83,7 +72,7 @@ const (
                               bgcolor="#EAF1FC"
                             >
                               <div style="font-size: 48px" align="center">
-                                <strong>{{.Code}}</strong>
+                                <strong>{{.OTP}}</strong>
                               </div>
                             </td>
                           </tr>
@@ -91,8 +80,7 @@ const (
                       </table>
                       <br />
                       <p>
-                        If you didn't initiate a password reset, just ignore this
-                        email.
+                        If you didn't register, please ignore this email.
                       </p>
                     </td>
                   </tr>
@@ -162,10 +150,8 @@ const (
                       <div
                         style="font-size: 10px; line-height: 1; padding-top: 24px"
                       >
-                        You are receiving this communication because you have a IES
-                        CMS account and a password reset for
-                        <a href="mailto:{{.Email}}" target="_blank">{{.Email}}</a>
-                        was requested
+                        You are receiving this communication because you initiated a registration to IES
+                        CMS using <a href="mailto:{{.Email}}" target="_blank">{{.Email}}</a>.
                       </div>
                     </td>
                   </tr>
@@ -180,22 +166,31 @@ const (
   `
 )
 
-type passwordResetOutputHandler struct {
+type registrationOTPOutputHandler struct {
 	emailClient infra.EmailClient
 	template    *template.Template
 }
 
 // OnError implements out.Output.
-func (*passwordResetOutputHandler) OnError(err out.AppErrorDetail) {
+func (*registrationOTPOutputHandler) OnError(err out.AppErrorDetail) {
 	fmt.Println(err.Error())
 }
 
+type OTPData struct {
+	Email string
+	OTP   string
+}
+
 // OnSuccess implements out.Output.
-func (o *passwordResetOutputHandler) OnSuccess(result dto.PasswordResetCodeResult) {
+func (o *registrationOTPOutputHandler) OnSuccess(result dto.OtpResult) {
 	to := []string{result.Email}
-	subject := fmt.Sprintf(PasswordResetSubjectTemplate, string(result.Code))
+	subject := fmt.Sprintf(RegistrationOtpResultSubjectTemplate, string(result.Email))
 	buf := new(bytes.Buffer)
-	if err := o.template.Execute(buf, result); err != nil {
+	otpData := OTPData{
+		Email: result.Email,
+		OTP:   string(result.OTP),
+	}
+	if err := o.template.Execute(buf, otpData); err != nil {
 		log.Default().Printf("Failed to generate email from template: %s", err.Error())
 	}
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
@@ -210,12 +205,12 @@ func (o *passwordResetOutputHandler) OnSuccess(result dto.PasswordResetCodeResul
 	}
 }
 
-func NewPasswordResetOutputHandler(emailClient infra.EmailClient) out.Output[dto.PasswordResetCodeResult] {
-	template, err := template.New("password-reset").Parse(PasswordResetMessageTemplate)
+func NewRegistrationOTPOutputHandler(emailClient infra.EmailClient) out.Output[dto.OtpResult] {
+	template, err := template.New("registration-otp").Parse(RegistrationOtpResultMessageTemplate)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &passwordResetOutputHandler{
+	return &registrationOTPOutputHandler{
 		emailClient: emailClient,
 		template:    template,
 	}
