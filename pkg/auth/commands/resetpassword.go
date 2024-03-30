@@ -1,10 +1,7 @@
 package commands
 
 import (
-	"crypto/rand"
-	"crypto/sha256"
 	"fmt"
-	"math/big"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
@@ -12,8 +9,8 @@ import (
 )
 
 const (
-	SavePasswordErrorInvalidInput          CommandErrorCode = 20401
-	SavePasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
+	ResetPasswordErrorInvalidInput          CommandErrorCode = 20401
+	ResetPasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
 )
 
 type ResetPasswordCommand struct {
@@ -44,74 +41,18 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 		}
 	}
 
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Input.Email))
-
-	if err != nil {
-
-		return CommandExecutionResult[dto.PasswordResult]{
-			Status: ExecutionStatusFailed,
-			Error: CommandErrorDetail{
-				Code:    SavePasswordErrorFailedToVerifyAccount,
-				Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
-			},
-		}
+	savePasswordCmd := SavePasswordCommand{
+		Email:    entities.EmailAddress(cmd.Input.Email),
+		Password: []byte(cmd.Input.Password),
 	}
 
-	if account == nil {
-		_, err = ctx.AccountRepository().AddAccount(entities.Account{
-			Email: entities.EmailAddress(cmd.Input.Email),
-			Roles: []entities.Role{},
-		})
+	result := savePasswordCmd.Execute(ctx)
 
-		if err != nil {
-
-			return CommandExecutionResult[dto.PasswordResult]{
-				Status: ExecutionStatusFailed,
-				Error: CommandErrorDetail{
-					Code:    SavePasswordErrorFailedToVerifyAccount,
-					Message: fmt.Sprintf("Failed to Verify Account: %s", err.Error()),
-				},
-			}
-		}
-	}
-
-	password := entities.PasswordDetail{
-		EmailAddress: entities.EmailAddress(cmd.Input.Email),
-	}
-
-	salt, err := rand.Int(rand.Reader, big.NewInt(999999))
-	if err != nil {
-		return CommandExecutionResult[dto.PasswordResult]{
-			Status: ExecutionStatusFailed,
-			Error: CommandErrorDetail{
-				Code:    GenerateOtpErrorFailedToGenOtp,
-				Message: fmt.Sprintf("Failed to Save Password: %s", err.Error()),
-			},
-		}
-	}
-
-	password.Salt = salt.Bytes()
-	passwordAndSalt := append([]byte(cmd.Input.Password), password.Salt...)
-	passwordHash := sha256.Sum256(passwordAndSalt)
-	password.PasswordHash = passwordHash[:]
-
-	err = ctx.PasswordRepository().Save(password)
-	if err != nil {
-		return CommandExecutionResult[dto.PasswordResult]{
-			Status: ExecutionStatusFailed,
-			Error: CommandErrorDetail{
-				Code:    SavePasswordErrorFailedToVerifyAccount,
-				Message: fmt.Sprintf("Failed to Save Password: %s", err.Error()),
-			},
-		}
+	if result.Status != ExecutionStatusSuccess {
+		return result
 	}
 
 	err = ctx.PasswordRepository().DeleteResetToken(entities.EmailAddress(cmd.Input.Email))
 
-	return CommandExecutionResult[dto.PasswordResult]{
-		Status: ExecutionStatusSuccess,
-		Result: dto.PasswordResult{
-			Email: string(password.EmailAddress),
-		},
-	}
+	return result
 }
