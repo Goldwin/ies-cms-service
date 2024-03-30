@@ -31,15 +31,11 @@ const (
 type SigninCommand struct {
 	Email     string
 	Password  []byte
-	Method    SigninMethod
 	SecretKey []byte
 }
 
 func (cmd SigninCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.SignInResult] {
-	if cmd.Method == SigninMethodPassword {
-		return cmd.passwordLogin(ctx)
-	}
-	return cmd.otpSignIn(ctx)
+	return cmd.passwordLogin(ctx)
 }
 
 func (cmd SigninCommand) passwordLogin(ctx CommandContext) CommandExecutionResult[dto.SignInResult] {

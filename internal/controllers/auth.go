@@ -36,7 +36,6 @@ func InitializeAuthController(r *gin.Engine, authComponent auth.AuthComponent,
 	authGroup.GET("", authController.auth)
 	authGroup.POST("registration", middlewareComponent.Auth(), authController.completeRegistration)
 	authGroup.POST("otp", authController.otp)
-	authGroup.POST("otp/signin", authController.otpSignIn)
 	authGroup.POST("password/signin", authController.passwordSignIn)
 
 	eventBusComponent.Subscribe("people.added", func(ctx context.Context, event common.Event) {
@@ -133,29 +132,9 @@ func (a *authController) otp(c *gin.Context) {
 	c.JSON(204, gin.H{})
 }
 
-func (a *authController) otpSignIn(c *gin.Context) {
-	var input dto.SignInInput
-	c.BindJSON(&input)
-	input.Method = "otp"
-	output := &outputDecorator[dto.SignInResult]{
-		errFunction: func(err out.AppErrorDetail) {
-			c.JSON(400, gin.H{
-				"error": err,
-			})
-		},
-		successFunc: func(result dto.SignInResult) {
-			c.JSON(200, gin.H{
-				"data": result,
-			})
-		},
-	}
-	a.authComponent.SignIn(c, input, output)
-}
-
 func (a *authController) passwordSignIn(c *gin.Context) {
 	var input dto.SignInInput
 	c.BindJSON(&input)
-	input.Method = "password"
 	output := &outputDecorator[dto.SignInResult]{
 		output: a.authOutputComponent.SignInOutput(),
 		errFunction: func(err out.AppErrorDetail) {

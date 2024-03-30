@@ -90,8 +90,6 @@ func (a *cmsController) login(ctx *gin.Context) {
 	result := &LoginResult{}
 	ctx.Bind(&input)
 
-	input.Method = "password"
-
 	peopleOutput := &outputDecorator[queries.ViewPersonResult]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {

@@ -147,7 +147,6 @@ func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, o
 		result = commands.SigninCommand{
 			Email:     input.Email,
 			Password:  []byte(input.Password),
-			Method:    commands.SigninMethod(input.Method),
 			SecretKey: a.secretKey,
 		}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
