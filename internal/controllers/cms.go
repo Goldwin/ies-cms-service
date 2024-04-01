@@ -168,3 +168,42 @@ func (a *cmsController) UpdateProfile(ctx *gin.Context) {
 		},
 	})
 }
+
+func (a *cmsController) Register(ctx *gin.Context) {
+	var input dto.CompleteRegistrationInput
+	err := ctx.Bind(&input)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"error": err,
+		})
+		return
+	}
+	a.authComponent.CompleteRegistration(ctx, input, &outputDecorator[dto.AuthData]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(authData dto.AuthData) {
+			a.peopleComponent.AddPerson(ctx, peopleDto.Person{
+				FirstName:    input.FirstName,
+				MiddleName:   input.MiddleName,
+				LastName:     input.LastName,
+				EmailAddress: input.Email,
+			}, &outputDecorator[peopleDto.Person]{
+				output: nil,
+				errFunction: func(err out.AppErrorDetail) {
+					ctx.JSON(400, gin.H{
+						"error": err,
+					})
+				},
+				successFunc: func(person peopleDto.Person) {
+					ctx.JSON(200, gin.H{
+						"data": authData,
+					})
+				},
+			})
+		},
+	})
+}

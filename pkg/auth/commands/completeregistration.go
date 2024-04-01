@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	CompleteRegistrationErrorAlreadyCompleted       CommandErrorCode = 20201
+	CompleteRegistrationErrorAlreadyRegistered      CommandErrorCode = 20201
 	CompleteRegistrationErrorUpdateFailure          CommandErrorCode = 20202
 	CompleteRegistrationErrorAccountIsNotRegistered CommandErrorCode = 20203
 	CompleteRegistrationErrorFailedToGetAccount     CommandErrorCode = 20203
@@ -57,7 +57,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    CompleteRegistrationErrorAlreadyCompleted,
+				Code:    CompleteRegistrationErrorAlreadyRegistered,
 				Message: fmt.Sprintf("Account Already Completed Registration"),
 			},
 		}
@@ -69,16 +69,6 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 			Error: CommandErrorDetail{
 				Code:    CompleteRegistrationErrorInvalidInput,
 				Message: fmt.Sprintf("First Name and Last Name must be filled"),
-			},
-		}
-	}
-
-	if !bytes.Equal(cmd.Input.Password, cmd.Input.ConfirmPassword) {
-		return CommandExecutionResult[dto.AuthData]{
-			Status: ExecutionStatusFailed,
-			Error: CommandErrorDetail{
-				Code:    CompleteRegistrationErrorInvalidInput,
-				Message: fmt.Sprintf("Password and Confirm Password should be same"),
 			},
 		}
 	}
@@ -171,7 +161,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
 				Code:    SigninErrorWrongOtp,
-				Message: "Wrong Email Or Wrong Password. Please try again.",
+				Message: "Wrong OTP. Please try again.",
 			},
 		}
 	}
