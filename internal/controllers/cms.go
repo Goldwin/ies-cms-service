@@ -56,13 +56,30 @@ func InitializeCMSController(r *gin.Engine,
 	appGroup.POST("password/reset", c.resetPassword)
 
 	appGroup.POST("register/otp", c.otp)
+	appGroup.POST("register", c.register)
 }
 
 func (a *cmsController) otp(c *gin.Context) {
 	var input dto.OtpInput
-	c.BindJSON(&input)
-	a.authComponent.GenerateOtp(c, input, a.otpOutput)
-	c.JSON(204, gin.H{})
+	err := c.BindJSON(&input)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err,
+		})
+		return
+	}
+	output := &outputDecorator[dto.OtpResult]{
+		output: a.otpOutput,
+		errFunction: func(out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(dto.OtpResult) {
+			c.JSON(204, gin.H{})
+		},
+	}
+	a.authComponent.GenerateOtp(c, input, output)
 }
 
 func (a *cmsController) resetPassword(ctx *gin.Context) {
@@ -169,7 +186,7 @@ func (a *cmsController) UpdateProfile(ctx *gin.Context) {
 	})
 }
 
-func (a *cmsController) Register(ctx *gin.Context) {
+func (a *cmsController) register(ctx *gin.Context) {
 	var input dto.CompleteRegistrationInput
 	err := ctx.Bind(&input)
 	if err != nil {
