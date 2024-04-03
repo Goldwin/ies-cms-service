@@ -126,7 +126,8 @@ func (a *authComponentImpl) GenerateOtp(ctx context.Context, input dto.OtpInput,
 	var result CommandExecutionResult[dto.OtpResult]
 	_ = a.worker.Execute(ctx, func(ctx commands.CommandContext) error {
 		result = commands.GenerateOtpCommand{
-			Email: input.Email,
+			Email:     input.Email,
+			TTLMillis: 30 * 60 * 1000, //half an hour
 		}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {
 			return result.Error
@@ -147,7 +148,6 @@ func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, o
 		result = commands.SigninCommand{
 			Email:     input.Email,
 			Password:  []byte(input.Password),
-			Method:    commands.SigninMethod(input.Method),
 			SecretKey: a.secretKey,
 		}.Execute(ctx)
 		if result.Status != ExecutionStatusSuccess {

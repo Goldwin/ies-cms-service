@@ -17,6 +17,7 @@ type cmsController struct {
 	peopleComponent     people.PeopleManagementComponent
 	authComponent       auth.AuthComponent
 	resetPasswordOutput out.Output[dto.PasswordResetCodeResult]
+	otpOutput           out.Output[dto.OtpResult]
 }
 
 type LoginResult struct {
@@ -47,11 +48,38 @@ func InitializeCMSController(r *gin.Engine,
 		peopleComponent:     peopleComponent,
 		authComponent:       authComponent,
 		resetPasswordOutput: cms.NewPasswordResetOutputHandler(emailClient),
+		otpOutput:           cms.NewRegistrationOTPOutputHandler(emailClient),
 	}
 	appGroup := r.Group("app")
 	appGroup.POST("login", c.login)
 	appGroup.POST("password/forgot", c.forgotPassword)
 	appGroup.POST("password/reset", c.resetPassword)
+
+	appGroup.POST("register/otp", c.otp)
+	appGroup.POST("register", c.register)
+}
+
+func (a *cmsController) otp(c *gin.Context) {
+	var input dto.OtpInput
+	err := c.BindJSON(&input)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err,
+		})
+		return
+	}
+	output := &outputDecorator[dto.OtpResult]{
+		output: a.otpOutput,
+		errFunction: func(out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(dto.OtpResult) {
+			c.JSON(204, gin.H{})
+		},
+	}
+	a.authComponent.GenerateOtp(c, input, output)
 }
 
 func (a *cmsController) resetPassword(ctx *gin.Context) {
@@ -78,8 +106,6 @@ func (a *cmsController) login(ctx *gin.Context) {
 	var input dto.SignInInput
 	result := &LoginResult{}
 	ctx.Bind(&input)
-
-	input.Method = "password"
 
 	peopleOutput := &outputDecorator[queries.ViewPersonResult]{
 		output: nil,
@@ -155,6 +181,45 @@ func (a *cmsController) UpdateProfile(ctx *gin.Context) {
 		successFunc: func(person peopleDto.Person) {
 			ctx.JSON(200, gin.H{
 				"data": person,
+			})
+		},
+	})
+}
+
+func (a *cmsController) register(ctx *gin.Context) {
+	var input dto.CompleteRegistrationInput
+	err := ctx.Bind(&input)
+	if err != nil {
+		ctx.JSON(400, gin.H{
+			"error": err,
+		})
+		return
+	}
+	a.authComponent.CompleteRegistration(ctx, input, &outputDecorator[dto.AuthData]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			ctx.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(authData dto.AuthData) {
+			a.peopleComponent.AddPerson(ctx, peopleDto.Person{
+				FirstName:    input.FirstName,
+				MiddleName:   input.MiddleName,
+				LastName:     input.LastName,
+				EmailAddress: input.Email,
+			}, &outputDecorator[peopleDto.Person]{
+				output: nil,
+				errFunction: func(err out.AppErrorDetail) {
+					ctx.JSON(400, gin.H{
+						"error": err,
+					})
+				},
+				successFunc: func(person peopleDto.Person) {
+					ctx.JSON(200, gin.H{
+						"data": authData,
+					})
+				},
 			})
 		},
 	})
