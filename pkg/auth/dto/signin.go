@@ -15,5 +15,6 @@ type CompleteRegistrationInput struct {
 	MiddleName string `json:"middle_name"`
 	LastName   string `json:"last_name"`
 	Email      string `json:"email"`
-	Password   []byte `json:"password"`
+	Password   string `json:"password"`
+	OTP        string `json:"otp"`
 }

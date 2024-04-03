@@ -151,7 +151,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	passwordAndSalt := append(cmd.Input.Password, otp.Salt...)
+	passwordAndSalt := append([]byte(cmd.Input.OTP), otp.Salt...)
 	passwordHash := sha256.Sum256(passwordAndSalt)
 
 	isMatching := bytes.Equal(passwordHash[:], otp.PasswordHash[:])
