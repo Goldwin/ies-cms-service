@@ -44,12 +44,8 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 	if account == nil {
-		return CommandExecutionResult[dto.AuthData]{
-			Status: ExecutionStatusFailed,
-			Error: CommandErrorDetail{
-				Code:    CompleteRegistrationErrorAccountIsNotRegistered,
-				Message: fmt.Sprintf("Account Is Not Registered"),
-			},
+		account = &entities.Account{
+			Email: entities.EmailAddress(cmd.Input.Email),
 		}
 	}
 
