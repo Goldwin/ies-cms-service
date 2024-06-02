@@ -18,3 +18,33 @@ type AttendanceComponent interface {
 	CreateEvent(ctx context.Context, event Event)
 	CreateEventActivity(ctx context.Context, activity EventActivity)
 }
+
+type attendanceComponentImpl struct {
+	dataLayer AttendanceDataLayerComponent
+}
+
+// AddEventScheduleActivity implements AttendanceComponent.
+func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, activity EventScheduleActivity) {
+	panic("unimplemented")
+}
+
+// CreateEvent implements AttendanceComponent.
+func (a *attendanceComponentImpl) CreateEvent(ctx context.Context, event Event) {
+	panic("unimplemented")
+}
+
+// CreateEventActivity implements AttendanceComponent.
+func (a *attendanceComponentImpl) CreateEventActivity(ctx context.Context, activity EventActivity) {
+	panic("unimplemented")
+}
+
+// CreateEventSchedule implements AttendanceComponent.
+func (a *attendanceComponentImpl) CreateEventSchedule(ctx context.Context, schedule EventSchedule) {
+	panic("unimplemented")
+}
+
+func NewAttendanceComponent(datalayer AttendanceDataLayerComponent) AttendanceComponent {
+	return &attendanceComponentImpl{
+		dataLayer: datalayer,
+	}
+}

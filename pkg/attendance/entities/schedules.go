@@ -1,4 +1,4 @@
-package attendance
+package entities
 
 import "time"
 
@@ -21,22 +21,22 @@ type EventSchedule struct {
 	TimezoneOffset int
 	Type           EventScheduleType
 	Activities     []EventScheduleActivity
+	OneTimeEventSchedule
+	WeeklyEventSchedule
+	DailyEventSchedule
 }
 
 type OneTimeEventSchedule struct {
 	Date time.Time
-	EventSchedule
 }
 
 type WeeklyEventSchedule struct {
 	Days []time.Weekday
-	EventSchedule
 }
 
 type DailyEventSchedule struct {
 	StartDate time.Time
 	EndDate   time.Time
-	EventSchedule
 }
 
 /*
