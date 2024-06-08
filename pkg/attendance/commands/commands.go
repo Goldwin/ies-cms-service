@@ -1,4 +1,4 @@
-package attendance
+package commands
 
 import "github.com/Goldwin/ies-pik-cms/pkg/attendance/repositories"
 

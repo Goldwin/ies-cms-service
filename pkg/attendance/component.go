@@ -4,12 +4,13 @@ import (
 	"context"
 
 	. "github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
+	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 )
 
 type AttendanceDataLayerComponent interface {
 	QueryWorker() worker.QueryWorker[QueryContext]
-	CommandWorker() worker.UnitOfWork[CommandContext]
+	CommandWorker() worker.UnitOfWork[commands.CommandContext]
 }
 
 type AttendanceComponent interface {
