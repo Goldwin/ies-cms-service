@@ -11,9 +11,3 @@ type Event struct {
 	EventActivities []EventActivity
 	Date            time.Time
 }
-
-const (
-	EventScheduleTypeDaily   EventScheduleType = "Daily"
-	EventScheduleTypeWeekly  EventScheduleType = "Weekly"
-	EventScheduleTypeOneTime EventScheduleType = "OneTime"
-)

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"fmt"
+	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	CreateEventScheduleCommandErrorAppError CommandErrorCode = 30101
+	CreateEventScheduleValidationError CommandErrorCode = 30101
 )
 
 /*
@@ -20,6 +20,10 @@ type CreateEventScheduleCommand struct {
 	Name           string
 	ScheduleType   string
 	TimezoneOffset int
+	Days           []time.Weekday
+	Date           time.Time
+	StartDate      time.Time
+	EndDate        time.Time
 }
 
 func (c CreateEventScheduleCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.EventSchedule] {
@@ -31,16 +35,25 @@ func (c CreateEventScheduleCommand) Execute(ctx CommandContext) CommandExecution
 		Type:           entities.EventScheduleType(c.ScheduleType),
 	}
 
+	validationMsg := eventSchedule.IsValid()
+
+	if validationMsg != "" {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    CreateEventScheduleValidationError,
+				Message: validationMsg,
+			},
+		}
+	}
+
 	result, err := ctx.EventScheduleRepository().Save(eventSchedule)
 
 	if err != nil {
 
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
-			Error: CommandErrorDetail{
-				Code:    CreateEventScheduleCommandErrorAppError,
-				Message: fmt.Sprintf("Failed to Create Event Schedule: %s", err.Error()),
-			},
+			Error:  CommandErrorDetailWorkerFailure(err),
 		}
 	}
 
