@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	AddEventScheduleActivityValidationError CommandErrorCode = 30201
+	AddActivityValidationError           CommandErrorCode = 30201
+	AddActivityScheduleDoesntExistsError CommandErrorCode = 30202
 )
 
 type AddEventScheduleActivityCommand struct {
@@ -18,11 +19,11 @@ type AddEventScheduleActivityCommand struct {
 }
 
 func (c AddEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.EventSchedule] {
-	if(c.Hour < 0 || c.Hour > 23 || c.Minute < 0 || c.Minute > 59) {
+	if c.Hour < 0 || c.Hour > 23 || c.Minute < 0 || c.Minute > 59 {
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    AddEventScheduleActivityValidationError,
+				Code:    AddActivityValidationError,
 				Message: "Invalid hour or minute",
 			},
 		}
@@ -34,6 +35,16 @@ func (c AddEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExec
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
 			Error:  CommandErrorDetailWorkerFailure(err),
+		}
+	}
+
+	if schedule == nil {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    AddActivityScheduleDoesntExistsError,
+				Message: "Schedule not found",
+			},
 		}
 	}
 
