@@ -15,8 +15,27 @@ type EventScheduleDTO struct {
 }
 
 type EventScheduleActivityDTO struct {
-	ID     string
-	Name   string
-	Hour   int
-	Minute int
+	ScheduleID string
+	ID         string
+	Name       string
+	Hour       int
+	Minute     int
+}
+
+type EventDTO struct {
+	ID             string
+	Name           string
+	TimezoneOffset int
+	Type           string
+	Activities     []EventActivityDTO
+	Date           time.Time
+	Days           []time.Weekday
+	StartDate      time.Time
+	EndDate        time.Time
+}
+
+type EventActivityDTO struct {
+	ID   string
+	Name string
+	Time time.Time
 }
