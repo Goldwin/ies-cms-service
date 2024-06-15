@@ -25,7 +25,7 @@ func (e *eventScheduleRepositoryImpl) Delete(schedule *entities.EventSchedule) e
 
 // Get implements repositories.EventScheduleRepository.
 func (e *eventScheduleRepositoryImpl) Get(id string) (*entities.EventSchedule, error) {
-	model := &EventScheduleModel{}
+	var model EventScheduleModel
 	err := e.collection.FindOne(e.ctx, bson.M{"_id": id}).Decode(&model)
 
 	if err == mongo.ErrNoDocuments {

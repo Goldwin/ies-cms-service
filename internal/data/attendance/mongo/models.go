@@ -81,3 +81,54 @@ func (e *EventScheduleActivityModel) ToEventScheduleActivity() entities.EventSch
 		Minute: e.Minute,
 	}
 }
+
+type EventModel struct {
+	ID              string               `bson:"_id"`
+	ScheduleID      string               `bson:"scheduleId"`
+	EventActivities []EventActivityModel `bson:"eventActivities"`
+	Date            time.Time            `bson:"date"`
+}
+
+func (e *EventModel) ToEvent() *entities.Event {
+	return &entities.Event{
+		ID:         e.ID,
+		ScheduleID: e.ScheduleID,
+		EventActivities: lo.Map(e.EventActivities, func(e EventActivityModel, _ int) entities.EventActivity {
+			return e.ToEventActivity()
+		}),
+		Date: e.Date,
+	}
+}
+
+func toEventModel(e *entities.Event) EventModel {
+	return EventModel{
+		ID:         e.ID,
+		ScheduleID: e.ScheduleID,
+		EventActivities: lo.Map(e.EventActivities, func(e entities.EventActivity, _ int) EventActivityModel {
+			return toEventActivityModel(&e)
+		}),
+		Date: e.Date,
+	}
+}
+
+type EventActivityModel struct {
+	ID   string    `bson:"_id"`
+	Name string    `bson:"name"`
+	Time time.Time `bson:"time"`
+}
+
+func (e *EventActivityModel) ToEventActivity() entities.EventActivity {
+	return entities.EventActivity{
+		ID:   e.ID,
+		Name: e.Name,
+		Time: e.Time,
+	}
+}
+
+func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
+	return EventActivityModel{
+		ID:   e.ID,
+		Name: e.Name,
+		Time: e.Time,
+	}
+}

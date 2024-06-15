@@ -7,7 +7,7 @@ Event is the model of actual event that is currently running, or already happene
 */
 type Event struct {
 	ID              string
-	Schedule        EventSchedule
+	ScheduleID      string
 	EventActivities []EventActivity
 	Date            time.Time
 }
