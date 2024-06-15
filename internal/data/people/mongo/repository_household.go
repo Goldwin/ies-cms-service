@@ -112,11 +112,10 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 
 	//replace member's household id with new ids
 	for _, id := range personIds {
-		h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
-	}
-
-	if err != nil {
-		return nil, err
+		_, err = h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &e, nil
