@@ -17,7 +17,22 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 		attendanceComponent: attendanceComponent,
 		middlewareComponent: middleware,
 	}
-	r.POST("schedules", attendanceController.createSchedule)
+	
+	rg := r.Group("attendance")
+	rg.POST("schedules", attendanceController.createSchedule)
+	
+	scheduleURL := "schedules/:id"
+	rg.GET(scheduleURL)
+	rg.PUT(scheduleURL)
+	rg.DELETE(scheduleURL)
+
+	rg.GET("schedules/:scheduleID/events")
+	rg.GET("schedules/:scheduleID/events/:eventID")
+
+	rg.GET("schedules/:scheduleID/events/:eventID/checkin")
+	rg.POST("schedules/:scheduleID/events/:eventID/checkin")
+
+	rg.GET("schedules/:scheduleID/stats")
 }
 
 func (a *attendanceController) createSchedule(c *gin.Context) {
