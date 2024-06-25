@@ -17,14 +17,14 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 		attendanceComponent: attendanceComponent,
 		middlewareComponent: middleware,
 	}
-	
+
 	rg := r.Group("attendance")
 	rg.POST("schedules", attendanceController.createSchedule)
-	
+
 	scheduleURL := "schedules/:id"
 	rg.GET(scheduleURL, attendanceController.getEventSchedule)
 	rg.PUT(scheduleURL, attendanceController.updateEventSchedule)
-	rg.DELETE(scheduleURL, attendanceController.deleteEventSchedule)
+	rg.DELETE(scheduleURL, attendanceController.archiveEventSchedule)
 
 	rg.GET("schedules/:scheduleID/events", attendanceController.listEventsBySchedule)
 	rg.GET("schedules/:scheduleID/events/:eventID", attendanceController.getEventBySchedule)
@@ -41,7 +41,7 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
-				"error": err,
+				"error": err.Error(),
 			})
 		},
 		successFunc: func(result attendance.EventScheduleDTO) {
@@ -49,6 +49,13 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 				"data": result,
 			})
 		},
+	}
+	err := c.ShouldBindJSON(&schedule)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 	a.attendanceComponent.CreateEventSchedule(c, schedule, output)
 }
@@ -73,12 +80,34 @@ func (a *attendanceController) getEventSchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) updateEventSchedule(c *gin.Context) {
-	//TODO fill this
+	var schedule attendance.EventScheduleDTO
+	output := &outputDecorator[attendance.EventScheduleDTO]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(result attendance.EventScheduleDTO) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+	err := c.ShouldBindJSON(&schedule)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	a.attendanceComponent.UpdateEventSchedule(c, schedule, output)
 }
 
-func (a *attendanceController) deleteEventSchedule(c *gin.Context) {
+func (a *attendanceController) archiveEventSchedule(c *gin.Context) {
 	//TODO fill this
-}	
+}
 
 func (a *attendanceController) getEventScheduleStats(c *gin.Context) {
 	//TODO fill this
@@ -86,7 +115,7 @@ func (a *attendanceController) getEventScheduleStats(c *gin.Context) {
 
 func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
 	//TODO fill this
-}	
+}
 
 func (a *attendanceController) getEventBySchedule(c *gin.Context) {
 	//TODO fill this
@@ -99,5 +128,3 @@ func (a *attendanceController) listEventCheckIn(c *gin.Context) {
 func (a *attendanceController) checkIn(c *gin.Context) {
 	//TODO fill this
 }
-
-

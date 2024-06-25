@@ -1,6 +1,11 @@
 package attendance
 
-import "time"
+import (
+	"time"
+
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
+	"github.com/samber/lo"
+)
 
 type EventScheduleDTO struct {
 	ID             string                     `json:"id"`
@@ -12,6 +17,21 @@ type EventScheduleDTO struct {
 	Days           []time.Weekday             `json:"days"`
 	StartDate      time.Time                  `json:"start_date"`
 	EndDate        time.Time                  `json:"end_date"`
+}
+
+func fromEntities(result *entities.EventSchedule) EventScheduleDTO {
+	return EventScheduleDTO{
+		ID:             result.ID,
+		Name:           result.Name,
+		TimezoneOffset: result.TimezoneOffset,
+		Type:           string(result.Type),
+		Activities: lo.Map(result.Activities,
+			func(ea entities.EventScheduleActivity, _ int) EventScheduleActivityDTO {
+				return EventScheduleActivityDTO{ID: ea.ID, Name: ea.Name, Hour: ea.Hour, Minute: ea.Minute}
+			}),
+		Date:      result.Date,
+		StartDate: result.StartDate,
+		EndDate:   result.EndDate}
 }
 
 type EventScheduleActivityDTO struct {
