@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,7 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 
 	rg := r.Group("attendance")
 	rg.POST("schedules", attendanceController.createSchedule)
+	rg.GET("schedules", attendanceController.listEventSchedules)
 
 	scheduleURL := "schedules/:id"
 	rg.GET(scheduleURL, attendanceController.getEventSchedule)
@@ -35,16 +37,20 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.GET("schedules/:scheduleID/stats", attendanceController.getEventScheduleStats)
 }
 
+func (a *attendanceController) listEventSchedules(c *gin.Context) {
+	//TODO fill this
+}
+
 func (a *attendanceController) createSchedule(c *gin.Context) {
-	var schedule attendance.EventScheduleDTO
-	output := &outputDecorator[attendance.EventScheduleDTO]{
+	var schedule dto.EventScheduleDTO
+	output := &outputDecorator[dto.EventScheduleDTO]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err.Error(),
 			})
 		},
-		successFunc: func(result attendance.EventScheduleDTO) {
+		successFunc: func(result dto.EventScheduleDTO) {
 			c.JSON(200, gin.H{
 				"data": result,
 			})
@@ -63,14 +69,14 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 func (a *attendanceController) getEventSchedule(c *gin.Context) {
 	//TODO fill this
 	// id := c.Param("id")
-	// output := &outputDecorator[attendance.EventScheduleDTO]{
+	// output := &outputDecorator[dto.EventScheduleDTO]{
 	// 	output: nil,
 	// 	errFunction: func(err out.AppErrorDetail) {
 	// 		c.JSON(400, gin.H{
 	// 			"error": err,
 	// 		})
 	// 	},
-	// 	successFunc: func(result attendance.EventScheduleDTO) {
+	// 	successFunc: func(result dto.EventScheduleDTO) {
 	// 		c.JSON(200, gin.H{
 	// 			"data": result,
 	// 		})
@@ -80,15 +86,15 @@ func (a *attendanceController) getEventSchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) updateEventSchedule(c *gin.Context) {
-	var schedule attendance.EventScheduleDTO
-	output := &outputDecorator[attendance.EventScheduleDTO]{
+	var schedule dto.EventScheduleDTO
+	output := &outputDecorator[dto.EventScheduleDTO]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err.Error(),
 			})
 		},
-		successFunc: func(result attendance.EventScheduleDTO) {
+		successFunc: func(result dto.EventScheduleDTO) {
 			c.JSON(200, gin.H{
 				"data": result,
 			})

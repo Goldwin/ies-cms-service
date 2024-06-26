@@ -4,23 +4,25 @@ import (
 	"context"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 )
 
 type AttendanceDataLayerComponent interface {
-	QueryWorker() worker.QueryWorker[QueryContext]
+	QueryWorker() worker.QueryWorker[queries.QueryContext]
 	CommandWorker() worker.UnitOfWork[commands.CommandContext]
 }
 
 type AttendanceComponent interface {
-	CreateEventSchedule(ctx context.Context, schedule EventScheduleDTO, output out.Output[EventScheduleDTO])
-	AddEventScheduleActivity(ctx context.Context, activity EventScheduleActivityDTO, output out.Output[EventScheduleDTO])
-	CreateEvent(ctx context.Context, scheduleID string, output out.Output[EventDTO])
-	UpdateEventSchedule(ctx context.Context, schedule EventScheduleDTO, output out.Output[EventScheduleDTO])
-	RemoveEventScheduleActivity(ctx context.Context, activity EventScheduleActivityDTO, output out.Output[EventScheduleDTO])
+	CreateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO])
+	AddEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO])
+	CreateEvent(ctx context.Context, scheduleID string, output out.Output[dto.EventDTO])
+	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO])
+	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO])
 }
 
 type attendanceComponentImpl struct {
@@ -28,7 +30,7 @@ type attendanceComponentImpl struct {
 }
 
 // UpdateEventSchedule implements AttendanceComponent.
-func (a *attendanceComponentImpl) UpdateEventSchedule(ctx context.Context, schedule EventScheduleDTO, output out.Output[EventScheduleDTO]) {
+func (a *attendanceComponentImpl) UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) {
 	var result CommandExecutionResult[entities.EventSchedule]
 	a.dataLayer.CommandWorker().Execute(ctx, func(cc commands.CommandContext) error {
 		result = commands.UpdateEventScheduleCommand{
@@ -49,11 +51,11 @@ func (a *attendanceComponentImpl) UpdateEventSchedule(ctx context.Context, sched
 		return
 	}
 
-	output.OnSuccess(fromEntities(&result.Result))
+	output.OnSuccess(dto.FromEntities(&result.Result))
 }
 
 // RemoveEventScheduleActivity implements AttendanceComponent.
-func (a *attendanceComponentImpl) RemoveEventScheduleActivity(ctx context.Context, activity EventScheduleActivityDTO, output out.Output[EventScheduleDTO]) {
+func (a *attendanceComponentImpl) RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) {
 	var result CommandExecutionResult[entities.EventSchedule]
 	a.dataLayer.CommandWorker().Execute(ctx, func(cc commands.CommandContext) error {
 		result = commands.RemoveScheduleActivityCommand{
@@ -68,11 +70,11 @@ func (a *attendanceComponentImpl) RemoveEventScheduleActivity(ctx context.Contex
 		return
 	}
 
-	output.OnSuccess(fromEntities(&result.Result))
+	output.OnSuccess(dto.FromEntities(&result.Result))
 }
 
 // AddEventScheduleActivity implements AttendanceComponent.
-func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, activity EventScheduleActivityDTO, output out.Output[EventScheduleDTO]) {
+func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) {
 	var result CommandExecutionResult[entities.EventSchedule]
 	a.dataLayer.CommandWorker().Execute(ctx, func(cc commands.CommandContext) error {
 		result = commands.AddEventScheduleActivityCommand{
@@ -89,16 +91,16 @@ func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, 
 		return
 	}
 
-	output.OnSuccess(fromEntities(&result.Result))
+	output.OnSuccess(dto.FromEntities(&result.Result))
 }
 
 // CreateEvent implements AttendanceComponent.
-func (a *attendanceComponentImpl) CreateEvent(ctx context.Context, scheduleID string, output out.Output[EventDTO]) {
+func (a *attendanceComponentImpl) CreateEvent(ctx context.Context, scheduleID string, output out.Output[dto.EventDTO]) {
 	panic("unimplemented")
 }
 
 // CreateEventSchedule implements AttendanceComponent.
-func (a *attendanceComponentImpl) CreateEventSchedule(ctx context.Context, schedule EventScheduleDTO, output out.Output[EventScheduleDTO]) {
+func (a *attendanceComponentImpl) CreateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) {
 
 	var result CommandExecutionResult[entities.EventSchedule]
 	err := a.dataLayer.CommandWorker().Execute(ctx, func(cc commands.CommandContext) error {
@@ -119,7 +121,7 @@ func (a *attendanceComponentImpl) CreateEventSchedule(ctx context.Context, sched
 		return
 	}
 
-	output.OnSuccess(fromEntities(&result.Result))
+	output.OnSuccess(dto.FromEntities(&result.Result))
 }
 
 func NewAttendanceComponent(datalayer AttendanceDataLayerComponent) AttendanceComponent {

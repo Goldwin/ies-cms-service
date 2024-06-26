@@ -5,6 +5,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 )
 
@@ -17,7 +18,7 @@ func (a *attendanceDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[com
 }
 
 // QueryWorker implements attendance.AttendanceDataLayerComponent.
-func (a *attendanceDataLayerComponentImpl) QueryWorker() worker.QueryWorker[attendance.QueryContext] {
+func (a *attendanceDataLayerComponentImpl) QueryWorker() worker.QueryWorker[queries.QueryContext] {
 	panic("unimplemented")
 }
 

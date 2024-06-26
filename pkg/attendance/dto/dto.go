@@ -1,4 +1,4 @@
-package attendance
+package dto
 
 import (
 	"time"
@@ -19,7 +19,7 @@ type EventScheduleDTO struct {
 	EndDate        time.Time                  `json:"end_date"`
 }
 
-func fromEntities(result *entities.EventSchedule) EventScheduleDTO {
+func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 	return EventScheduleDTO{
 		ID:             result.ID,
 		Name:           result.Name,
