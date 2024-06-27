@@ -1,9 +1,9 @@
 package queries
 
 type QueryContext interface {
-	GetEventSchedule()
+	GetEventSchedule() GetEventSchedule
 	ListEventSchedules() ListEventSchedule
-	ListEventBySchedule()
-	GetEvent()
-	ListEventCheckIn()
+	ListEventsBySchedule() ListEventBySchedule
+	GetEvent() GetEvent
+	ListEventAttendance() ListEventAttendance
 }

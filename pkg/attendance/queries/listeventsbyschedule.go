@@ -5,15 +5,16 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
-type ListEventScheduleQuery struct {
-	Limit  int    `json:"limit"`
-	LastID string `json:"last_id"`
+type ListEventByScheduleQuery struct {
+	ScheduleID string `json:"schedule_id"`
+	Limit      int    `json:"limit"`
+	LastID     string `json:"last_id"`
 }
 
-type ListEventScheduleResult struct {
+type ListEventByScheduleResult struct {
 	Data []dto.EventScheduleDTO `json:"data"`
 }
 
-type ListEventSchedule interface {
+type ListEventBySchedule interface {
 	Execute(query ListEventScheduleQuery) (ListEventScheduleResult, queries.QueryErrorDetail)
 }
