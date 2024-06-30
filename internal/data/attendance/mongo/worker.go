@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/commands"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -37,6 +38,23 @@ func (a *attendanceUnitOfWorkImpl) Execute(ctx context.Context, op worker.Atomic
 
 func NewUnitOfWork(db *mongo.Database, useTransaction bool) worker.UnitOfWork[commands.CommandContext] {
 	return &attendanceUnitOfWorkImpl{
+		db:             db,
+		useTransaction: useTransaction,
+	}
+}
+
+type attendanceQueryWorkerImpl struct {
+	db             *mongo.Database
+	useTransaction bool
+}
+
+// Query implements worker.QueryWorker.
+func (a *attendanceQueryWorkerImpl) Query(ctx context.Context) queries.QueryContext {
+	return NewQueryContext(ctx, a.db)
+}
+
+func NewQueryWorker(db *mongo.Database, useTransaction bool) worker.QueryWorker[queries.QueryContext] {
+	return &attendanceQueryWorkerImpl{
 		db:             db,
 		useTransaction: useTransaction,
 	}
