@@ -7,8 +7,12 @@ type QueryErrorDetail struct {
 	Message string         `json:"message"`
 }
 
-func (e QueryErrorDetail) Error() string {
+func (e *QueryErrorDetail) Error() string {
 	return e.Message
+}
+
+func (e *QueryErrorDetail) NoError() bool {
+	return e == nil || e.Code == NoQueryError.Code
 }
 
 type QueryResult[T any] struct {

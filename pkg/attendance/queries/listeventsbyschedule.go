@@ -16,5 +16,5 @@ type ListEventByScheduleResult struct {
 }
 
 type ListEventBySchedule interface {
-	Execute(query ListEventScheduleQuery) (ListEventScheduleResult, queries.QueryErrorDetail)
+	Execute(query ListEventByScheduleQuery) (ListEventByScheduleResult, queries.QueryErrorDetail)
 }
