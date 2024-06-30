@@ -68,7 +68,7 @@ func (e *eventScheduleRepositoryImpl) Save(schedule *entities.EventSchedule) (*e
 	return schedule, nil
 }
 
-func NewAttendanceRepository(ctx context.Context, db *mongo.Database) repositories.EventScheduleRepository {
+func NewEventScheduleRepository(ctx context.Context, db *mongo.Database) repositories.EventScheduleRepository {
 	return &eventScheduleRepositoryImpl{
 		ctx:        ctx,
 		db:         db,
