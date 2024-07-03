@@ -9,7 +9,8 @@ import (
 )
 
 type listEventAttendanceImpl struct {
-	db *mongo.Database
+	db  *mongo.Database
+	ctx context.Context
 }
 
 // Execute implements queries.ListEventAttendance.
@@ -20,5 +21,6 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceQuery) (ListE
 func NewListEventAttendance(ctx context.Context, db *mongo.Database) ListEventAttendance {
 	return &listEventAttendanceImpl{
 		db: db,
+		ctx: ctx,
 	}
 }

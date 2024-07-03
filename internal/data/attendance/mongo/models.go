@@ -9,8 +9,9 @@ import (
 
 const (
 	EventScheduleCollection = "event_schedules"
-	EventCollection        = "events"
+	EventCollection         = "events"
 )
+
 type EventScheduleModel struct {
 	ID             string                       `bson:"_id"`
 	Name           string                       `bson:"name"`
@@ -88,6 +89,7 @@ func (e *EventScheduleActivityModel) ToEventScheduleActivity() entities.EventSch
 
 type EventModel struct {
 	ID              string               `bson:"_id"`
+	Name            string               `bson:"name"`
 	ScheduleID      string               `bson:"scheduleId"`
 	EventActivities []EventActivityModel `bson:"eventActivities"`
 	Date            time.Time            `bson:"date"`

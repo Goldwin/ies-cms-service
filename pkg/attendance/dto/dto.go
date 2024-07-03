@@ -44,14 +44,10 @@ type EventScheduleActivityDTO struct {
 
 type EventDTO struct {
 	ID             string             `json:"id"`
+	ScheduleID     string             `json:"schedule_id"`
 	Name           string             `json:"name"`
-	TimezoneOffset int                `json:"timezone_offset"`
-	Type           string             `json:"type"`
 	Activities     []EventActivityDTO `json:"activities"`
 	Date           time.Time          `json:"date"`
-	Days           []time.Weekday     `json:"days"`
-	StartDate      time.Time          `json:"start_date"`
-	EndDate        time.Time          `json:"end_date"`
 }
 
 type EventActivityDTO struct {
