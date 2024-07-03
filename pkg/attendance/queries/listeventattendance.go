@@ -6,14 +6,17 @@ import (
 )
 
 type ListEventAttendanceQuery struct {
-	ScheduleID string `json:"schedule_id"`
-	EventID    string `json:"event_id"`
-	Limit      int    `json:"limit"`
-	LastID     string `json:"last_id"`
+	EventID         string `json:"event_id"`
+	EventActivityID string `json:"event_activity_id"`
+	Limit           int    `json:"limit"`
+	LastID          string `json:"last_id"`
+
+	AttendanceTypes []string `json:"attendance_type"`
+	Name            string   `json:"name"`
 }
 
 type ListEventAttendanceResult struct {
-	Data []dto.EventCheckInDTO `json:"data"`
+	Data []dto.EventAttendanceDTO `json:"data"`
 }
 
 type ListEventAttendance interface {

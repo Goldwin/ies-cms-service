@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	AttendanceCollection    = "attendances"
 	EventScheduleCollection = "event_schedules"
 	EventCollection         = "events"
 )
@@ -136,5 +137,57 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 		ID:   e.ID,
 		Name: e.Name,
 		Time: e.Time,
+	}
+}
+
+type AttendanceModel struct {
+	ID              string `bson:"_id"`
+	EventID         string `bson:"eventId"`
+	EventActivityID string `bson:"eventActivityId"`
+
+	PersonID          string `bson:"personId"`
+	FirstName         string `bson:"firstName"`
+	MiddleName        string `bson:"middleName"`
+	LastName          string `bson:"lastName"`
+	ProfilePictureUrl string `bson:"profilePictureUrl"`
+
+	SecurityCode   string    `bson:"securityCode"`
+	SecurityNumber int       `bson:"securityNumber"`
+	CheckinTime    time.Time `bson:"checkinTime"`
+
+	Type string `bson:"type"`
+}
+
+func toAttendanceModel(e *entities.Attendance) AttendanceModel {
+	return AttendanceModel{
+		ID:                e.ID,
+		EventID:           e.EventID,
+		EventActivityID:   e.EventActivityID,
+		PersonID:          e.PersonID,
+		FirstName:         e.FirstName,
+		MiddleName:        e.MiddleName,
+		LastName:          e.LastName,
+		ProfilePictureUrl: e.ProfilePictureUrl,
+		SecurityCode:      e.SecurityCode,
+		SecurityNumber:    e.SecurityNumber,
+		CheckinTime:       e.CheckinTime,
+		Type:              string(e.Type),
+	}
+}
+
+func (e *AttendanceModel) ToAttendance() *entities.Attendance {
+	return &entities.Attendance{
+		ID:                e.ID,
+		EventID:           e.EventID,
+		EventActivityID:   e.EventActivityID,
+		PersonID:          e.PersonID,
+		FirstName:         e.FirstName,
+		MiddleName:        e.MiddleName,
+		LastName:          e.LastName,
+		ProfilePictureUrl: e.ProfilePictureUrl,
+		SecurityCode:      e.SecurityCode,
+		SecurityNumber:    e.SecurityNumber,
+		CheckinTime:       e.CheckinTime,
+		Type:              entities.AttendanceType(e.Type),
 	}
 }

@@ -43,11 +43,11 @@ type EventScheduleActivityDTO struct {
 }
 
 type EventDTO struct {
-	ID             string             `json:"id"`
-	ScheduleID     string             `json:"schedule_id"`
-	Name           string             `json:"name"`
-	Activities     []EventActivityDTO `json:"activities"`
-	Date           time.Time          `json:"date"`
+	ID         string             `json:"id"`
+	ScheduleID string             `json:"schedule_id"`
+	Name       string             `json:"name"`
+	Activities []EventActivityDTO `json:"activities"`
+	Date       time.Time          `json:"date"`
 }
 
 type EventActivityDTO struct {
@@ -56,9 +56,8 @@ type EventActivityDTO struct {
 	Time time.Time `json:"time"`
 }
 
-type EventCheckInDTO struct {
+type EventAttendanceDTO struct {
 	ID                string           `json:"id"`
-	ScheduleID        string           `json:"schedule_id"`
 	EventID           string           `json:"event_id"`
 	Activity          EventActivityDTO `json:"activity"`
 	PersonID          string           `json:"person_id"`
