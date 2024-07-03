@@ -72,6 +72,6 @@ func NewEventScheduleRepository(ctx context.Context, db *mongo.Database) reposit
 	return &eventScheduleRepositoryImpl{
 		ctx:        ctx,
 		db:         db,
-		collection: db.Collection("eventSchedule"),
+		collection: db.Collection(EventScheduleCollection),
 	}
 }

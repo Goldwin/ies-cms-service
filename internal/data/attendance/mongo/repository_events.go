@@ -69,6 +69,6 @@ func NewEventRepository(ctx context.Context, db *mongo.Database) repositories.Ev
 	return &EventRepositoryImpl{
 		ctx:        ctx,
 		db:         db,
-		collection: db.Collection("event"),
+		collection: db.Collection(EventCollection),
 	}
 }

@@ -7,6 +7,10 @@ import (
 	"github.com/samber/lo"
 )
 
+const (
+	EventScheduleCollection = "event_schedules"
+	EventCollection        = "events"
+)
 type EventScheduleModel struct {
 	ID             string                       `bson:"_id"`
 	Name           string                       `bson:"name"`
