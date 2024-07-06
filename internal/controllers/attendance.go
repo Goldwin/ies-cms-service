@@ -4,6 +4,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/gin-gonic/gin"
 )
@@ -38,7 +39,30 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 }
 
 func (a *attendanceController) listEventSchedules(c *gin.Context) {
-	//TODO fill this
+	var query queries.ListEventScheduleQuery
+
+	err := c.ShouldBindQuery(&query)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	output := &outputDecorator[queries.ListEventScheduleResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err.Error(),
+			})
+		},
+		successFunc: func(result queries.ListEventScheduleResult) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+	a.attendanceComponent.ListEventSchedules(c, query, output)
 }
 
 func (a *attendanceController) createSchedule(c *gin.Context) {
@@ -67,22 +91,23 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) getEventSchedule(c *gin.Context) {
-	//TODO fill this
-	// id := c.Param("id")
-	// output := &outputDecorator[dto.EventScheduleDTO]{
-	// 	output: nil,
-	// 	errFunction: func(err out.AppErrorDetail) {
-	// 		c.JSON(400, gin.H{
-	// 			"error": err,
-	// 		})
-	// 	},
-	// 	successFunc: func(result dto.EventScheduleDTO) {
-	// 		c.JSON(200, gin.H{
-	// 			"data": result,
-	// 		})
-	// 	},
-	// }
-	// //a.attendanceComponent.GetEventSchedule(c, id, output)
+	id := c.Param("id")
+	output := &outputDecorator[queries.GetEventScheduleResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result queries.GetEventScheduleResult) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+	a.attendanceComponent.GetEventSchedule(c, queries.GetEventScheduleQuery{
+		ScheduleID: id,
+	}, output)
 }
 
 func (a *attendanceController) updateEventSchedule(c *gin.Context) {
@@ -90,9 +115,7 @@ func (a *attendanceController) updateEventSchedule(c *gin.Context) {
 	output := &outputDecorator[dto.EventScheduleDTO]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
-			c.JSON(400, gin.H{
-				"error": err.Error(),
-			})
+			c.JSON(400, err)
 		},
 		successFunc: func(result dto.EventScheduleDTO) {
 			c.JSON(200, gin.H{
@@ -120,15 +143,74 @@ func (a *attendanceController) getEventScheduleStats(c *gin.Context) {
 }
 
 func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
-	//TODO fill this
+	var input queries.ListEventByScheduleQuery
+	err := c.BindQuery(&input)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	output := &outputDecorator[queries.ListEventByScheduleResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, err)
+		},
+		successFunc: func(result queries.ListEventByScheduleResult) {
+			c.JSON(200, result)
+		},
+	}
+	a.attendanceComponent.ListEventsBySchedule(c, input, output)
 }
 
 func (a *attendanceController) getEventBySchedule(c *gin.Context) {
-	//TODO fill this
+	var input queries.GetEventQuery
+
+	err := c.BindQuery(&input)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	output := &outputDecorator[queries.GetEventResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, err)
+		},
+		successFunc: func(result queries.GetEventResult) {
+			c.JSON(200, result)
+		},
+	}
+
+	a.attendanceComponent.GetEvent(c, input, output)
 }
 
 func (a *attendanceController) listEventCheckIn(c *gin.Context) {
-	//TODO fill this
+	var input queries.ListEventAttendanceQuery
+	err := c.ShouldBindQuery(&input)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	output := &outputDecorator[queries.ListEventAttendanceResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, err)
+		},
+		successFunc: func(result queries.ListEventAttendanceResult) {
+			c.JSON(200, result)
+		},
+	}
+
+	a.attendanceComponent.ListEventAttendance(c, input, output)
 }
 
 func (a *attendanceController) checkIn(c *gin.Context) {

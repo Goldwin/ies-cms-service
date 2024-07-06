@@ -6,12 +6,12 @@ import (
 )
 
 type ListEventScheduleQuery struct {
-	Limit  int    `json:"limit"`
-	LastID string `json:"last_id"`
+	Limit  int    `json:"limit" form:"limit"`
+	LastID string `json:"last_id" form:"last_id"`
 }
 
 type ListEventScheduleResult struct {
-	Data []dto.EventScheduleDTO `json:"data"`
+	Data []dto.EventScheduleDTO `json:"data" form:"data"`
 }
 
 type ListEventSchedule interface {

@@ -6,11 +6,11 @@ import (
 )
 
 type GetEventScheduleQuery struct {
-	ScheduleID string `json:"schedule_id"`
+	ScheduleID string `json:"schedule_id" form:"schedule_id"`
 }
 
 type GetEventScheduleResult struct {
-	Data dto.EventScheduleDTO `json:"data"`
+	Data dto.EventScheduleDTO `json:"data" form:"data"`
 }
 
 type GetEventSchedule interface {
