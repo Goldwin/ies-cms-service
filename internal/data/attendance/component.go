@@ -12,6 +12,7 @@ import (
 
 type attendanceDataLayerComponentImpl struct {
 	commandWorker worker.UnitOfWork[commands.CommandContext]
+	queryWorker   worker.QueryWorker[queries.QueryContext]
 }
 
 // CommandWorker implements attendance.AttendanceDataLayerComponent.
@@ -21,11 +22,12 @@ func (a *attendanceDataLayerComponentImpl) CommandWorker() worker.UnitOfWork[com
 
 // QueryWorker implements attendance.AttendanceDataLayerComponent.
 func (a *attendanceDataLayerComponentImpl) QueryWorker() worker.QueryWorker[queries.QueryContext] {
-	panic("unimplemented")
+	return a.queryWorker
 }
 
 func NewAttendanceDataLayerComponent(config data.DataLayerConfig, infraComponent infra.InfraComponent) attendance.AttendanceDataLayerComponent {
 	return &attendanceDataLayerComponentImpl{
 		commandWorker: mongo.NewUnitOfWork(infraComponent.Mongo(), config.CommandConfig.UseTransaction),
+		queryWorker:   mongo.NewQueryWorker(infraComponent.Mongo(), config.QueryConfig.UseTransaction),
 	}
 }

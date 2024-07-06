@@ -1,5 +1,7 @@
 package queries
 
+import "log"
+
 type QueryErrorCode int
 
 type QueryErrorDetail struct {
@@ -21,8 +23,18 @@ type QueryResult[T any] struct {
 
 const (
 	ResourceNotFound QueryErrorCode = 404
+	InternalError    QueryErrorCode = 500
 )
 
 var (
 	NoQueryError = QueryErrorDetail{Code: 0, Message: ""}
 )
+
+func ResourceNotFoundError(msg string) QueryErrorDetail {
+	return QueryErrorDetail{Code: ResourceNotFound, Message: msg}
+}
+
+func InternalServerError(err error) QueryErrorDetail {
+	log.Default().Printf("Failed to execute query: %s\n", err.Error())
+	return QueryErrorDetail{Code: InternalError, Message: "Failed to execute query because of an internal error. please contact the system administrator."}
+}

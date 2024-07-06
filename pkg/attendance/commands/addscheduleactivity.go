@@ -1,14 +1,21 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/google/uuid"
 )
 
 const (
-	AddActivityValidationError           CommandErrorCode = 30201
-	AddActivityScheduleDoesntExistsError CommandErrorCode = 30202
+	AddActivityScheduleDoesntExistsError CommandErrorCode = 30201
+	AddActivityInvalidTimeError          CommandErrorCode = 30202
+	AddActivityLimitExceeded             CommandErrorCode = 30303
+)
+
+const (
+	ActivityPerScheduleLimit int = 10
 )
 
 type AddEventScheduleActivityCommand struct {
@@ -23,7 +30,7 @@ func (c AddEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExec
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    AddActivityValidationError,
+				Code:    AddActivityInvalidTimeError,
 				Message: "Invalid hour or minute",
 			},
 		}
@@ -44,6 +51,16 @@ func (c AddEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExec
 			Error: CommandErrorDetail{
 				Code:    AddActivityScheduleDoesntExistsError,
 				Message: "Schedule not found",
+			},
+		}
+	}
+
+	if (len(schedule.Activities) + 1) > ActivityPerScheduleLimit {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    AddActivityLimitExceeded,
+				Message: fmt.Sprintf("Cannot add more than %d activities", ActivityPerScheduleLimit),
 			},
 		}
 	}

@@ -17,18 +17,25 @@ type AttendanceDataLayerComponent interface {
 	CommandWorker() worker.UnitOfWork[commands.CommandContext]
 }
 
-type AttendanceComponent interface {
+type AttendanceCommandComponent interface {
 	CreateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO])
 	AddEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO])
 	CreateEvent(ctx context.Context, scheduleID string, output out.Output[dto.EventDTO])
 	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO])
 	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO])
+}
 
+type AttendanceQueryComponent interface {
 	GetEventSchedule(ctx context.Context, query queries.GetEventScheduleQuery, output out.Output[queries.GetEventScheduleResult])
 	ListEventSchedules(ctx context.Context, query queries.ListEventScheduleQuery, output out.Output[queries.ListEventScheduleResult])
 	ListEventsBySchedule(ctx context.Context, query queries.ListEventByScheduleQuery, output out.Output[queries.ListEventByScheduleResult])
 	GetEvent(ctx context.Context, query queries.GetEventQuery, output out.Output[queries.GetEventResult])
 	ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceQuery, output out.Output[queries.ListEventAttendanceResult])
+}
+
+type AttendanceComponent interface {
+	AttendanceCommandComponent
+	AttendanceQueryComponent
 }
 
 type attendanceComponentImpl struct {

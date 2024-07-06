@@ -27,20 +27,14 @@ func (l *listEventScheduleImpl) Execute(query ListEventScheduleQuery) (ListEvent
 	)
 
 	if err != nil {
-		return ListEventScheduleResult{}, queries.QueryErrorDetail{
-			Code:    500,
-			Message: "Failed to connect to database",
-		}
+		return ListEventScheduleResult{}, queries.InternalServerError(err)
 	}
 	defer cursor.Close(l.ctx)
 	var result = make([]dto.EventScheduleDTO, 0)
 	for cursor.Next(l.ctx) {
 		var eventScheduleModel EventScheduleModel
 		if err := cursor.Decode(&eventScheduleModel); err != nil {
-			return ListEventScheduleResult{}, queries.QueryErrorDetail{
-				Code:    500,
-				Message: "Failed to Decode Event Schedule Information",
-			}
+			return ListEventScheduleResult{}, queries.InternalServerError(err)
 		}
 		result = append(result, dto.EventScheduleDTO{
 			ID:             eventScheduleModel.ID,
@@ -51,7 +45,7 @@ func (l *listEventScheduleImpl) Execute(query ListEventScheduleQuery) (ListEvent
 			Date:           eventScheduleModel.Date,
 			StartDate:      eventScheduleModel.StartDate,
 			EndDate:        eventScheduleModel.EndDate,
-			Activities:     lo.Map(
+			Activities: lo.Map(
 				eventScheduleModel.Activities, func(e EventScheduleActivityModel, _ int) dto.EventScheduleActivityDTO {
 					return dto.EventScheduleActivityDTO{
 						ScheduleID: eventScheduleModel.ID,

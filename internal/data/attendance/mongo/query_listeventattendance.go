@@ -36,29 +36,21 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceQuery) (ListE
 	)
 
 	if err != nil {
-		return ListEventAttendanceResult{}, queries.QueryErrorDetail{
-			Code:    500,
-			Message: "Failed to connect to database",
-		}
+		return ListEventAttendanceResult{}, queries.InternalServerError(err)
 	}
+	
 	defer cursor.Close(l.ctx)
 	var result = make([]AttendanceModel, 0)
 	err = cursor.Decode(&result)
 
 	if err != nil {
-		return ListEventAttendanceResult{}, queries.QueryErrorDetail{
-			Code:    500,
-			Message: "Failed to Decode Event Information",
-		}
+		return ListEventAttendanceResult{}, queries.InternalServerError(err)
 	}
 
 	activityCache, err := l.fetchActivities(query)
 
 	if err != nil {
-		return ListEventAttendanceResult{}, queries.QueryErrorDetail{
-			Code:    500,
-			Message: "Failed to Fetch Event Activities Information",
-		}
+		return ListEventAttendanceResult{}, queries.InternalServerError(err)
 	}
 
 	return ListEventAttendanceResult{

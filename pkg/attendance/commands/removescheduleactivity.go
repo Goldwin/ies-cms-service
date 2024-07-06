@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	RemoveActivityIDDoesntExistsError       CommandErrorCode = 30301
-	RemoveActivityScheduleDoesntExistsError CommandErrorCode = 30302
+	RemoveActivityIDDoesntExistsError       CommandErrorCode = 30211
+	RemoveActivityScheduleDoesntExistsError CommandErrorCode = 30212
 )
 
 type RemoveScheduleActivityCommand struct {

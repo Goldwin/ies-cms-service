@@ -22,16 +22,10 @@ func (g *getEventImpl) Execute(query GetEventQuery) (GetEventResult, queries.Que
 	err := g.db.Collection(EventCollection).FindOne(g.ctx, bson.M{"_id": query.EventID}).Decode(&model)
 
 	if err == mongo.ErrNoDocuments {
-		return GetEventResult{}, queries.QueryErrorDetail{
-			Code:    queries.ResourceNotFound,
-			Message: "Event not found",
-		}
+		return GetEventResult{}, queries.ResourceNotFoundError("Event not found")
 	}
 	if err != nil {
-		return GetEventResult{}, queries.QueryErrorDetail{
-			Code:    500,
-			Message: "Failed to connect to database",
-		}
+		return GetEventResult{}, queries.InternalServerError(err)
 	}
 
 	return GetEventResult{
