@@ -7,6 +7,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/config"
 	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
 	"github.com/Goldwin/ies-pik-cms/internal/data"
+	attendanceData "github.com/Goldwin/ies-pik-cms/internal/data/attendance"
 	authData "github.com/Goldwin/ies-pik-cms/internal/data/auth"
 	eventData "github.com/Goldwin/ies-pik-cms/internal/data/events"
 	peopleData "github.com/Goldwin/ies-pik-cms/internal/data/people"
@@ -16,6 +17,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/internal/middleware"
 
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
 	"github.com/Goldwin/ies-pik-cms/pkg/events"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
@@ -43,10 +45,13 @@ func main() {
 		},
 	}, infraComponent)
 	eventDataLayer := eventData.NewChurchEventDataLayerComponent(config.DataConfig["EVENTS"], infraComponent)
+	attendanceDataLayer := attendanceData.NewAttendanceDataLayerComponent(config.DataConfig["ATTENDANCE"], infraComponent)
 
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
 	peopleManagementComponent := people.NewPeopleManagementComponent(peopleDataLayer)
 	churchEventComponent := events.NewChurchEventComponent(eventDataLayer)
+
+	attendanceComponent := attendance.NewAttendanceComponent(attendanceDataLayer)
 
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)
 	eventBusComponent := bus.Local()
@@ -66,6 +71,7 @@ func main() {
 	controller.InitializeAuthController(r, authComponent, eventBusComponent, authOutputComponent, middlewareComponent)
 	controller.InitializeEventsController(r, middlewareComponent, churchEventComponent, eventBusComponent)
 	controller.InitializeCMSController(r, authComponent, peopleManagementComponent, middlewareComponent, emailClient)
+	controller.InitializeAttendanceController(r, middlewareComponent, attendanceComponent)
 
 	r.Run()
 }
