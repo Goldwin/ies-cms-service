@@ -11,6 +11,9 @@ type CommandExecutionResult[T any] struct {
 	Result T
 }
 
+type Command[CTX any, R any] interface {
+	Execute(ctx CTX) CommandExecutionResult[R]
+}
 type CommandErrorDetail struct {
 	Code    CommandErrorCode `json:"code"`
 	Message string           `json:"message"`

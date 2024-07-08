@@ -87,7 +87,7 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 		})
 		return
 	}
-	a.attendanceComponent.CreateEventSchedule(c, schedule, output)
+	a.attendanceComponent.CreateEventSchedule(c, schedule, output).Wait()
 }
 
 func (a *attendanceController) getEventSchedule(c *gin.Context) {
@@ -131,7 +131,7 @@ func (a *attendanceController) updateEventSchedule(c *gin.Context) {
 		return
 	}
 
-	a.attendanceComponent.UpdateEventSchedule(c, schedule, output)
+	a.attendanceComponent.UpdateEventSchedule(c, schedule, output).Wait()
 }
 
 func (a *attendanceController) archiveEventSchedule(c *gin.Context) {

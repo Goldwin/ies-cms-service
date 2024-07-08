@@ -32,3 +32,7 @@ type Output[T any] interface {
 	OnError(err AppErrorDetail)
 	OnSuccess(result T)
 }
+
+type Waitable interface {
+	Wait()
+}
