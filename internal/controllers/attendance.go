@@ -24,7 +24,7 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.POST("schedules", attendanceController.createSchedule)
 	rg.GET("schedules", attendanceController.listEventSchedules)
 
-	scheduleURL := "schedules/:id"
+	scheduleURL := "schedules/:scheduleID"
 	rg.GET(scheduleURL, attendanceController.getEventSchedule)
 	rg.PUT(scheduleURL, attendanceController.updateEventSchedule)
 	rg.DELETE(scheduleURL, attendanceController.archiveEventSchedule)
@@ -91,7 +91,7 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) getEventSchedule(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("scheduleID")
 	output := &outputDecorator[queries.GetEventScheduleResult]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {

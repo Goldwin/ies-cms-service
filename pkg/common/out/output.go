@@ -33,6 +33,29 @@ type Output[T any] interface {
 	OnSuccess(result T)
 }
 
+type outputAdapter[FROM, TO any] struct {
+	transformer    OutputTransformer[TO, FROM]
+	originalOutput Output[FROM]
+}
+
+func (o *outputAdapter[FROM, TO]) OnSuccess(result TO) {
+	transformedResult := o.transformer(result)
+	o.originalOutput.OnSuccess(transformedResult)
+}
+
+func (o *outputAdapter[FROM, TO]) OnError(err AppErrorDetail) {
+	o.originalOutput.OnError(err)
+}
+
+type OutputTransformer[FROM, TO any] func(FROM) TO
+
+func OutputAdapter[FROM, TO any](output Output[FROM], transformer OutputTransformer[TO, FROM]) Output[TO]{
+	return &outputAdapter[FROM, TO] {
+		transformer: transformer,
+		originalOutput: output,
+	}
+}
+
 type Waitable interface {
 	Wait()
 }

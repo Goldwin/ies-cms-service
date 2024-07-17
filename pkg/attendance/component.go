@@ -5,6 +5,7 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/utils"
@@ -111,7 +112,11 @@ func (a *attendanceComponentImpl) UpdateEventSchedule(ctx context.Context, sched
 		Date:           schedule.Date,
 		StartDate:      schedule.StartDate,
 		EndDate:        schedule.EndDate,
-	}).Execute(ctx)
+	}).WithOutput(
+		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
+			return dto.FromEntities(&e)
+		}),
+	).Execute(ctx)
 }
 
 // RemoveEventScheduleActivity implements AttendanceComponent.
@@ -119,7 +124,11 @@ func (a *attendanceComponentImpl) RemoveEventScheduleActivity(ctx context.Contex
 	return utils.SingleCommandExecution(a.dataLayer.CommandWorker(), commands.RemoveScheduleActivityCommand{
 		ScheduleID: activity.ScheduleID,
 		ActivityID: activity.ID,
-	}).Execute(ctx)
+	}).WithOutput(
+		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
+			return dto.FromEntities(&e)
+		}),
+	).Execute(ctx)
 }
 
 // AddEventScheduleActivity implements AttendanceComponent.
@@ -129,7 +138,11 @@ func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, 
 		Name:       activity.Name,
 		Hour:       activity.Hour,
 		Minute:     activity.Minute,
-	}).Execute(ctx)
+	}).WithOutput(
+		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
+			return dto.FromEntities(&e)
+		}),
+	).Execute(ctx)
 }
 
 // CreateEvent implements AttendanceComponent.
@@ -147,7 +160,11 @@ func (a *attendanceComponentImpl) CreateEventSchedule(ctx context.Context, sched
 		Date:           schedule.Date,
 		StartDate:      schedule.StartDate,
 		EndDate:        schedule.EndDate,
-	}).Execute(ctx)
+	}).WithOutput(
+		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
+			return dto.FromEntities(&e)
+		}),
+	).Execute(ctx)
 }
 
 func NewAttendanceComponent(datalayer AttendanceDataLayerComponent) AttendanceComponent {
