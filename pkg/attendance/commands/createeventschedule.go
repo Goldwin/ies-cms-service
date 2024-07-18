@@ -50,7 +50,6 @@ func (c CreateEventScheduleCommand) Execute(ctx CommandContext) CommandExecution
 	result, err := ctx.EventScheduleRepository().Save(eventSchedule)
 
 	if err != nil {
-
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
 			Error:  CommandErrorDetailWorkerFailure(err),

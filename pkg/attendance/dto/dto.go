@@ -10,13 +10,13 @@ import (
 type EventScheduleDTO struct {
 	ID             string                     `json:"id"`
 	Name           string                     `json:"name"`
-	TimezoneOffset int                        `json:"timezone_offset"`
+	TimezoneOffset int                        `json:"timezoneOffset"`
 	Type           string                     `json:"type"`
 	Activities     []EventScheduleActivityDTO `json:"activities"`
 	Date           time.Time                  `json:"date"`
 	Days           []time.Weekday             `json:"days"`
-	StartDate      time.Time                  `json:"start_date"`
-	EndDate        time.Time                  `json:"end_date"`
+	StartDate      time.Time                  `json:"startDate"`
+	EndDate        time.Time                  `json:"endDate"`
 }
 
 func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
@@ -35,7 +35,7 @@ func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 }
 
 type EventScheduleActivityDTO struct {
-	ScheduleID string `json:"schedule_id"`
+	ScheduleID string `json:"scheduleId"`
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Hour       int    `json:"hour"`
@@ -44,7 +44,7 @@ type EventScheduleActivityDTO struct {
 
 type EventDTO struct {
 	ID         string             `json:"id"`
-	ScheduleID string             `json:"schedule_id"`
+	ScheduleID string             `json:"scheduleId"`
 	Name       string             `json:"name"`
 	Activities []EventActivityDTO `json:"activities"`
 	Date       time.Time          `json:"date"`
@@ -58,15 +58,15 @@ type EventActivityDTO struct {
 
 type EventAttendanceDTO struct {
 	ID                string           `json:"id"`
-	EventID           string           `json:"event_id"`
+	EventID           string           `json:"eventId"`
 	Activity          EventActivityDTO `json:"activity"`
-	PersonID          string           `json:"person_id"`
-	FirstName         string           `json:"first_name"`
-	MiddleName        string           `json:"middle_name"`
-	LastName          string           `json:"last_name"`
-	ProfilePictureURL string           `json:"profile_picture_url"`
-	SecurityCode      string           `json:"security_code"`
-	SecurityNumber    int              `json:"security_number"`
-	CheckinTime       time.Time        `json:"checkin_time"`
-	AttendanceType    string           `json:"attendance_type"`
+	PersonID          string           `json:"personId"`
+	FirstName         string           `json:"firstName"`
+	MiddleName        string           `json:"middleName"`
+	LastName          string           `json:"lastName"`
+	ProfilePictureURL string           `json:"profilePictureUrl"`
+	SecurityCode      string           `json:"securityCode"`
+	SecurityNumber    int              `json:"securityNumber"`
+	CheckinTime       time.Time        `json:"checkinTime"`
+	AttendanceType    string           `json:"attendanceType"`
 }

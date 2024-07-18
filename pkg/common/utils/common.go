@@ -43,9 +43,9 @@ func (s *singleCommandExecutor[CTX, R]) WithOutput(output out.Output[R]) *single
 
 func (s *singleCommandExecutor[CTX, R]) Execute(ctx context.Context) out.Waitable {
 	wg := &sync.WaitGroup{}
+	wg.Add(1)
 	go s.unitOfWork.Execute(ctx, func(commandContext CTX) error {
-		var res commands.CommandExecutionResult[R]
-		wg.Add(1)
+		var res commands.CommandExecutionResult[R]		
 		defer wg.Done()
 		res = s.command.Execute(commandContext)
 		if res.Status == commands.ExecutionStatusSuccess {
