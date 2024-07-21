@@ -13,6 +13,7 @@ const (
 	EventScheduleTypeDaily   EventScheduleType = "Daily"
 	EventScheduleTypeWeekly  EventScheduleType = "Weekly"
 	EventScheduleTypeOneTime EventScheduleType = "OneTime"
+	EventScheduleTypeNone    EventScheduleType = "None"
 )
 
 /*
@@ -52,6 +53,11 @@ func (s *EventSchedule) IsDaily() bool {
 	return s.Type == EventScheduleTypeDaily
 }
 
+// IsNone returns true if the schedule is none
+func (s *EventSchedule) IsNone() bool {
+	return s.Type == EventScheduleTypeNone
+}
+
 /*
 IsValid returns an error message if the schedule is invalid
 If the schedule is valid, it returns an empty string
@@ -66,7 +72,10 @@ func (s *EventSchedule) IsValid() string {
 	if s.IsDaily() {
 		return s.DailyEventSchedule.IsValid()
 	}
-	return ""
+	if s.IsNone() {
+		return ""
+	}
+	return "Invalid schedule type"
 }
 
 /*
