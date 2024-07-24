@@ -57,9 +57,7 @@ func (a *attendanceController) listEventSchedules(c *gin.Context) {
 			})
 		},
 		successFunc: func(result queries.ListEventScheduleResult) {
-			c.JSON(200, gin.H{
-				"data": result,
-			})
+			c.JSON(200, result)
 		},
 	}
 	a.attendanceComponent.ListEventSchedules(c, query, output)
@@ -100,9 +98,7 @@ func (a *attendanceController) getEventSchedule(c *gin.Context) {
 			})
 		},
 		successFunc: func(result queries.GetEventScheduleResult) {
-			c.JSON(200, gin.H{
-				"data": result,
-			})
+			c.JSON(200, result)
 		},
 	}
 	a.attendanceComponent.GetEventSchedule(c, queries.GetEventScheduleQuery{

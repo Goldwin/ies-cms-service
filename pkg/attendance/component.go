@@ -47,11 +47,11 @@ func (a *attendanceComponentImpl) GetEvent(ctx context.Context, query queries.Ge
 
 	result, err := a.dataLayer.QueryWorker().Query(ctx).GetEvent().Execute(query)
 	if err.NoError() {
-		output.OnError(out.ConvertQueryErrorDetail(err))
+		output.OnSuccess(result)
 		return
 	}
+	output.OnError(out.ConvertQueryErrorDetail(err))
 
-	output.OnSuccess(result)
 }
 
 // GetEventSchedule implements AttendanceComponent.
@@ -59,11 +59,11 @@ func (a *attendanceComponentImpl) GetEventSchedule(ctx context.Context, query qu
 
 	result, err := a.dataLayer.QueryWorker().Query(ctx).GetEventSchedule().Execute(query)
 	if err.NoError() {
-		output.OnError(out.ConvertQueryErrorDetail(err))
+		output.OnSuccess(result)
 		return
 	}
+	output.OnError(out.ConvertQueryErrorDetail(err))
 
-	output.OnSuccess(result)
 }
 
 // ListEventAttendance implements AttendanceComponent.
@@ -71,11 +71,11 @@ func (a *attendanceComponentImpl) ListEventAttendance(ctx context.Context, query
 	result, err := a.dataLayer.QueryWorker().Query(ctx).ListEventAttendance().Execute(query)
 
 	if err.NoError() {
-		output.OnError(out.ConvertQueryErrorDetail(err))
+		output.OnSuccess(result)
 		return
 	}
+	output.OnError(out.ConvertQueryErrorDetail(err))
 
-	output.OnSuccess(result)
 }
 
 // ListEventSchedules implements AttendanceComponent.
@@ -83,22 +83,23 @@ func (a *attendanceComponentImpl) ListEventSchedules(ctx context.Context, query 
 
 	result, err := a.dataLayer.QueryWorker().Query(ctx).ListEventSchedules().Execute(queries.ListEventScheduleQuery{Limit: query.Limit, LastID: query.LastID})
 	if err.NoError() {
-		output.OnError(out.ConvertQueryErrorDetail(err))
+		output.OnSuccess(result)
 		return
 	}
 
-	output.OnSuccess(result)
+	output.OnError(out.ConvertQueryErrorDetail(err))
+
 }
 
 // ListEventsBySchedule implements AttendanceComponent.
 func (a *attendanceComponentImpl) ListEventsBySchedule(ctx context.Context, query queries.ListEventByScheduleQuery, output out.Output[queries.ListEventByScheduleResult]) {
 	result, err := a.dataLayer.QueryWorker().Query(ctx).ListEventsBySchedule().Execute(query)
 	if err.NoError() {
-		output.OnError(out.ConvertQueryErrorDetail(err))
+		output.OnSuccess(result)
 		return
 	}
+	output.OnError(out.ConvertQueryErrorDetail(err))
 
-	output.OnSuccess(result)
 }
 
 // UpdateEventSchedule implements AttendanceComponent.
