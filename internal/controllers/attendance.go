@@ -69,7 +69,7 @@ func (a *attendanceController) createSchedule(c *gin.Context) {
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
-				"error": err.Error(),
+				"error": err,
 			})
 		},
 		successFunc: func(result dto.EventScheduleDTO) {
@@ -111,7 +111,9 @@ func (a *attendanceController) updateEventSchedule(c *gin.Context) {
 	output := &outputDecorator[dto.EventScheduleDTO]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
-			c.JSON(400, err)
+			c.JSON(400, gin.H{
+				"error": err,
+			})
 		},
 		successFunc: func(result dto.EventScheduleDTO) {
 			c.JSON(200, gin.H{
