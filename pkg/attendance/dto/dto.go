@@ -31,6 +31,7 @@ func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 			}),
 		Date:      result.Date,
 		StartDate: result.StartDate,
+		Days:      result.Days,
 		EndDate:   result.EndDate}
 }
 

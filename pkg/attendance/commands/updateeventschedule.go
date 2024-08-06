@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	UpdateEventScheduleErrorNotFound   CommandErrorCode = 30110
 	UpdateEventScheduleValidationError CommandErrorCode = 30111
 )
 
@@ -27,13 +28,28 @@ type UpdateEventScheduleCommand struct {
 }
 
 func (c UpdateEventScheduleCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.EventSchedule] {
+	eventSchedule, err := ctx.EventScheduleRepository().Get(c.ID)
 
-	eventSchedule := &entities.EventSchedule{
-		ID:             c.ID,
-		Name:           c.Name,
-		TimezoneOffset: c.TimezoneOffset,
-		Type:           entities.EventScheduleType(c.ScheduleType),
+	if err != nil {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetailWorkerFailure(err),
+		}
 	}
+
+	if eventSchedule == nil {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    UpdateEventScheduleValidationError,
+				Message: "Event schedule not found",
+			},
+		}
+	}
+
+	eventSchedule.Name = c.Name
+	eventSchedule.TimezoneOffset = c.TimezoneOffset
+	eventSchedule.Type = entities.EventScheduleType(c.ScheduleType)
 
 	if eventSchedule.Type == entities.EventScheduleTypeWeekly {
 		eventSchedule.Days = c.Days
