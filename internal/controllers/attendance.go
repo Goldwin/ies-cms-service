@@ -29,6 +29,12 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.PUT(scheduleURL, attendanceController.updateEventSchedule)
 	rg.DELETE(scheduleURL, attendanceController.archiveEventSchedule)
 
+	activitiesUrl := scheduleURL + "/activities"
+	activityUrl := activitiesUrl + "/:activityID"
+	rg.POST(activitiesUrl, attendanceController.createEventScheduleActivity)
+	rg.PUT(activityUrl, attendanceController.updateEventScheduleActivity)
+	rg.DELETE(activityUrl, attendanceController.removeEventScheduleActivity)
+
 	rg.GET("schedules/:scheduleID/events", attendanceController.listEventsBySchedule)
 	rg.GET("schedules/:scheduleID/events/:eventID", attendanceController.getEventBySchedule)
 
@@ -122,6 +128,7 @@ func (a *attendanceController) updateEventSchedule(c *gin.Context) {
 		},
 	}
 	err := c.ShouldBindJSON(&schedule)
+	schedule.ID = c.Param("scheduleID")
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -209,6 +216,46 @@ func (a *attendanceController) listEventCheckIn(c *gin.Context) {
 	}
 
 	a.attendanceComponent.ListEventAttendance(c, input, output)
+}
+
+func (a *attendanceController) createEventScheduleActivity(c *gin.Context) {
+	var data dto.EventScheduleActivityDTO
+	err := c.ShouldBindJSON(&data)
+	data.ScheduleID = c.Param("scheduleID")
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": gin.H{
+				"code":    "400",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	output := &outputDecorator[dto.EventScheduleDTO]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result dto.EventScheduleDTO) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+
+	a.attendanceComponent.AddEventScheduleActivity(c, data, output).Wait()
+}
+
+func (a *attendanceController) updateEventScheduleActivity(c *gin.Context) {
+	//TODO fill this
+}
+
+func (a *attendanceController) removeEventScheduleActivity(c *gin.Context) {
+	//TODO fill this
 }
 
 func (a *attendanceController) checkIn(c *gin.Context) {
