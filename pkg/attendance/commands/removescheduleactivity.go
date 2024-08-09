@@ -36,17 +36,17 @@ func (c RemoveScheduleActivityCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	isScheduleExists := false
+	isActivityExists := false
 
 	for i, activity := range schedule.Activities {
 		if activity.ID == c.ActivityID {
 			schedule.Activities = append(schedule.Activities[:i], schedule.Activities[i+1:]...)
-			isScheduleExists = true
+			isActivityExists = true
 			break
 		}
 	}
 
-	if !isScheduleExists {
+	if !isActivityExists {
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{

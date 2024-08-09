@@ -251,11 +251,58 @@ func (a *attendanceController) createEventScheduleActivity(c *gin.Context) {
 }
 
 func (a *attendanceController) updateEventScheduleActivity(c *gin.Context) {
-	//TODO fill this
+	var data dto.EventScheduleActivityDTO
+	err := c.ShouldBindJSON(&data)
+	data.ScheduleID = c.Param("scheduleID")
+	data.ID = c.Param("activityID")
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": gin.H{
+				"code":    "400",
+				"message": err.Error(),
+			},
+		})
+		return
+	}
+
+	output := &outputDecorator[dto.EventScheduleDTO]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result dto.EventScheduleDTO) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+
+	a.attendanceComponent.AddEventScheduleActivity(c, data, output).Wait()
 }
 
 func (a *attendanceController) removeEventScheduleActivity(c *gin.Context) {
-	//TODO fill this
+	var data dto.EventScheduleActivityDTO
+	data.ScheduleID = c.Param("scheduleID")
+	data.ID = c.Param("activityID")
+
+	output := &outputDecorator[dto.EventScheduleDTO]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result dto.EventScheduleDTO) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+
+	a.attendanceComponent.RemoveEventScheduleActivity(c, data, output).Wait()
 }
 
 func (a *attendanceController) checkIn(c *gin.Context) {
