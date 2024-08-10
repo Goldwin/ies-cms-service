@@ -23,6 +23,7 @@ type AttendanceCommandComponent interface {
 	CreateEvent(ctx context.Context, scheduleID string, output out.Output[dto.EventDTO]) out.Waitable
 	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
+	UpdateEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 }
 
 type AttendanceQueryComponent interface {
@@ -166,6 +167,20 @@ func (a *attendanceComponentImpl) CreateEventSchedule(ctx context.Context, sched
 			return dto.FromEntities(&e)
 		}),
 	).Execute(ctx)
+}
+
+// UpdateEventScheduleActivity implements AttendanceComponent.
+func (a *attendanceComponentImpl) UpdateEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable {
+	return utils.SingleCommandExecution(a.dataLayer.CommandWorker(), commands.UpdateEventScheduleActivityCommand{
+		ScheduleID: activity.ScheduleID,
+		ActivityID: activity.ID,
+		Name:       activity.Name,
+		Hour:       activity.Hour,
+		Minute:     activity.Minute,
+	}).WithOutput(
+		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
+			return dto.FromEntities(&e)
+		})).Execute(ctx)
 }
 
 func NewAttendanceComponent(datalayer AttendanceDataLayerComponent) AttendanceComponent {

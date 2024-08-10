@@ -280,7 +280,7 @@ func (a *attendanceController) updateEventScheduleActivity(c *gin.Context) {
 		},
 	}
 
-	a.attendanceComponent.AddEventScheduleActivity(c, data, output).Wait()
+	a.attendanceComponent.UpdateEventScheduleActivity(c, data, output).Wait()
 }
 
 func (a *attendanceController) removeEventScheduleActivity(c *gin.Context) {
