@@ -27,7 +27,7 @@ func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 		Type:           string(result.Type),
 		Activities: lo.Map(result.Activities,
 			func(ea entities.EventScheduleActivity, _ int) EventScheduleActivityDTO {
-				return EventScheduleActivityDTO{ID: ea.ID, Name: ea.Name, Hour: ea.Hour, Minute: ea.Minute}
+				return EventScheduleActivityDTO{ID: ea.ID, Name: ea.Name, Hour: ea.Hour, Minute: ea.Minute, ScheduleID: result.ID}
 			}),
 		Date:      result.Date,
 		StartDate: result.StartDate,
