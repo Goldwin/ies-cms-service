@@ -37,10 +37,11 @@ func (g *getEventScheduleImpl) Execute(query GetEventScheduleQuery) (GetEventSch
 			Type:           model.Type,
 			Activities: lo.Map(model.Activities, func(e EventScheduleActivityModel, _ int) dto.EventScheduleActivityDTO {
 				return dto.EventScheduleActivityDTO{
-					ID:     e.ID,
-					Name:   e.Name,
-					Hour:   e.Hour,
-					Minute: e.Minute,
+					ID:         e.ID,
+					ScheduleID: model.ID,
+					Name:       e.Name,
+					Hour:       e.Hour,
+					Minute:     e.Minute,
 				}
 			}),
 			Date:      model.Date,
