@@ -19,7 +19,7 @@ type viewPersonImpl struct {
 // Execute implements queries.ViewPerson.
 func (v *viewPersonImpl) Execute(query queries.ViewPersonQuery) (queries.ViewPersonResult, QueryErrorDetail) {
 	person := Person{}
-	err := v.db.Collection("person").FindOne(v.ctx, bson.M{"_id": query.ID}).Decode(&person)
+	err := v.db.Collection(personCollectionName).FindOne(v.ctx, bson.M{"_id": query.ID}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewPersonResult{
 				Data: nil,
@@ -50,7 +50,7 @@ type viewPersonByEmailImpl struct {
 // Execute implements queries.ViewPersonByEmail.
 func (v *viewPersonByEmailImpl) Execute(query queries.ViewPersonByEmailQuery) (queries.ViewPersonResult, QueryErrorDetail) {
 	person := Person{}
-	err := v.db.Collection("person").FindOne(v.ctx, bson.M{"email": query.Email}).Decode(&person)
+	err := v.db.Collection(personCollectionName).FindOne(v.ctx, bson.M{"email": query.Email}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewPersonResult{
 				Data: nil,

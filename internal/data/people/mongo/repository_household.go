@@ -125,7 +125,7 @@ func NewHouseholdRepository(ctx context.Context, db *mongo.Database) repositorie
 	return &householdRepositoryImpl{
 		ctx:                       ctx,
 		db:                        db,
-		householdCollection:       db.Collection("household"),
-		personHouseholdCollection: db.Collection("personHousehold"),
+		householdCollection:       db.Collection(householdCollectionName),
+		personHouseholdCollection: db.Collection(personHouseholdCollectionName),
 	}
 }
