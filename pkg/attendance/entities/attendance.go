@@ -24,6 +24,7 @@ type Attendance struct {
 	SecurityCode   string
 	SecurityNumber int
 	CheckinTime    time.Time
+	CheckoutTime   time.Time
 
 	Type AttendanceType
 }
