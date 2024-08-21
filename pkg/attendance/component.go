@@ -24,6 +24,7 @@ type AttendanceCommandComponent interface {
 	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	UpdateEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
+	CheckIn(ctx context.Context, command commands.CheckInCommand, output out.Output[entities.Attendance]) out.Waitable
 }
 
 type AttendanceQueryComponent interface {
@@ -181,6 +182,11 @@ func (a *attendanceComponentImpl) UpdateEventScheduleActivity(ctx context.Contex
 		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
 			return dto.FromEntities(&e)
 		})).Execute(ctx)
+}
+
+// CheckIn implements AttendanceComponent.
+func (a *attendanceComponentImpl) CheckIn(ctx context.Context, command commands.CheckInCommand, output out.Output[entities.Attendance]) out.Waitable {
+	panic("unimplemented")
 }
 
 func NewAttendanceComponent(datalayer AttendanceDataLayerComponent) AttendanceComponent {

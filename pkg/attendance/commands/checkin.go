@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
@@ -11,6 +13,7 @@ import (
 const (
 	CheckInEventDoesNotExistsError    CommandErrorCode = 30401
 	CheckInActivityDoesNotExistsError CommandErrorCode = 30402
+	CheckInInvalidInputError          CommandErrorCode = 30403
 )
 
 type PersonInput struct {
@@ -25,6 +28,7 @@ type CheckInCommand struct {
 	EventID    string
 	ActivityID string
 	Person     PersonInput
+	Type       string
 }
 
 func (c CheckInCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.Attendance] {
@@ -56,24 +60,47 @@ func (c CheckInCommand) Execute(ctx CommandContext) CommandExecutionResult[entit
 		}
 	}
 
-	//TODO upsert attendance.
+	securityCode := lo.RandomString(5, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
+	securityNumber := rand.Int() % 1000
+
+	attendanceID := fmt.Sprintf("%s.%s.%s", event.ID, activity.ID, c.Person.PersonID)
+	attendance := &entities.Attendance{
+		ID:                attendanceID,
+		EventID:           event.ID,
+		EventActivityID:   activity.ID,
+		PersonID:          c.Person.PersonID,
+		FirstName:         c.Person.FirstName,
+		MiddleName:        c.Person.MiddleName,
+		LastName:          c.Person.LastName,
+		ProfilePictureUrl: c.Person.ProfilePictureUrl,
+		SecurityCode:      securityCode,
+		SecurityNumber:    securityNumber,
+		CheckinTime:       time.Now(),
+		CheckoutTime:      time.UnixMilli(0),
+		Type:              entities.AttendanceType(c.Type),
+	}
+
+	validationErr := attendance.IsValid()
+
+	if validationErr != "" {
+		return CommandExecutionResult[entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetail{Code: CheckInInvalidInputError, Message: validationErr},
+		}
+	}
+
+	attendance, err = ctx.AttendanceRepository().Save(attendance)
+
+	if err != nil {
+		return CommandExecutionResult[entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetailWorkerFailure(err),
+		}
+	}
+
 	return CommandExecutionResult[entities.Attendance]{
 		Status: ExecutionStatusSuccess,
-		Result: entities.Attendance{
-			ID:                "",
-			EventID:           event.ID,
-			EventActivityID:   activity.ID,
-			PersonID:          "",
-			FirstName:         "",
-			MiddleName:        "",
-			LastName:          "",
-			ProfilePictureUrl: "",
-			SecurityCode:      "",
-			SecurityNumber:    0,
-			CheckinTime:       time.Now(),
-			CheckoutTime:      time.Now(),
-			Type:              "",
-		},
+		Result: *attendance,
 	}
 
 }

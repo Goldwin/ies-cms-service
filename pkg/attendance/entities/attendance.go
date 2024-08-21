@@ -10,6 +10,10 @@ const (
 	Regular   AttendanceType = "regular"
 )
 
+var (
+	AttendanceTypes = []AttendanceType{Volunteer, Guest, Regular}
+)
+
 type Attendance struct {
 	ID              string
 	EventID         string
@@ -27,4 +31,13 @@ type Attendance struct {
 	CheckoutTime   time.Time
 
 	Type AttendanceType
+}
+
+func (a *Attendance) IsValid() string {
+	for _, t := range AttendanceTypes {
+		if a.Type == t {
+			return ""
+		}
+	}
+	return "Invalid attendance type"
 }
