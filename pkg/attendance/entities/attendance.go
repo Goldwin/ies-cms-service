@@ -15,9 +15,10 @@ var (
 )
 
 type Attendance struct {
-	ID              string
-	EventID         string
-	EventActivityID string
+	ID string
+
+	Event         *Event
+	EventActivity *EventActivity
 
 	PersonID          string
 	FirstName         string

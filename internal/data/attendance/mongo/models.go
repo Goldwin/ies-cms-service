@@ -100,7 +100,7 @@ func (e *EventModel) ToEvent() *entities.Event {
 	return &entities.Event{
 		ID:         e.ID,
 		ScheduleID: e.ScheduleID,
-		EventActivities: lo.Map(e.EventActivities, func(e EventActivityModel, _ int) entities.EventActivity {
+		EventActivities: lo.Map(e.EventActivities, func(e EventActivityModel, _ int) *entities.EventActivity {
 			return e.ToEventActivity()
 		}),
 		Date: e.Date,
@@ -111,8 +111,8 @@ func toEventModel(e *entities.Event) EventModel {
 	return EventModel{
 		ID:         e.ID,
 		ScheduleID: e.ScheduleID,
-		EventActivities: lo.Map(e.EventActivities, func(e entities.EventActivity, _ int) EventActivityModel {
-			return toEventActivityModel(&e)
+		EventActivities: lo.Map(e.EventActivities, func(e *entities.EventActivity, _ int) EventActivityModel {
+			return toEventActivityModel(e)
 		}),
 		Date: e.Date,
 	}
@@ -124,8 +124,8 @@ type EventActivityModel struct {
 	Time time.Time `bson:"time"`
 }
 
-func (e *EventActivityModel) ToEventActivity() entities.EventActivity {
-	return entities.EventActivity{
+func (e *EventActivityModel) ToEventActivity() *entities.EventActivity {
+	return &entities.EventActivity{
 		ID:   e.ID,
 		Name: e.Name,
 		Time: e.Time,
@@ -141,9 +141,9 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 }
 
 type AttendanceModel struct {
-	ID              string `bson:"_id"`
-	EventID         string `bson:"eventId"`
-	EventActivityID string `bson:"eventActivityId"`
+	ID            string             `bson:"_id"`
+	Event         EventModel         `bson:"event"`
+	EventActivity EventActivityModel `bson:"eventActivity"`
 
 	PersonID          string `bson:"personId"`
 	FirstName         string `bson:"firstName"`
@@ -161,8 +161,8 @@ type AttendanceModel struct {
 func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 	return AttendanceModel{
 		ID:                e.ID,
-		EventID:           e.EventID,
-		EventActivityID:   e.EventActivityID,
+		Event:             toEventModel(e.Event),
+		EventActivity:     toEventActivityModel(e.EventActivity),
 		PersonID:          e.PersonID,
 		FirstName:         e.FirstName,
 		MiddleName:        e.MiddleName,
@@ -178,8 +178,8 @@ func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 func (e *AttendanceModel) ToAttendance() *entities.Attendance {
 	return &entities.Attendance{
 		ID:                e.ID,
-		EventID:           e.EventID,
-		EventActivityID:   e.EventActivityID,
+		Event:             e.Event.ToEvent(),
+		EventActivity:     e.EventActivity.ToEventActivity(),
 		PersonID:          e.PersonID,
 		FirstName:         e.FirstName,
 		MiddleName:        e.MiddleName,

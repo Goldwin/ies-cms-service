@@ -24,7 +24,7 @@ type AttendanceCommandComponent interface {
 	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	UpdateEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
-	CheckIn(ctx context.Context, command commands.CheckInCommand, output out.Output[entities.Attendance]) out.Waitable
+	CheckIn(ctx context.Context, attendance dto.EventAttendanceDTO, output out.Output[dto.EventAttendanceDTO]) out.Waitable
 }
 
 type AttendanceQueryComponent interface {
@@ -185,8 +185,22 @@ func (a *attendanceComponentImpl) UpdateEventScheduleActivity(ctx context.Contex
 }
 
 // CheckIn implements AttendanceComponent.
-func (a *attendanceComponentImpl) CheckIn(ctx context.Context, command commands.CheckInCommand, output out.Output[entities.Attendance]) out.Waitable {
-	panic("unimplemented")
+func (a *attendanceComponentImpl) CheckIn(ctx context.Context, attendance dto.EventAttendanceDTO, output out.Output[dto.EventAttendanceDTO]) out.Waitable {
+	return utils.SingleCommandExecution(a.dataLayer.CommandWorker(), commands.CheckInCommand{
+		EventID:    attendance.Event.ID,
+		ActivityID: attendance.Activity.ID,
+		Person: commands.PersonInput{
+			PersonID:          attendance.Person.PersonID,
+			FirstName:         attendance.Person.FirstName,
+			MiddleName:        attendance.Person.MiddleName,
+			LastName:          attendance.Person.LastName,
+			ProfilePictureUrl: attendance.Person.ProfilePictureURL,
+		},
+		Type: attendance.AttendanceType,
+	}).WithOutput(
+		out.OutputAdapter(output, func(e entities.Attendance) dto.EventAttendanceDTO {
+			return dto.FromAttendanceEntities(&e)
+		})).Execute(ctx)
 }
 
 func NewAttendanceComponent(datalayer AttendanceDataLayerComponent) AttendanceComponent {

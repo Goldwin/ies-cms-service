@@ -9,6 +9,6 @@ type Event struct {
 	ID              string
 	Name            string
 	ScheduleID      string
-	EventActivities []EventActivity
+	EventActivities []*EventActivity
 	Date            time.Time
 }

@@ -38,7 +38,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceQuery) (ListE
 	if err != nil {
 		return ListEventAttendanceResult{}, queries.InternalServerError(err)
 	}
-	
+
 	defer cursor.Close(l.ctx)
 	var result = make([]AttendanceModel, 0)
 	err = cursor.Decode(&result)
@@ -47,27 +47,33 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceQuery) (ListE
 		return ListEventAttendanceResult{}, queries.InternalServerError(err)
 	}
 
-	activityCache, err := l.fetchActivities(query)
-
-	if err != nil {
-		return ListEventAttendanceResult{}, queries.InternalServerError(err)
-	}
-
 	return ListEventAttendanceResult{
 		Data: lo.Map(result, func(e AttendanceModel, _ int) dto.EventAttendanceDTO {
 			return dto.EventAttendanceDTO{
-				ID:                e.ID,
-				EventID:           e.EventID,
-				Activity:          activityCache[e.EventActivityID],
-				PersonID:          e.PersonID,
-				FirstName:         e.FirstName,
-				MiddleName:        e.MiddleName,
-				LastName:          e.LastName,
-				ProfilePictureURL: e.ProfilePictureUrl,
-				SecurityCode:      e.SecurityCode,
-				SecurityNumber:    e.SecurityNumber,
-				CheckinTime:       e.CheckinTime,
-				AttendanceType:    e.Type,
+				ID: e.ID,
+				Event: dto.EventDTO{
+					ID:         e.Event.ID,
+					ScheduleID: e.Event.ScheduleID,
+					Name:       e.Event.Name,
+					Date:       e.Event.Date,
+				},
+				Activity: dto.EventActivityDTO{
+					ID:   e.EventActivity.ID,
+					Name: e.EventActivity.Name,
+					Time: e.EventActivity.Time,
+				},
+				Person: dto.AttendeeDTO{
+					PersonID:          e.PersonID,
+					FirstName:         e.FirstName,
+					MiddleName:        e.MiddleName,
+					LastName:          e.LastName,
+					ProfilePictureURL: e.ProfilePictureUrl,
+				},
+
+				SecurityCode:   e.SecurityCode,
+				SecurityNumber: e.SecurityNumber,
+				CheckinTime:    e.CheckinTime,
+				AttendanceType: e.Type,
 			}
 		}),
 	}, queries.NoQueryError

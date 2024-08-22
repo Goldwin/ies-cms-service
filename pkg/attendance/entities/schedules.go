@@ -93,8 +93,8 @@ func (s *EventSchedule) CreateNextEvent(targetDate time.Time) (*Event, error) {
 		ID:         s.ID,
 		Name:       s.Name,
 		ScheduleID: s.ID,
-		EventActivities: lo.Map(s.Activities, func(e EventScheduleActivity, _ int) EventActivity {
-			return EventActivity{
+		EventActivities: lo.Map(s.Activities, func(e EventScheduleActivity, _ int) *EventActivity {
+			return &EventActivity{
 				ID:   e.ID,
 				Name: e.Name,
 				Time: time.Date(nextEventDate.Year(), nextEventDate.Month(), nextEventDate.Day(), e.Hour, e.Minute, 0, 0, nextEventDate.Location()).Add(time.Duration(s.TimezoneOffset) * time.Hour),

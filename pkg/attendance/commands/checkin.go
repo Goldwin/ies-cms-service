@@ -49,7 +49,7 @@ func (c CheckInCommand) Execute(ctx CommandContext) CommandExecutionResult[entit
 		}
 	}
 
-	activity, found := lo.Find(event.EventActivities, func(e entities.EventActivity) bool {
+	activity, found := lo.Find(event.EventActivities, func(e *entities.EventActivity) bool {
 		return e.ID == c.ActivityID
 	})
 
@@ -63,11 +63,11 @@ func (c CheckInCommand) Execute(ctx CommandContext) CommandExecutionResult[entit
 	securityCode := lo.RandomString(5, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
 	securityNumber := rand.Int() % 1000
 
-	attendanceID := fmt.Sprintf("%s.%s.%s", event.ID, activity.ID, c.Person.PersonID)
+	attendanceID := fmt.Sprintf("%s.%s", event.ID, c.Person.PersonID)
 	attendance := &entities.Attendance{
 		ID:                attendanceID,
-		EventID:           event.ID,
-		EventActivityID:   activity.ID,
+		Event:             event,
+		EventActivity:     activity,
 		PersonID:          c.Person.PersonID,
 		FirstName:         c.Person.FirstName,
 		MiddleName:        c.Person.MiddleName,
