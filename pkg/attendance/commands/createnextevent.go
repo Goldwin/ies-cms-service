@@ -15,11 +15,11 @@ const (
 	CreateEventCommandsErrorInvalidScheduleType  CommandErrorCode = 30302
 )
 
-type CreateEventCommand struct {
+type CreateNextEventCommand struct {
 	ScheduleID string
 }
 
-func (c CreateEventCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Event] {
+func (c CreateNextEventCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Event] {
 	schedule, err := ctx.EventScheduleRepository().Get(c.ScheduleID)
 
 	if err != nil {
@@ -63,7 +63,7 @@ func generateEventId(scheduleId string, date time.Time) string {
 
 func createNextWeeklyEvent(weeklySchedule *entities.EventSchedule, ctx CommandContext) CommandExecutionResult[[]*entities.Event] {
 	resultSet := make([]*entities.Event, 0)
-	for d := time.Now(); d.Before(weeklySchedule.EndDate) || d.Equal(weeklySchedule.EndDate); d = d.AddDate(0, 0, 1) {
+	for d, i := time.Now(), 0; i <= 7; d, i = d.AddDate(0, 0, 1), i+1 {
 		if lo.Contains(weeklySchedule.Days, d.Weekday()) {
 			event := entities.Event{
 				ID:         generateEventId(weeklySchedule.ID, d),

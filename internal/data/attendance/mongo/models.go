@@ -100,6 +100,7 @@ func (e *EventModel) ToEvent() *entities.Event {
 	return &entities.Event{
 		ID:         e.ID,
 		ScheduleID: e.ScheduleID,
+		Name:       e.Name,
 		EventActivities: lo.Map(e.EventActivities, func(e EventActivityModel, _ int) *entities.EventActivity {
 			return e.ToEventActivity()
 		}),
@@ -110,6 +111,7 @@ func (e *EventModel) ToEvent() *entities.Event {
 func toEventModel(e *entities.Event) EventModel {
 	return EventModel{
 		ID:         e.ID,
+		Name:       e.Name,
 		ScheduleID: e.ScheduleID,
 		EventActivities: lo.Map(e.EventActivities, func(e *entities.EventActivity, _ int) EventActivityModel {
 			return toEventActivityModel(e)

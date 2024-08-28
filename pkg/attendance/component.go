@@ -10,6 +10,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/utils"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
+	"github.com/samber/lo"
 )
 
 type AttendanceDataLayerComponent interface {
@@ -20,7 +21,7 @@ type AttendanceDataLayerComponent interface {
 type AttendanceCommandComponent interface {
 	CreateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	AddEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
-	CreateEvent(ctx context.Context, scheduleID string, output out.Output[dto.EventDTO]) out.Waitable
+	CreateNextEvent(ctx context.Context, scheduleID string, output out.Output[[]dto.EventDTO]) out.Waitable
 	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	UpdateEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
@@ -148,9 +149,17 @@ func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, 
 	).Execute(ctx)
 }
 
-// CreateEvent implements AttendanceComponent.
-func (a *attendanceComponentImpl) CreateEvent(ctx context.Context, scheduleID string, output out.Output[dto.EventDTO]) out.Waitable {
-	panic("unimplemented")
+// CreateNextEvent implements AttendanceComponent.
+func (a *attendanceComponentImpl) CreateNextEvent(ctx context.Context, scheduleID string, output out.Output[[]dto.EventDTO]) out.Waitable {
+	return utils.SingleCommandExecution(a.dataLayer.CommandWorker(), commands.CreateNextEventCommand{
+		ScheduleID: scheduleID,
+	}).WithOutput(
+		out.OutputAdapter(output, func(e []*entities.Event) []dto.EventDTO {
+			return lo.Map(e, func(e *entities.Event, _ int) dto.EventDTO {
+				return dto.FromEventEntities(e)
+			})
+		}),
+	).Execute(ctx)
 }
 
 // CreateEventSchedule implements AttendanceComponent.

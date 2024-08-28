@@ -66,8 +66,18 @@ func (c UpdateEventScheduleCommand) Execute(ctx CommandContext) CommandExecution
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
-				Code:    CreateEventScheduleValidationError,
+				Code:    UpdateEventScheduleValidationError,
 				Message: validationMsg,
+			},
+		}
+	}
+
+	if eventSchedule.IsNone() {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    UpdateEventScheduleValidationError,
+				Message: "Invalid schedule type. Please Configure the schedule correctly",
 			},
 		}
 	}

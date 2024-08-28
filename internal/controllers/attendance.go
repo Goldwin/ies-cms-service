@@ -29,6 +29,8 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.PUT(scheduleURL, attendanceController.updateEventSchedule)
 	rg.DELETE(scheduleURL, attendanceController.archiveEventSchedule)
 
+	rg.POST("schedules/:scheduleID/create-next-event", attendanceController.createNextEvent)
+
 	activitiesUrl := scheduleURL + "/activities"
 	activityUrl := activitiesUrl + "/:activityID"
 	rg.POST(activitiesUrl, attendanceController.createEventScheduleActivity)
@@ -137,6 +139,26 @@ func (a *attendanceController) updateEventSchedule(c *gin.Context) {
 	}
 
 	a.attendanceComponent.UpdateEventSchedule(c, schedule, output).Wait()
+}
+
+func (a *attendanceController) createNextEvent(c *gin.Context) {
+	scheduleID := c.Param("scheduleID")
+
+	output := &outputDecorator[[]dto.EventDTO]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result []dto.EventDTO) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+
+	a.attendanceComponent.CreateNextEvent(c, scheduleID, output).Wait()
 }
 
 func (a *attendanceController) archiveEventSchedule(c *gin.Context) {
