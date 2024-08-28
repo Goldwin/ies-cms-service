@@ -54,10 +54,10 @@ func (c UpdateEventScheduleCommand) Execute(ctx CommandContext) CommandExecution
 	if eventSchedule.Type == entities.EventScheduleTypeWeekly {
 		eventSchedule.Days = c.Days
 	} else if eventSchedule.Type == entities.EventScheduleTypeDaily {
-		eventSchedule.StartDate = c.StartDate
-		eventSchedule.EndDate = c.EndDate
+		eventSchedule.StartDate = time.Date(c.StartDate.Year(), c.StartDate.Month(), c.StartDate.Day(), 0, 0, 0, 0, time.UTC)
+		eventSchedule.EndDate = time.Date(c.EndDate.Year(), c.EndDate.Month(), c.EndDate.Day(), 0, 0, 0, 0, time.UTC)
 	} else if eventSchedule.Type == entities.EventScheduleTypeOneTime {
-		eventSchedule.Date = c.Date
+		eventSchedule.Date = time.Date(c.Date.Year(), c.Date.Month(), c.Date.Day(), 0, 0, 0, 0, time.UTC)
 	}
 
 	validationMsg := eventSchedule.IsValid()

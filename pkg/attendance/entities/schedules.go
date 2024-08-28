@@ -3,8 +3,6 @@ package entities
 import (
 	"fmt"
 	"time"
-
-	"github.com/samber/lo"
 )
 
 type EventScheduleType string
@@ -76,59 +74,6 @@ func (s *EventSchedule) IsValid() string {
 		return ""
 	}
 	return "Invalid schedule type"
-}
-
-/*
-CreateNextEvent returns the next event entity in the schedule
-Noted that all time fields of the event and activities are in UTC
-*/
-func (s *EventSchedule) CreateNextEvent(targetDate time.Time) (*Event, error) {
-	nextEventDate, err := s.getNextDate(targetDate.UTC().Add(time.Duration(s.TimezoneOffset) * time.Hour))
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &Event{
-		ID:         s.ID,
-		Name:       s.Name,
-		ScheduleID: s.ID,
-		EventActivities: lo.Map(s.Activities, func(e EventScheduleActivity, _ int) *EventActivity {
-			return &EventActivity{
-				ID:   e.ID,
-				Name: e.Name,
-				Time: time.Date(nextEventDate.Year(), nextEventDate.Month(), nextEventDate.Day(), e.Hour, e.Minute, 0, 0, nextEventDate.Location()).Add(time.Duration(s.TimezoneOffset) * time.Hour),
-			}
-		}),
-		Date: nextEventDate,
-	}, nil
-}
-
-func (s *EventSchedule) getNextDate(targetDate time.Time) (time.Time, error) {
-	if s.IsOneTime() {
-		if !s.OneTimeEventSchedule.Date.After(targetDate) {
-			return targetDate, fmt.Errorf("One Time Event schedule already ended in the past at %s", s.OneTimeEventSchedule.Date.String())
-		}
-		return s.OneTimeEventSchedule.Date.UTC(), nil
-	}
-
-	if s.IsWeekly() {
-		nextDate := targetDate.UTC().Add(time.Duration(s.TimezoneOffset) * time.Hour)
-
-		if !lo.Contains(s.WeeklyEventSchedule.Days, nextDate.Weekday()) {
-			return nextDate, fmt.Errorf("There is no weekly schedule for date %s", nextDate.String())
-		}
-
-		return nextDate.UTC().Add(time.Duration(s.TimezoneOffset) * time.Hour), nil
-	}
-
-	if s.IsDaily() {
-		if s.DailyEventSchedule.EndDate.Before(targetDate) {
-			return targetDate, fmt.Errorf("Daily Event Schedule already ended at %s", s.DailyEventSchedule.EndDate.String())
-		}
-		return s.DailyEventSchedule.StartDate.UTC(), nil
-	}
-	return targetDate.UTC(), nil
 }
 
 type OneTimeEventSchedule struct {
