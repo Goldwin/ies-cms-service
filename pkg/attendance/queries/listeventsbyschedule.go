@@ -8,9 +8,11 @@ import (
 )
 
 type ListEventByScheduleQuery struct {
-	ScheduleID string    `json:"schedule_id" form:"schedule_id"`
+	ScheduleID string    `json:"scheduleId" form:"scheduleId"`
+	StartDate  time.Time `json:"startDate" form:"startDate"`
+	EndDate    time.Time `json:"endDate" form:"endDate"`
 	Limit      int       `json:"limit" form:"limit"`
-	LastDate   time.Time `json:"last_date" form:"last_date"`
+	LastDate   time.Time `json:"lastDate" form:"lastDate"`
 }
 
 type ListEventByScheduleResult struct {

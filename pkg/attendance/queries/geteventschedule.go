@@ -6,7 +6,7 @@ import (
 )
 
 type GetEventScheduleQuery struct {
-	ScheduleID string `json:"schedule_id" form:"schedule_id"`
+	ScheduleID string `json:"scheduleId" form:"scheduleId"`
 }
 
 type GetEventScheduleResult struct {

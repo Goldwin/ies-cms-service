@@ -7,7 +7,7 @@ import (
 
 type ListEventScheduleQuery struct {
 	Limit  int    `json:"limit" form:"limit"`
-	LastID string `json:"last_id" form:"last_id"`
+	LastID string `json:"lastID" form:"lastId"`
 }
 
 type ListEventScheduleResult struct {

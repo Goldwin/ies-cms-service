@@ -6,12 +6,12 @@ import (
 )
 
 type ListEventAttendanceQuery struct {
-	EventID         string `json:"event_id" form:"event_id"`
-	EventActivityID string `json:"event_activity_id" form:"event_activity_id"`
+	EventID         string `json:"eventId" form:"eventId"`
+	EventActivityID string `json:"eventActivityId" form:"eventActivityId"`
 	Limit           int    `json:"limit" form:"limit"`
-	LastID          string `json:"last_id" form:"last_id"`
+	LastID          string `json:"lastId" form:"lastId"`
 
-	AttendanceTypes []string `json:"attendance_type" form:"attendance_type"`
+	AttendanceTypes []string `json:"attendanceType" form:"attendanceType"`
 	Name            string   `json:"name" form:"name"`
 }
 
