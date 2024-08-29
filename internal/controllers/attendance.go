@@ -171,7 +171,17 @@ func (a *attendanceController) getEventScheduleStats(c *gin.Context) {
 
 func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
 	var input queries.ListEventByScheduleQuery
-	err := c.BindQuery(&input)
+	err := c.ShouldBindQuery(&input)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	input.ScheduleID = c.Param("scheduleID")
+
+	err = input.Validate()
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),

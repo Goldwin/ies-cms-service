@@ -21,9 +21,9 @@ type listEventByScheduleImpl struct {
 func (l *listEventByScheduleImpl) Execute(query ListEventByScheduleQuery) (ListEventByScheduleResult, queries.QueryErrorDetail) {
 	cursor, err := l.db.Collection(EventCollection).Find(
 		l.ctx,
-		bson.M{"scheduleId": bson.M{"$eq": query.ScheduleID}, "date": bson.M{"$lt": query.LastDate}},
+		bson.M{"scheduleId": bson.M{"$eq": query.ScheduleID}, "date": bson.M{"$gte": query.StartDate, "$lte": query.EndDate}},
 		options.Find().SetLimit(int64(query.Limit)),
-		options.Find().SetSort(bson.D{{Key: "date", Value: -1}}),
+		options.Find().SetSort(bson.D{{Key: "_id", Value: -1}}),
 	)
 
 	if err != nil {
