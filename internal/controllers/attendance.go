@@ -101,7 +101,7 @@ func (a *attendanceController) getEventSchedule(c *gin.Context) {
 	output := &outputDecorator[queries.GetEventScheduleResult]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
-			c.JSON(400, gin.H{
+			c.JSON(err.Code, gin.H{
 				"error": err,
 			})
 		},
@@ -204,19 +204,13 @@ func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
 func (a *attendanceController) getEventBySchedule(c *gin.Context) {
 	var input queries.GetEventQuery
 
-	err := c.BindQuery(&input)
-
-	if err != nil {
-		c.JSON(400, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	input.EventID = c.Param("eventID")
+	input.ScheduleID = c.Param("scheduleID")
 
 	output := &outputDecorator[queries.GetEventResult]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
-			c.JSON(400, err)
+			c.JSON(err.Code, err)
 		},
 		successFunc: func(result queries.GetEventResult) {
 			c.JSON(200, result)
