@@ -13,6 +13,7 @@ import (
 const (
 	CreateEventCommandsErrorScheduleDoesntExists CommandErrorCode = 30301
 	CreateEventCommandsErrorInvalidScheduleType  CommandErrorCode = 30302
+	CreateEventCommandsErrorNoActivities         CommandErrorCode = 30303
 )
 
 type CreateNextEventCommand struct {
@@ -35,6 +36,16 @@ func (c CreateNextEventCommand) Execute(ctx CommandContext) CommandExecutionResu
 			Error: CommandErrorDetail{
 				Code:    CreateEventCommandsErrorScheduleDoesntExists,
 				Message: "Schedule not found",
+			},
+		}
+	}
+
+	if schedule.Activities == nil || len(schedule.Activities) == 0 {
+		return CommandExecutionResult[[]*entities.Event]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    CreateEventCommandsErrorNoActivities,
+				Message: "No activities found under this schedule. Please configure activity for this event first",
 			},
 		}
 	}
