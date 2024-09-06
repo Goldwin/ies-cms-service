@@ -42,10 +42,3 @@ type EventScheduleActivityDTO struct {
 	Hour       int    `json:"hour"`
 	Minute     int    `json:"minute"`
 }
-
-
-type EventActivityDTO struct {
-	ID   string    `json:"id"`
-	Name string    `json:"name"`
-	Time time.Time `json:"time"`
-}

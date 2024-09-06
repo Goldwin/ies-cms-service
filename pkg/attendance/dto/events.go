@@ -27,3 +27,9 @@ func FromEventEntities(result *entities.Event) EventDTO {
 		Date: result.Date,
 	}
 }
+
+type EventActivityDTO struct {
+	ID   string    `json:"id"`
+	Name string    `json:"name"`
+	Time time.Time `json:"time"`
+}

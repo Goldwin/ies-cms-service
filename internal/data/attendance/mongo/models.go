@@ -11,6 +11,7 @@ const (
 	AttendanceCollection    = "attendances"
 	EventScheduleCollection = "event_schedules"
 	EventCollection         = "events"
+	PersonCollection        = "people"
 )
 
 type EventScheduleModel struct {
@@ -142,6 +143,24 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 	}
 }
 
+type PersonModel struct {
+	ID                string `bson:"_id"`
+	FirstName         string `bson:"firstName"`
+	MiddleName        string `bson:"middleName"`
+	LastName          string `bson:"lastName"`
+	ProfilePictureUrl string `bson:"profilePictureUrl"`
+}
+
+func (p *PersonModel) ToEntity() *entities.Person {
+	return &entities.Person{
+		PersonID:          p.ID,
+		FirstName:         p.FirstName,
+		MiddleName:        p.MiddleName,
+		LastName:          p.LastName,
+		ProfilePictureUrl: p.ProfilePictureUrl,
+	}
+}
+
 type AttendanceModel struct {
 	ID            string             `bson:"_id"`
 	Event         EventModel         `bson:"event"`
@@ -165,11 +184,11 @@ func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 		ID:                e.ID,
 		Event:             toEventModel(e.Event),
 		EventActivity:     toEventActivityModel(e.EventActivity),
-		PersonID:          e.PersonID,
-		FirstName:         e.FirstName,
-		MiddleName:        e.MiddleName,
-		LastName:          e.LastName,
-		ProfilePictureUrl: e.ProfilePictureUrl,
+		PersonID:          e.Attendee.PersonID,
+		FirstName:         e.Attendee.FirstName,
+		MiddleName:        e.Attendee.MiddleName,
+		LastName:          e.Attendee.LastName,
+		ProfilePictureUrl: e.Attendee.ProfilePictureUrl,
 		SecurityCode:      e.SecurityCode,
 		SecurityNumber:    e.SecurityNumber,
 		CheckinTime:       e.CheckinTime,
@@ -179,17 +198,13 @@ func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 
 func (e *AttendanceModel) ToAttendance() *entities.Attendance {
 	return &entities.Attendance{
-		ID:                e.ID,
-		Event:             e.Event.ToEvent(),
-		EventActivity:     e.EventActivity.ToEventActivity(),
-		PersonID:          e.PersonID,
-		FirstName:         e.FirstName,
-		MiddleName:        e.MiddleName,
-		LastName:          e.LastName,
-		ProfilePictureUrl: e.ProfilePictureUrl,
-		SecurityCode:      e.SecurityCode,
-		SecurityNumber:    e.SecurityNumber,
-		CheckinTime:       e.CheckinTime,
-		Type:              entities.AttendanceType(e.Type),
+		ID:             e.ID,
+		Event:          e.Event.ToEvent(),
+		EventActivity:  e.EventActivity.ToEventActivity(),
+		Attendee:       &entities.Person{PersonID: e.PersonID, FirstName: e.FirstName, MiddleName: e.MiddleName, LastName: e.LastName, ProfilePictureUrl: e.ProfilePictureUrl},
+		SecurityCode:   e.SecurityCode,
+		SecurityNumber: e.SecurityNumber,
+		CheckinTime:    e.CheckinTime,
+		Type:           entities.AttendanceType(e.Type),
 	}
 }

@@ -15,6 +15,15 @@ type commandContextImpl struct {
 	eventRepository      repositories.EventRepository
 	scheduleRepository   repositories.EventScheduleRepository
 	attendanceRepository repositories.AttendanceRepository
+	personRepositoryImpl repositories.PersonRepository
+}
+
+// PersonRepository implements commands.CommandContext.
+func (c *commandContextImpl) PersonRepository() repositories.PersonRepository {
+	if c.personRepositoryImpl == nil {
+		c.personRepositoryImpl = NewPersonRepository(c.ctx, c.db)
+	}
+	return c.personRepositoryImpl
 }
 
 // EventRepository implements commands.CommandContext.

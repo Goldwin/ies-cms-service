@@ -20,11 +20,7 @@ type Attendance struct {
 	Event         *Event
 	EventActivity *EventActivity
 
-	PersonID          string
-	FirstName         string
-	MiddleName        string
-	LastName          string
-	ProfilePictureUrl string
+	Attendee *Person
 
 	SecurityCode   string
 	SecurityNumber int

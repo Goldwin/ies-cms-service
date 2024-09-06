@@ -60,24 +60,35 @@ func (c CheckInCommand) Execute(ctx CommandContext) CommandExecutionResult[entit
 		}
 	}
 
+	person, err := ctx.PersonRepository().Get(c.Person.PersonID)
+
+	if err != nil {
+		return CommandExecutionResult[entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetailWorkerFailure(err),
+		}
+	}
+
+	if person == nil {
+		return CommandExecutionResult[entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetail{Code: CheckInInvalidInputError, Message: "Person not found"},
+		}
+	}
+
 	securityCode := lo.RandomString(5, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))
 	securityNumber := rand.Int() % 1000
 
 	attendanceID := fmt.Sprintf("%s.%s", event.ID, c.Person.PersonID)
 	attendance := &entities.Attendance{
-		ID:                attendanceID,
-		Event:             event,
-		EventActivity:     activity,
-		PersonID:          c.Person.PersonID,
-		FirstName:         c.Person.FirstName,
-		MiddleName:        c.Person.MiddleName,
-		LastName:          c.Person.LastName,
-		ProfilePictureUrl: c.Person.ProfilePictureUrl,
-		SecurityCode:      securityCode,
-		SecurityNumber:    securityNumber,
-		CheckinTime:       time.Now(),
-		CheckoutTime:      time.UnixMilli(0),
-		Type:              entities.AttendanceType(c.Type),
+		ID:             attendanceID,
+		Event:          event,
+		EventActivity:  activity,
+		SecurityCode:   securityCode,
+		SecurityNumber: securityNumber,
+		CheckinTime:    time.Now(),
+		CheckoutTime:   time.UnixMilli(0),
+		Type:           entities.AttendanceType(c.Type),
 	}
 
 	validationErr := attendance.IsValid()
