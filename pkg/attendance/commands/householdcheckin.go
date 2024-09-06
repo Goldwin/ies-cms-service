@@ -29,7 +29,7 @@ type HouseholdCheckinCommand struct {
 	Attendee []Attendee
 }
 
-func (c *HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Attendance] {
+func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Attendance] {
 	event, err := ctx.EventRepository().Get(c.EventID)
 
 	if err != nil {
