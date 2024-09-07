@@ -12,7 +12,7 @@ const (
 	AttendanceCollection      = "attendances"
 	EventScheduleCollection   = "event_schedules"
 	EventCollection           = "events"
-	PersonCollection          = "people"
+	PersonCollection          = "persons"
 	HouseholdCollection       = "households"
 	PersonHouseholdCollection = "person_households"
 )
@@ -148,15 +148,21 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 
 type PersonModel struct {
 	ID                string `bson:"_id"`
+	PersonID          string `bson:"personID"`
 	FirstName         string `bson:"firstName"`
 	MiddleName        string `bson:"middleName"`
 	LastName          string `bson:"lastName"`
 	ProfilePictureUrl string `bson:"profilePictureUrl"`
+	Birthday          time.Time
 }
 
 func (p *PersonModel) ToEntity() *entities.Person {
+	id := p.ID
+	if id == "" {
+		id = p.PersonID
+	}
 	return &entities.Person{
-		PersonID:          p.ID,
+		PersonID:          id,
 		FirstName:         p.FirstName,
 		MiddleName:        p.MiddleName,
 		LastName:          p.LastName,
@@ -165,12 +171,17 @@ func (p *PersonModel) ToEntity() *entities.Person {
 }
 
 func (p *PersonModel) ToDTO() dto.PersonDTO {
+	id := p.ID
+	if id == "" {
+		id = p.PersonID
+	}
 	return dto.PersonDTO{
-		ID:                p.ID,
+		ID:                id,
 		FirstName:         p.FirstName,
 		MiddleName:        p.MiddleName,
 		LastName:          p.LastName,
 		ProfilePictureUrl: p.ProfilePictureUrl,
+		Age:               int(time.Now().Sub(p.Birthday).Hours() / 24 / 365),
 	}
 }
 

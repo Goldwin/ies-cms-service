@@ -44,6 +44,8 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.POST("schedules/:scheduleID/events/:eventID/checkin", attendanceController.checkIn)
 
 	rg.GET("schedules/:scheduleID/stats", attendanceController.getEventScheduleStats)
+
+	rg.POST("households/search", attendanceController.householdSearch)
 }
 
 func (a *attendanceController) listEventSchedules(c *gin.Context) {
@@ -362,7 +364,7 @@ func (a *attendanceController) checkIn(c *gin.Context) {
 
 func (a *attendanceController) householdSearch(c *gin.Context) {
 	var data queries.SearchHouseholdFilter
-	err := c.ShouldBindQuery(&data)
+	err := c.ShouldBindJSON(&data)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"error": gin.H{
@@ -380,9 +382,7 @@ func (a *attendanceController) householdSearch(c *gin.Context) {
 			})
 		},
 		successFunc: func(result queries.SearchHouseholdResult) {
-			c.JSON(200, gin.H{
-				"data": result,
-			})
+			c.JSON(200, result)
 		},
 	}
 
