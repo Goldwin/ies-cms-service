@@ -35,6 +35,7 @@ type AttendanceQueryComponent interface {
 	ListEventsBySchedule(ctx context.Context, query queries.ListEventByScheduleFilter, output out.Output[queries.ListEventByScheduleResult])
 	GetEvent(ctx context.Context, query queries.GetEventFilter, output out.Output[queries.GetEventResult])
 	ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult])
+	SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult])
 }
 
 type AttendanceComponent interface {
@@ -44,6 +45,17 @@ type AttendanceComponent interface {
 
 type attendanceComponentImpl struct {
 	dataLayer AttendanceDataLayerComponent
+}
+
+// SearchHousehold implements AttendanceComponent.
+func (a *attendanceComponentImpl) SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult]) {
+	result, err := a.dataLayer.QueryWorker().Query(ctx).SearchHousehold().Execute(filter)
+
+	if err.NoError() {
+		output.OnSuccess(result)
+		return
+	}
+	output.OnError(out.ConvertQueryErrorDetail(err))
 }
 
 // HouseholdCheckin implements AttendanceComponent.

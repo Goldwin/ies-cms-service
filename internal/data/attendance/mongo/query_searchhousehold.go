@@ -15,6 +15,7 @@ type searchHouseholdImpl struct {
 
 // Execute implements queries.SearchHousehold.
 func (s *searchHouseholdImpl) Execute(filter SearchHouseholdFilter) (SearchHouseholdResult, queries.QueryErrorDetail) {
+	//TODO implement
 	panic("unimplemented")
 }
 
