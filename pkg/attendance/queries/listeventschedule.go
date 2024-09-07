@@ -1,13 +1,27 @@
 package queries
 
 import (
+	"fmt"
+
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
-type ListEventScheduleQuery struct {
+type ListEventScheduleFilter struct {
 	Limit  int    `json:"limit" form:"limit"`
-	LastID string `json:"lastID" form:"lastId"`
+	LastID string `json:"lastId" form:"lastId"`
+}
+
+func (query *ListEventScheduleFilter) Validate() error {
+	if query.Limit > 200 {
+		return fmt.Errorf("limit must be less than or equal to 200")
+	}
+
+	if query.Limit <= 0 {
+		return fmt.Errorf("limit must be greater than 0")
+	}
+
+	return nil
 }
 
 type ListEventScheduleResult struct {
@@ -15,5 +29,5 @@ type ListEventScheduleResult struct {
 }
 
 type ListEventSchedule interface {
-	Execute(query ListEventScheduleQuery) (ListEventScheduleResult, queries.QueryErrorDetail)
+	Execute(filter ListEventScheduleFilter) (ListEventScheduleResult, queries.QueryErrorDetail)
 }

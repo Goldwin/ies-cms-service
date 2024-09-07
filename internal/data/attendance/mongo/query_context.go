@@ -16,6 +16,13 @@ type queryContextImpl struct {
 	listAttendance queries.ListEventAttendance
 	listSchedules  queries.ListEventSchedule
 	listBySchedule queries.ListEventBySchedule
+
+	searchHousehold queries.SearchHousehold
+}
+
+// SearchHousehold implements queries.QueryContext.
+func (q *queryContextImpl) SearchHousehold() queries.SearchHousehold {
+	return NewSearchHousehold(q.ctx, q.db)
 }
 
 // GetEvent implements queries.QueryContext.

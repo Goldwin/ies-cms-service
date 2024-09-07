@@ -17,7 +17,7 @@ type getEventImpl struct {
 }
 
 // Execute implements queries.GetEvent.
-func (g *getEventImpl) Execute(query GetEventQuery) (GetEventResult, queries.QueryErrorDetail) {
+func (g *getEventImpl) Execute(query GetEventFilter) (GetEventResult, queries.QueryErrorDetail) {
 	var model EventModel
 	err := g.db.Collection(EventCollection).FindOne(g.ctx, bson.M{"_id": query.EventID}).Decode(&model)
 

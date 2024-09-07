@@ -8,7 +8,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
-type ListEventByScheduleQuery struct {
+type ListEventByScheduleFilter struct {
 	ScheduleID string    `json:"scheduleId" form:"scheduleId"`
 	StartDate  time.Time `json:"startDate" form:"startDate"`
 	EndDate    time.Time `json:"endDate" form:"endDate"`
@@ -16,7 +16,7 @@ type ListEventByScheduleQuery struct {
 	LastID     string    `json:"lastId" form:"lastId"`
 }
 
-func (query *ListEventByScheduleQuery) Validate() error {
+func (query *ListEventByScheduleFilter) Validate() error {
 	if query.StartDate.IsZero() {
 		return fmt.Errorf("start date is required")
 	}
@@ -49,5 +49,5 @@ type ListEventByScheduleResult struct {
 }
 
 type ListEventBySchedule interface {
-	Execute(query ListEventByScheduleQuery) (ListEventByScheduleResult, queries.QueryErrorDetail)
+	Execute(filter ListEventByScheduleFilter) (ListEventByScheduleResult, queries.QueryErrorDetail)
 }

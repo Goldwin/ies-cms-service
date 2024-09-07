@@ -5,7 +5,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
-type ListEventAttendanceQuery struct {
+type ListEventAttendanceFilter struct {
 	EventID         string `json:"eventId" form:"eventId"`
 	EventActivityID string `json:"eventActivityId" form:"eventActivityId"`
 	Limit           int    `json:"limit" form:"limit"`
@@ -20,5 +20,5 @@ type ListEventAttendanceResult struct {
 }
 
 type ListEventAttendance interface {
-	Execute(query ListEventAttendanceQuery) (ListEventAttendanceResult, queries.QueryErrorDetail)
+	Execute(filter ListEventAttendanceFilter) (ListEventAttendanceResult, queries.QueryErrorDetail)
 }

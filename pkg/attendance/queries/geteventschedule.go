@@ -5,7 +5,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
-type GetEventScheduleQuery struct {
+type GetEventScheduleFilter struct {
 	ScheduleID string `json:"scheduleId" form:"scheduleId"`
 }
 
@@ -14,5 +14,5 @@ type GetEventScheduleResult struct {
 }
 
 type GetEventSchedule interface {
-	Execute(query GetEventScheduleQuery) (GetEventScheduleResult, queries.QueryErrorDetail)
+	Execute(filter GetEventScheduleFilter) (GetEventScheduleResult, queries.QueryErrorDetail)
 }

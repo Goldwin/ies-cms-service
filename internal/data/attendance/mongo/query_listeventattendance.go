@@ -18,7 +18,7 @@ type listEventAttendanceImpl struct {
 }
 
 // Execute implements queries.ListEventAttendance.
-func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceQuery) (ListEventAttendanceResult, queries.QueryErrorDetail) {
+func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (ListEventAttendanceResult, queries.QueryErrorDetail) {
 	filter := bson.M{"eventId": bson.M{"$eq": query.EventID}}
 
 	if query.EventActivityID != "" {
@@ -79,7 +79,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceQuery) (ListE
 	}, queries.NoQueryError
 }
 
-func (l *listEventAttendanceImpl) fetchActivities(query ListEventAttendanceQuery) (activityCache map[string]dto.EventActivityDTO, err error) {
+func (l *listEventAttendanceImpl) fetchActivities(query ListEventAttendanceFilter) (activityCache map[string]dto.EventActivityDTO, err error) {
 	var eventModel EventModel
 	err = l.db.Collection(query.EventID).FindOne(l.ctx, bson.M{"id": query.EventActivityID}).Decode(&eventModel)
 	if err != nil {

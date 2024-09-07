@@ -18,7 +18,7 @@ type listEventByScheduleImpl struct {
 }
 
 // Execute implements queries.ListEventBySchedule.
-func (l *listEventByScheduleImpl) Execute(query ListEventByScheduleQuery) (ListEventByScheduleResult, queries.QueryErrorDetail) {
+func (l *listEventByScheduleImpl) Execute(query ListEventByScheduleFilter) (ListEventByScheduleResult, queries.QueryErrorDetail) {
 	cursor, err := l.db.Collection(EventCollection).Find(
 		l.ctx,
 		bson.M{"scheduleId": bson.M{"$eq": query.ScheduleID}, "date": bson.M{"$gte": query.StartDate, "$lte": query.EndDate}},

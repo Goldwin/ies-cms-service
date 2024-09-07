@@ -47,7 +47,7 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 }
 
 func (a *attendanceController) listEventSchedules(c *gin.Context) {
-	var query queries.ListEventScheduleQuery
+	var query queries.ListEventScheduleFilter
 
 	err := c.ShouldBindQuery(&query)
 	if err != nil {
@@ -109,7 +109,7 @@ func (a *attendanceController) getEventSchedule(c *gin.Context) {
 			c.JSON(200, result)
 		},
 	}
-	a.attendanceComponent.GetEventSchedule(c, queries.GetEventScheduleQuery{
+	a.attendanceComponent.GetEventSchedule(c, queries.GetEventScheduleFilter{
 		ScheduleID: id,
 	}, output)
 }
@@ -170,7 +170,7 @@ func (a *attendanceController) getEventScheduleStats(c *gin.Context) {
 }
 
 func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
-	var input queries.ListEventByScheduleQuery
+	var input queries.ListEventByScheduleFilter
 	err := c.ShouldBindQuery(&input)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -202,7 +202,7 @@ func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) getEventBySchedule(c *gin.Context) {
-	var input queries.GetEventQuery
+	var input queries.GetEventFilter
 
 	input.EventID = c.Param("eventID")
 	input.ScheduleID = c.Param("scheduleID")
@@ -221,7 +221,7 @@ func (a *attendanceController) getEventBySchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) listEventAttendance(c *gin.Context) {
-	var input queries.ListEventAttendanceQuery
+	var input queries.ListEventAttendanceFilter
 	err := c.ShouldBindQuery(&input)
 
 	if err != nil {
@@ -358,4 +358,7 @@ func (a *attendanceController) checkIn(c *gin.Context) {
 	}
 
 	a.attendanceComponent.HouseholdCheckin(c, data, output).Wait()
+}
+
+func (a *attendanceController) householdSearch(c *gin.Context) {
 }

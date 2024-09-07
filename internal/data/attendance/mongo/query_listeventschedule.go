@@ -18,7 +18,7 @@ type listEventScheduleImpl struct {
 }
 
 // Execute implements queries.ListEventSchedule.
-func (l *listEventScheduleImpl) Execute(query ListEventScheduleQuery) (ListEventScheduleResult, queries.QueryErrorDetail) {
+func (l *listEventScheduleImpl) Execute(query ListEventScheduleFilter) (ListEventScheduleResult, queries.QueryErrorDetail) {
 	cursor, err := l.db.Collection(EventScheduleCollection).Find(l.ctx,
 		bson.M{
 			"_id": bson.M{"$gt": query.LastID},

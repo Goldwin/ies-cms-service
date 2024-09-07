@@ -17,7 +17,7 @@ type getEventScheduleImpl struct {
 }
 
 // Execute implements queries.GetEventSchedule.
-func (g *getEventScheduleImpl) Execute(query GetEventScheduleQuery) (GetEventScheduleResult, queries.QueryErrorDetail) {
+func (g *getEventScheduleImpl) Execute(query GetEventScheduleFilter) (GetEventScheduleResult, queries.QueryErrorDetail) {
 	var model EventScheduleModel
 	err := g.db.Collection(EventScheduleCollection).FindOne(g.ctx, bson.M{"_id": query.ScheduleID}).Decode(&model)
 
