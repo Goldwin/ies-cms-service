@@ -40,7 +40,7 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.GET("schedules/:scheduleID/events", attendanceController.listEventsBySchedule)
 	rg.GET("schedules/:scheduleID/events/:eventID", attendanceController.getEventBySchedule)
 
-	rg.GET("schedules/:scheduleID/events/:eventID/checkin", attendanceController.listEventCheckIn)
+	rg.GET("schedules/:scheduleID/events/:eventID/attendees", attendanceController.listEventAttendance)
 	rg.POST("schedules/:scheduleID/events/:eventID/checkin", attendanceController.checkIn)
 
 	rg.GET("schedules/:scheduleID/stats", attendanceController.getEventScheduleStats)
@@ -220,7 +220,7 @@ func (a *attendanceController) getEventBySchedule(c *gin.Context) {
 	a.attendanceComponent.GetEvent(c, input, output)
 }
 
-func (a *attendanceController) listEventCheckIn(c *gin.Context) {
+func (a *attendanceController) listEventAttendance(c *gin.Context) {
 	var input queries.ListEventAttendanceQuery
 	err := c.ShouldBindQuery(&input)
 
@@ -332,5 +332,30 @@ func (a *attendanceController) removeEventScheduleActivity(c *gin.Context) {
 }
 
 func (a *attendanceController) checkIn(c *gin.Context) {
-	//TODO fill this
+	var data dto.HouseholdCheckinDTO
+	err := c.ShouldBindJSON(&data)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": gin.H{
+				"code":    "400",
+				"message": err.Error(),
+			},
+		})
+	}
+
+	output := &outputDecorator[[]dto.EventAttendanceDTO]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result []dto.EventAttendanceDTO) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+
+	a.attendanceComponent.HouseholdCheckin(c, data, output).Wait()
 }

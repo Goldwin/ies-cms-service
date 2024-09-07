@@ -25,7 +25,7 @@ type AttendanceCommandComponent interface {
 	UpdateEventSchedule(ctx context.Context, schedule dto.EventScheduleDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	RemoveEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
 	UpdateEventScheduleActivity(ctx context.Context, activity dto.EventScheduleActivityDTO, output out.Output[dto.EventScheduleDTO]) out.Waitable
-	HouseholdCheckin(ctx context.Context, checkins dto.HouseholdCheckinDTO, output out.Output[[]dto.EventAttendanceDTO])
+	HouseholdCheckin(ctx context.Context, checkins dto.HouseholdCheckinDTO, output out.Output[[]dto.EventAttendanceDTO]) out.Waitable
 	CheckIn(ctx context.Context, attendance dto.EventAttendanceDTO, output out.Output[dto.EventAttendanceDTO]) out.Waitable
 }
 
@@ -47,7 +47,7 @@ type attendanceComponentImpl struct {
 }
 
 // HouseholdCheckin implements AttendanceComponent.
-func (a *attendanceComponentImpl) HouseholdCheckin(ctx context.Context, input dto.HouseholdCheckinDTO, output out.Output[[]dto.EventAttendanceDTO]) {
+func (a *attendanceComponentImpl) HouseholdCheckin(ctx context.Context, input dto.HouseholdCheckinDTO, output out.Output[[]dto.EventAttendanceDTO]) out.Waitable {
 	x := commands.HouseholdCheckinCommand{
 		EventID: input.EventID,
 		Attendee: lo.Map(input.Attendees, func(e dto.PersonCheckinDTO, _ int) commands.Attendee {
@@ -58,13 +58,13 @@ func (a *attendanceComponentImpl) HouseholdCheckin(ctx context.Context, input dt
 			}
 		}),
 	}
-	utils.SingleCommandExecution(a.dataLayer.CommandWorker(), x).WithOutput(
+	return utils.SingleCommandExecution(a.dataLayer.CommandWorker(), x).WithOutput(
 		out.OutputAdapter(output, func(e []*entities.Attendance) []dto.EventAttendanceDTO {
 			return lo.Map(e, func(e *entities.Attendance, _ int) dto.EventAttendanceDTO {
 				return dto.FromAttendanceEntities(e)
 			})
 		}),
-	)
+	).Execute(ctx)
 }
 
 // GetEvent implements AttendanceComponent.
