@@ -361,4 +361,30 @@ func (a *attendanceController) checkIn(c *gin.Context) {
 }
 
 func (a *attendanceController) householdSearch(c *gin.Context) {
+	var data queries.SearchHouseholdFilter
+	err := c.ShouldBindQuery(&data)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": gin.H{
+				"code":    "400",
+				"message": err.Error(),
+			},
+		})
+	}
+
+	output := &outputDecorator[queries.SearchHouseholdResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result queries.SearchHouseholdResult) {
+			c.JSON(200, gin.H{
+				"data": result,
+			})
+		},
+	}
+
+	a.attendanceComponent.SearchHousehold(c, data, output)
 }

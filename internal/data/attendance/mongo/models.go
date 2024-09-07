@@ -3,15 +3,18 @@ package mongo
 import (
 	"time"
 
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
 	"github.com/samber/lo"
 )
 
 const (
-	AttendanceCollection    = "attendances"
-	EventScheduleCollection = "event_schedules"
-	EventCollection         = "events"
-	PersonCollection        = "people"
+	AttendanceCollection      = "attendances"
+	EventScheduleCollection   = "event_schedules"
+	EventCollection           = "events"
+	PersonCollection          = "people"
+	HouseholdCollection       = "households"
+	PersonHouseholdCollection = "person_households"
 )
 
 type EventScheduleModel struct {
@@ -159,6 +162,29 @@ func (p *PersonModel) ToEntity() *entities.Person {
 		LastName:          p.LastName,
 		ProfilePictureUrl: p.ProfilePictureUrl,
 	}
+}
+
+func (p *PersonModel) ToDTO() dto.PersonDTO {
+	return dto.PersonDTO{
+		ID:                p.ID,
+		FirstName:         p.FirstName,
+		MiddleName:        p.MiddleName,
+		LastName:          p.LastName,
+		ProfilePictureUrl: p.ProfilePictureUrl,
+	}
+}
+
+type PersonHouseholdModel struct {
+	ID          string `bson:"_id"`
+	HouseholdID string `bson:"householdID"`
+}
+
+type HouseholdModel struct {
+	ID               string        `bson:"_id"`
+	Name             string        `bson:"name"`
+	HouseholdHead    PersonModel   `bson:"householdHead"`
+	PictureUrl       string        `bson:"pictureUrl"`
+	HouseholdMembers []PersonModel `bson:"householdMembers"`
 }
 
 type AttendanceModel struct {
