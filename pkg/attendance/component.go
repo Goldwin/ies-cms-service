@@ -233,11 +233,11 @@ func (a *attendanceComponentImpl) CheckIn(ctx context.Context, attendance dto.Ev
 		EventID:    attendance.Event.ID,
 		ActivityID: attendance.Activity.ID,
 		Person: commands.PersonInput{
-			PersonID:          attendance.Person.PersonID,
-			FirstName:         attendance.Person.FirstName,
-			MiddleName:        attendance.Person.MiddleName,
-			LastName:          attendance.Person.LastName,
-			ProfilePictureUrl: attendance.Person.ProfilePictureURL,
+			PersonID:          attendance.Attendee.PersonID,
+			FirstName:         attendance.Attendee.FirstName,
+			MiddleName:        attendance.Attendee.MiddleName,
+			LastName:          attendance.Attendee.LastName,
+			ProfilePictureUrl: attendance.Attendee.ProfilePictureURL,
 		},
 		Type: attendance.AttendanceType,
 	}).WithOutput(

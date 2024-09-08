@@ -18,7 +18,7 @@ type EventAttendanceDTO struct {
 	ID             string           `json:"id"`
 	Event          EventDTO         `json:"event"`
 	Activity       EventActivityDTO `json:"activity"`
-	Person         AttendeeDTO      `json:"person"`
+	Attendee       AttendeeDTO      `json:"attendee"`
 	CheckedInBy    AttendeeDTO      `json:"checkedInBy"`
 	SecurityCode   string           `json:"securityCode"`
 	SecurityNumber int              `json:"securityNumber"`
@@ -31,7 +31,7 @@ func FromAttendanceEntities(result *entities.Attendance) EventAttendanceDTO {
 		ID:       result.ID,
 		Event:    FromEventEntities(result.Event),
 		Activity: EventActivityDTO{ID: result.EventActivity.ID, Name: result.EventActivity.Name, Time: result.EventActivity.Time},
-		Person:   AttendeeDTO{PersonID: result.Attendee.PersonID, FirstName: result.Attendee.FirstName, MiddleName: result.Attendee.MiddleName, LastName: result.Attendee.LastName, ProfilePictureURL: result.Attendee.ProfilePictureUrl},
+		Attendee: AttendeeDTO{PersonID: result.Attendee.PersonID, FirstName: result.Attendee.FirstName, MiddleName: result.Attendee.MiddleName, LastName: result.Attendee.LastName, ProfilePictureURL: result.Attendee.ProfilePictureUrl},
 		CheckedInBy: AttendeeDTO{
 			PersonID:          result.CheckedInBy.PersonID,
 			FirstName:         result.CheckedInBy.MiddleName,

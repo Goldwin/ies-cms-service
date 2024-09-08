@@ -62,7 +62,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 					Name: e.EventActivity.Name,
 					Time: e.EventActivity.Time,
 				},
-				Person: dto.AttendeeDTO{
+				Attendee: dto.AttendeeDTO{
 					PersonID:          e.Attendee.PersonID,
 					FirstName:         e.Attendee.FirstName,
 					MiddleName:        e.Attendee.MiddleName,
