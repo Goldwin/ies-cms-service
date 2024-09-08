@@ -25,8 +25,9 @@ type Attendee struct {
 }
 
 type HouseholdCheckinCommand struct {
-	EventID  string
-	Attendee []Attendee
+	EventID   string
+	Attendee  []Attendee
+	CheckinBy string
 }
 
 func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Attendance] {
@@ -61,6 +62,21 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 		}
 	}
 
+	checkinPerson, err := ctx.PersonRepository().Get(c.CheckinBy)
+	if err != nil {
+		return CommandExecutionResult[[]*entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetailWorkerFailure(err),
+		}
+	}
+
+	if checkinPerson == nil {
+		return CommandExecutionResult[[]*entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetail{Code: HouseholdCheckinCommandPersonMissingError, Message: "Can't Find person who check-in"},
+		}
+	}
+
 	activitiesMap := lo.SliceToMap(event.EventActivities, func(e *entities.EventActivity) (string, *entities.EventActivity) { return e.ID, e })
 
 	attendeesMap := lo.SliceToMap(attendees, func(e *entities.Person) (string, *entities.Person) { return e.PersonID, e })
@@ -73,6 +89,7 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 			Event:          &entities.Event{ID: event.ID},
 			EventActivity:  activitiesMap[a.ActivityID],
 			Attendee:       attendeesMap[a.PersonID],
+			CheckedInBy:    checkinPerson,
 			SecurityCode:   securityCode,
 			SecurityNumber: securityNumber,
 			CheckinTime:    time.Now(),

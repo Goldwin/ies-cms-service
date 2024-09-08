@@ -19,6 +19,7 @@ type EventAttendanceDTO struct {
 	Event          EventDTO         `json:"event"`
 	Activity       EventActivityDTO `json:"activity"`
 	Person         AttendeeDTO      `json:"person"`
+	CheckedInBy    AttendeeDTO      `json:"checkedInBy"`
 	SecurityCode   string           `json:"securityCode"`
 	SecurityNumber int              `json:"securityNumber"`
 	CheckinTime    time.Time        `json:"checkinTime"`
@@ -27,10 +28,17 @@ type EventAttendanceDTO struct {
 
 func FromAttendanceEntities(result *entities.Attendance) EventAttendanceDTO {
 	return EventAttendanceDTO{
-		ID:             result.ID,
-		Event:          FromEventEntities(result.Event),
-		Activity:       EventActivityDTO{ID: result.EventActivity.ID, Name: result.EventActivity.Name, Time: result.EventActivity.Time},
-		Person:         AttendeeDTO{PersonID: result.Attendee.PersonID, FirstName: result.Attendee.FirstName, MiddleName: result.Attendee.MiddleName, LastName: result.Attendee.LastName, ProfilePictureURL: result.Attendee.ProfilePictureUrl},
+		ID:       result.ID,
+		Event:    FromEventEntities(result.Event),
+		Activity: EventActivityDTO{ID: result.EventActivity.ID, Name: result.EventActivity.Name, Time: result.EventActivity.Time},
+		Person:   AttendeeDTO{PersonID: result.Attendee.PersonID, FirstName: result.Attendee.FirstName, MiddleName: result.Attendee.MiddleName, LastName: result.Attendee.LastName, ProfilePictureURL: result.Attendee.ProfilePictureUrl},
+		CheckedInBy: AttendeeDTO{
+			PersonID:          result.CheckedInBy.PersonID,
+			FirstName:         result.CheckedInBy.MiddleName,
+			MiddleName:        result.CheckedInBy.MiddleName,
+			LastName:          result.CheckedInBy.LastName,
+			ProfilePictureURL: result.CheckedInBy.ProfilePictureUrl,
+		},
 		SecurityCode:   result.SecurityCode,
 		SecurityNumber: result.SecurityNumber,
 		CheckinTime:    result.CheckinTime,
@@ -39,13 +47,14 @@ func FromAttendanceEntities(result *entities.Attendance) EventAttendanceDTO {
 }
 
 type PersonCheckinDTO struct {
-	PersonID        string
-	EventActivityID string
-	AttendanceType  string
+	PersonID        string `json:"personId"`
+	EventActivityID string `json:"eventActivityId"`
+	AttendanceType  string `json:"attendanceType"`
 }
 
 type HouseholdCheckinDTO struct {
-	EventID string
+	EventID string `json:"eventId"`
 
-	Attendees []PersonCheckinDTO
+	Attendees []PersonCheckinDTO `json:"attendees"`
+	CheckinBy string             `json:"checkinBy"`
 }

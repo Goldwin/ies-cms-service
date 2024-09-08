@@ -203,11 +203,8 @@ type AttendanceModel struct {
 	Event         EventModel         `bson:"event"`
 	EventActivity EventActivityModel `bson:"eventActivity"`
 
-	PersonID          string `bson:"personId"`
-	FirstName         string `bson:"firstName"`
-	MiddleName        string `bson:"middleName"`
-	LastName          string `bson:"lastName"`
-	ProfilePictureUrl string `bson:"profilePictureUrl"`
+	Attendee    PersonModel `bson:"attendee"`
+	CheckedInBy PersonModel `bson:"checkedInBy"`
 
 	SecurityCode   string    `bson:"securityCode"`
 	SecurityNumber int       `bson:"securityNumber"`
@@ -218,18 +215,31 @@ type AttendanceModel struct {
 
 func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 	return AttendanceModel{
-		ID:                e.ID,
-		Event:             toEventModel(e.Event),
-		EventActivity:     toEventActivityModel(e.EventActivity),
-		PersonID:          e.Attendee.PersonID,
-		FirstName:         e.Attendee.FirstName,
-		MiddleName:        e.Attendee.MiddleName,
-		LastName:          e.Attendee.LastName,
-		ProfilePictureUrl: e.Attendee.ProfilePictureUrl,
-		SecurityCode:      e.SecurityCode,
-		SecurityNumber:    e.SecurityNumber,
-		CheckinTime:       e.CheckinTime,
-		Type:              string(e.Type),
+		ID:            e.ID,
+		Event:         toEventModel(e.Event),
+		EventActivity: toEventActivityModel(e.EventActivity),
+		Attendee: PersonModel{
+			ID:                e.Attendee.PersonID,
+			PersonID:          e.Attendee.PersonID,
+			FirstName:         e.Attendee.FirstName,
+			MiddleName:        e.Attendee.MiddleName,
+			LastName:          e.Attendee.LastName,
+			ProfilePictureUrl: e.Attendee.ProfilePictureUrl,
+			Birthday:          time.Time{},
+		},
+		CheckedInBy: PersonModel{
+			ID:                e.CheckedInBy.PersonID,
+			PersonID:          e.CheckedInBy.PersonID,
+			FirstName:         e.CheckedInBy.FirstName,
+			MiddleName:        e.CheckedInBy.MiddleName,
+			LastName:          e.CheckedInBy.LastName,
+			ProfilePictureUrl: e.CheckedInBy.ProfilePictureUrl,
+			Birthday:          time.Time{},
+		},
+		SecurityCode:   e.SecurityCode,
+		SecurityNumber: e.SecurityNumber,
+		CheckinTime:    e.CheckinTime,
+		Type:           string(e.Type),
 	}
 }
 
@@ -238,7 +248,7 @@ func (e *AttendanceModel) ToAttendance() *entities.Attendance {
 		ID:             e.ID,
 		Event:          e.Event.ToEvent(),
 		EventActivity:  e.EventActivity.ToEventActivity(),
-		Attendee:       &entities.Person{PersonID: e.PersonID, FirstName: e.FirstName, MiddleName: e.MiddleName, LastName: e.LastName, ProfilePictureUrl: e.ProfilePictureUrl},
+		Attendee:       &entities.Person{PersonID: e.Attendee.PersonID, FirstName: e.Attendee.FirstName, MiddleName: e.Attendee.MiddleName, LastName: e.Attendee.LastName, ProfilePictureUrl: e.Attendee.ProfilePictureUrl},
 		SecurityCode:   e.SecurityCode,
 		SecurityNumber: e.SecurityNumber,
 		CheckinTime:    e.CheckinTime,

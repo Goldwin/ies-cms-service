@@ -63,11 +63,19 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 					Time: e.EventActivity.Time,
 				},
 				Person: dto.AttendeeDTO{
-					PersonID:          e.PersonID,
-					FirstName:         e.FirstName,
-					MiddleName:        e.MiddleName,
-					LastName:          e.LastName,
-					ProfilePictureURL: e.ProfilePictureUrl,
+					PersonID:          e.Attendee.PersonID,
+					FirstName:         e.Attendee.FirstName,
+					MiddleName:        e.Attendee.MiddleName,
+					LastName:          e.Attendee.LastName,
+					ProfilePictureURL: e.Attendee.ProfilePictureUrl,
+				},
+
+				CheckedInBy: dto.AttendeeDTO{
+					PersonID:          e.CheckedInBy.PersonID,
+					FirstName:         e.CheckedInBy.FirstName,
+					MiddleName:        e.CheckedInBy.MiddleName,
+					LastName:          e.CheckedInBy.LastName,
+					ProfilePictureURL: e.CheckedInBy.ProfilePictureUrl,
 				},
 
 				SecurityCode:   e.SecurityCode,
