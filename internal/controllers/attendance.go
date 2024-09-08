@@ -233,6 +233,8 @@ func (a *attendanceController) listEventAttendance(c *gin.Context) {
 		return
 	}
 
+	input.EventID = c.Param("eventID")
+
 	output := &outputDecorator[queries.ListEventAttendanceResult]{
 		output: nil,
 		errFunction: func(err out.AppErrorDetail) {

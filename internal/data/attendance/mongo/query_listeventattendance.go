@@ -19,7 +19,7 @@ type listEventAttendanceImpl struct {
 
 // Execute implements queries.ListEventAttendance.
 func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (ListEventAttendanceResult, queries.QueryErrorDetail) {
-	filter := bson.M{"eventId": bson.M{"$eq": query.EventID}}
+	filter := bson.M{"event._id": bson.M{"$eq": query.EventID}}
 
 	if query.EventActivityID != "" {
 		filter["activityId"] = bson.M{"$eq": query.EventActivityID}
@@ -29,9 +29,12 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 		filter["type"] = bson.M{"$in": query.AttendanceTypes}
 	}
 
+	if query.LastID != "" {
+		filter["_id"] = bson.M{"$gt": query.LastID}
+	}
+
 	cursor, err := l.db.Collection(AttendanceCollection).Find(
 		l.ctx, filter,
-		options.Find().SetSort(bson.D{{Key: "checkinTime", Value: 1}}),
 		options.Find().SetLimit(int64(query.Limit)),
 	)
 
@@ -41,7 +44,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 
 	defer cursor.Close(l.ctx)
 	var result = make([]AttendanceModel, 0)
-	err = cursor.Decode(&result)
+	err = cursor.All(l.ctx, &result)
 
 	if err != nil {
 		return ListEventAttendanceResult{}, queries.InternalServerError(err)
