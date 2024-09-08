@@ -61,7 +61,8 @@ func (a *attendanceComponentImpl) SearchHousehold(ctx context.Context, filter qu
 // HouseholdCheckin implements AttendanceComponent.
 func (a *attendanceComponentImpl) HouseholdCheckin(ctx context.Context, input dto.HouseholdCheckinDTO, output out.Output[[]dto.EventAttendanceDTO]) out.Waitable {
 	x := commands.HouseholdCheckinCommand{
-		EventID: input.EventID,
+		EventID:     input.EventID,
+		CheckedInBy: input.CheckedInBy,
 		Attendee: lo.Map(input.Attendees, func(e dto.PersonCheckinDTO, _ int) commands.Attendee {
 			return commands.Attendee{
 				PersonID:       e.PersonID,

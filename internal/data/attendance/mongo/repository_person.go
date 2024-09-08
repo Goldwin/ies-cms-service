@@ -32,8 +32,8 @@ func (p *PersonRepositoryImpl) Get(id string) (*entities.Person, error) {
 }
 
 // List implements repositories.PersonRepository.
-func (p *PersonRepositoryImpl) List([]string) ([]*entities.Person, error) {
-	cursor, err := p.collection.Find(p.ctx, bson.M{})
+func (p *PersonRepositoryImpl) List(idList []string) ([]*entities.Person, error) {
+	cursor, err := p.collection.Find(p.ctx, bson.M{"_id": bson.M{"$in": idList}})
 	if err != nil {
 		return nil, err
 	}
@@ -50,6 +50,6 @@ func NewPersonRepository(ctx context.Context, db *mongo.Database) repositories.P
 	return &PersonRepositoryImpl{
 		ctx:        ctx,
 		db:         db,
-		collection: db.Collection(EventCollection),
+		collection: db.Collection(PersonCollection),
 	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type AttendeeDTO struct {
-	PersonID          string `json:"personId"`
+	PersonID          string `json:"id"`
 	FirstName         string `json:"firstName"`
 	MiddleName        string `json:"middleName"`
 	LastName          string `json:"lastName"`
@@ -34,7 +34,7 @@ func FromAttendanceEntities(result *entities.Attendance) EventAttendanceDTO {
 		Attendee: AttendeeDTO{PersonID: result.Attendee.PersonID, FirstName: result.Attendee.FirstName, MiddleName: result.Attendee.MiddleName, LastName: result.Attendee.LastName, ProfilePictureURL: result.Attendee.ProfilePictureUrl},
 		CheckedInBy: AttendeeDTO{
 			PersonID:          result.CheckedInBy.PersonID,
-			FirstName:         result.CheckedInBy.MiddleName,
+			FirstName:         result.CheckedInBy.FirstName,
 			MiddleName:        result.CheckedInBy.MiddleName,
 			LastName:          result.CheckedInBy.LastName,
 			ProfilePictureURL: result.CheckedInBy.ProfilePictureUrl,
@@ -55,6 +55,6 @@ type PersonCheckinDTO struct {
 type HouseholdCheckinDTO struct {
 	EventID string `json:"eventId"`
 
-	Attendees []PersonCheckinDTO `json:"attendees"`
-	CheckinBy string             `json:"checkinBy"`
+	Attendees   []PersonCheckinDTO `json:"attendees"`
+	CheckedInBy string             `json:"checkedInBy"`
 }

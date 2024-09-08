@@ -72,6 +72,6 @@ func NewAttendanceRepository(ctx context.Context, db *mongo.Database) repositori
 	return &attendanceRepositoryImpl{
 		ctx:        ctx,
 		db:         db,
-		collection: db.Collection(EventScheduleCollection),
+		collection: db.Collection(AttendanceCollection),
 	}
 }

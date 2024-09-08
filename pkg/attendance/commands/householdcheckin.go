@@ -25,9 +25,9 @@ type Attendee struct {
 }
 
 type HouseholdCheckinCommand struct {
-	EventID   string
-	Attendee  []Attendee
-	CheckinBy string
+	EventID     string
+	Attendee    []Attendee
+	CheckedInBy string
 }
 
 func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Attendance] {
@@ -62,7 +62,7 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 		}
 	}
 
-	checkinPerson, err := ctx.PersonRepository().Get(c.CheckinBy)
+	checkinPerson, err := ctx.PersonRepository().Get(c.CheckedInBy)
 	if err != nil {
 		return CommandExecutionResult[[]*entities.Attendance]{
 			Status: ExecutionStatusFailed,
