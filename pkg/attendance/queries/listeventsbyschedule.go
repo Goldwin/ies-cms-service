@@ -16,7 +16,7 @@ type ListEventByScheduleFilter struct {
 	LastID     string    `json:"lastId" form:"lastId"`
 }
 
-func (query *ListEventByScheduleFilter) Validate() error {
+func (query ListEventByScheduleFilter) Validate() error {
 	if query.StartDate.IsZero() {
 		return fmt.Errorf("start date is required")
 	}

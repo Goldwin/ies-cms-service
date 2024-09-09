@@ -30,12 +30,12 @@ type AttendanceCommandComponent interface {
 }
 
 type AttendanceQueryComponent interface {
-	GetEventSchedule(ctx context.Context, query queries.GetEventScheduleFilter, output out.Output[queries.GetEventScheduleResult])
-	ListEventSchedules(ctx context.Context, query queries.ListEventScheduleFilter, output out.Output[queries.ListEventScheduleResult])
-	ListEventsBySchedule(ctx context.Context, query queries.ListEventByScheduleFilter, output out.Output[queries.ListEventByScheduleResult])
-	GetEvent(ctx context.Context, query queries.GetEventFilter, output out.Output[queries.GetEventResult])
-	ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult])
-	SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult])
+	GetEventSchedule(ctx context.Context, query queries.GetEventScheduleFilter, output out.Output[queries.GetEventScheduleResult]) out.Waitable
+	ListEventSchedules(ctx context.Context, query queries.ListEventScheduleFilter, output out.Output[queries.ListEventScheduleResult]) out.Waitable
+	ListEventsBySchedule(ctx context.Context, query queries.ListEventByScheduleFilter, output out.Output[queries.ListEventByScheduleResult]) out.Waitable
+	GetEvent(ctx context.Context, query queries.GetEventFilter, output out.Output[queries.GetEventResult]) out.Waitable
+	ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult]) out.Waitable
+	SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult]) out.Waitable
 }
 
 type AttendanceComponent interface {
@@ -48,14 +48,9 @@ type attendanceComponentImpl struct {
 }
 
 // SearchHousehold implements AttendanceComponent.
-func (a *attendanceComponentImpl) SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult]) {
-	result, err := a.dataLayer.QueryWorker().Query(ctx).SearchHousehold().Execute(filter)
-
-	if err.NoError() {
-		output.OnSuccess(result)
-		return
-	}
-	output.OnError(out.ConvertQueryErrorDetail(err))
+func (a *attendanceComponentImpl) SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).SearchHousehold()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // HouseholdCheckin implements AttendanceComponent.
@@ -81,63 +76,33 @@ func (a *attendanceComponentImpl) HouseholdCheckin(ctx context.Context, input dt
 }
 
 // GetEvent implements AttendanceComponent.
-func (a *attendanceComponentImpl) GetEvent(ctx context.Context, query queries.GetEventFilter, output out.Output[queries.GetEventResult]) {
-
-	result, err := a.dataLayer.QueryWorker().Query(ctx).GetEvent().Execute(query)
-	if err.NoError() {
-		output.OnSuccess(result)
-		return
-	}
-	output.OnError(out.ConvertQueryErrorDetail(err))
-
+func (a *attendanceComponentImpl) GetEvent(ctx context.Context, filter queries.GetEventFilter, output out.Output[queries.GetEventResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).GetEvent()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // GetEventSchedule implements AttendanceComponent.
-func (a *attendanceComponentImpl) GetEventSchedule(ctx context.Context, query queries.GetEventScheduleFilter, output out.Output[queries.GetEventScheduleResult]) {
-
-	result, err := a.dataLayer.QueryWorker().Query(ctx).GetEventSchedule().Execute(query)
-	if err.NoError() {
-		output.OnSuccess(result)
-		return
-	}
-	output.OnError(out.ConvertQueryErrorDetail(err))
-
+func (a *attendanceComponentImpl) GetEventSchedule(ctx context.Context, filter queries.GetEventScheduleFilter, output out.Output[queries.GetEventScheduleResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).GetEventSchedule()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // ListEventAttendance implements AttendanceComponent.
-func (a *attendanceComponentImpl) ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult]) {
-	result, err := a.dataLayer.QueryWorker().Query(ctx).ListEventAttendance().Execute(query)
-
-	if err.NoError() {
-		output.OnSuccess(result)
-		return
-	}
-	output.OnError(out.ConvertQueryErrorDetail(err))
-
+func (a *attendanceComponentImpl) ListEventAttendance(ctx context.Context, filter queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).ListEventAttendance()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // ListEventSchedules implements AttendanceComponent.
-func (a *attendanceComponentImpl) ListEventSchedules(ctx context.Context, query queries.ListEventScheduleFilter, output out.Output[queries.ListEventScheduleResult]) {
-
-	result, err := a.dataLayer.QueryWorker().Query(ctx).ListEventSchedules().Execute(queries.ListEventScheduleFilter{Limit: query.Limit, LastID: query.LastID})
-	if err.NoError() {
-		output.OnSuccess(result)
-		return
-	}
-
-	output.OnError(out.ConvertQueryErrorDetail(err))
-
+func (a *attendanceComponentImpl) ListEventSchedules(ctx context.Context, filter queries.ListEventScheduleFilter, output out.Output[queries.ListEventScheduleResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).ListEventSchedules()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // ListEventsBySchedule implements AttendanceComponent.
-func (a *attendanceComponentImpl) ListEventsBySchedule(ctx context.Context, query queries.ListEventByScheduleFilter, output out.Output[queries.ListEventByScheduleResult]) {
-	result, err := a.dataLayer.QueryWorker().Query(ctx).ListEventsBySchedule().Execute(query)
-	if err.NoError() {
-		output.OnSuccess(result)
-		return
-	}
-	output.OnError(out.ConvertQueryErrorDetail(err))
-
+func (a *attendanceComponentImpl) ListEventsBySchedule(ctx context.Context, filter queries.ListEventByScheduleFilter, output out.Output[queries.ListEventByScheduleResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).ListEventsBySchedule()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // UpdateEventSchedule implements AttendanceComponent.

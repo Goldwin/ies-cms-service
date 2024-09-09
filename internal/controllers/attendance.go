@@ -70,7 +70,7 @@ func (a *attendanceController) listEventSchedules(c *gin.Context) {
 			c.JSON(200, result)
 		},
 	}
-	a.attendanceComponent.ListEventSchedules(c, query, output)
+	a.attendanceComponent.ListEventSchedules(c, query, output).Wait()
 }
 
 func (a *attendanceController) createSchedule(c *gin.Context) {
@@ -113,7 +113,7 @@ func (a *attendanceController) getEventSchedule(c *gin.Context) {
 	}
 	a.attendanceComponent.GetEventSchedule(c, queries.GetEventScheduleFilter{
 		ScheduleID: id,
-	}, output)
+	}, output).Wait()
 }
 
 func (a *attendanceController) updateEventSchedule(c *gin.Context) {
@@ -200,7 +200,7 @@ func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
 			c.JSON(200, result)
 		},
 	}
-	a.attendanceComponent.ListEventsBySchedule(c, input, output)
+	a.attendanceComponent.ListEventsBySchedule(c, input, output).Wait()
 }
 
 func (a *attendanceController) getEventBySchedule(c *gin.Context) {
@@ -219,7 +219,7 @@ func (a *attendanceController) getEventBySchedule(c *gin.Context) {
 		},
 	}
 
-	a.attendanceComponent.GetEvent(c, input, output)
+	a.attendanceComponent.GetEvent(c, input, output).Wait()
 }
 
 func (a *attendanceController) listEventAttendance(c *gin.Context) {
@@ -245,7 +245,7 @@ func (a *attendanceController) listEventAttendance(c *gin.Context) {
 		},
 	}
 
-	a.attendanceComponent.ListEventAttendance(c, input, output)
+	a.attendanceComponent.ListEventAttendance(c, input, output).Wait()
 }
 
 func (a *attendanceController) createEventScheduleActivity(c *gin.Context) {
@@ -388,5 +388,5 @@ func (a *attendanceController) householdSearch(c *gin.Context) {
 		},
 	}
 
-	a.attendanceComponent.SearchHousehold(c, data, output)
+	a.attendanceComponent.SearchHousehold(c, data, output).Wait()
 }

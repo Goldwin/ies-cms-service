@@ -17,13 +17,9 @@ type ListEventAttendanceFilter struct {
 	Name            string   `json:"name" form:"name"`
 }
 
-func (f *ListEventAttendanceFilter) Validate() error {
+func (f ListEventAttendanceFilter) Validate() error {
 	if f.EventID == "" && f.EventActivityID == "" {
 		return fmt.Errorf("event id or event activity id is required")
-	}
-
-	if f.Limit == 0 {
-		f.Limit = 100
 	}
 
 	if f.Limit > 500 {

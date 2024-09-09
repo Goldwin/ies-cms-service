@@ -13,7 +13,7 @@ type SearchHouseholdFilter struct {
 	NamePrefix string `json:"namePrefix" form:"namePrefix"`
 }
 
-func (query *SearchHouseholdFilter) Validate() error {
+func (query SearchHouseholdFilter) Validate() error {
 	if query.Limit > 200 {
 		return fmt.Errorf("limit must be less than or equal to 200")
 	}

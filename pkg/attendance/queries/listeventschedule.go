@@ -12,7 +12,7 @@ type ListEventScheduleFilter struct {
 	LastID string `json:"lastId" form:"lastId"`
 }
 
-func (query *ListEventScheduleFilter) Validate() error {
+func (query ListEventScheduleFilter) Validate() error {
 	if query.Limit > 200 {
 		return fmt.Errorf("limit must be less than or equal to 200")
 	}
