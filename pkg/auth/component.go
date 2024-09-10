@@ -24,12 +24,20 @@ type AuthComponent interface {
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
 	ResetPassword(ctx context.Context, input dto.PasswordResetInput, output out.Output[dto.PasswordResult])
 	GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetCodeResult]) out.Waitable
+	GrantAdminRole(ctx context.Context, email string, output out.Output[dto.AuthData]) out.Waitable
 	common.Component
 }
 
 type authComponentImpl struct {
 	worker    worker.UnitOfWork[commands.CommandContext]
 	secretKey []byte
+}
+
+// GrantAdminRole implements AuthComponent.
+func (a *authComponentImpl) GrantAdminRole(ctx context.Context, email string, output out.Output[dto.AuthData]) out.Waitable {
+	return utils.SingleCommandExecution(a.worker, commands.GrantAdminRoleCommand{
+		Email: email,
+	}).WithOutput(output).Execute(ctx)
 }
 
 // GenerateResetToken implements AuthComponent.
