@@ -33,11 +33,12 @@ func (p *PersonRepositoryImpl) Get(id string) (*entities.Person, error) {
 
 // List implements repositories.PersonRepository.
 func (p *PersonRepositoryImpl) List(idList []string) ([]*entities.Person, error) {
+	var models []PersonModel
 	cursor, err := p.collection.Find(p.ctx, bson.M{"_id": bson.M{"$in": idList}})
 	if err != nil {
 		return nil, err
 	}
-	var models []PersonModel
+	defer cursor.Close(p.ctx)
 	if err = cursor.All(p.ctx, &models); err != nil {
 		return nil, err
 	}

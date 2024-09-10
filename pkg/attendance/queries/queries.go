@@ -7,4 +7,5 @@ type QueryContext interface {
 	GetEvent() GetEvent
 	ListEventAttendance() ListEventAttendance
 	SearchHousehold() SearchHousehold
+	GetEventAttendanceSummary() GetEventAttendanceSummary
 }

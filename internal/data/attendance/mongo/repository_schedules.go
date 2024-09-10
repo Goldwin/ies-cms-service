@@ -41,13 +41,14 @@ func (e *eventScheduleRepositoryImpl) Get(id string) (*entities.EventSchedule, e
 
 // List implements repositories.EventScheduleRepository.
 func (e *eventScheduleRepositoryImpl) List(idList []string) ([]*entities.EventSchedule, error) {
+	var models []EventScheduleModel
 	cursor, err := e.collection.Find(e.ctx, bson.M{"_id": bson.M{"$in": idList}})
 
 	if err != nil {
 		return nil, err
 	}
 
-	var models []EventScheduleModel
+	defer cursor.Close(e.ctx)
 	if err = cursor.All(e.ctx, &models); err != nil {
 		return nil, err
 	}

@@ -41,13 +41,14 @@ func (e *attendanceRepositoryImpl) Get(id string) (*entities.Attendance, error) 
 
 // List implements repositories.EventScheduleRepository.
 func (e *attendanceRepositoryImpl) List(idList []string) ([]*entities.Attendance, error) {
+	var models []AttendanceModel
 	cursor, err := e.collection.Find(e.ctx, bson.M{"_id": bson.M{"$in": idList}})
 
 	if err != nil {
 		return nil, err
 	}
 
-	var models []AttendanceModel
+	defer cursor.Close(e.ctx)
 	if err = cursor.All(e.ctx, &models); err != nil {
 		return nil, err
 	}

@@ -86,7 +86,7 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 		securityNumber := rand.Int() % 1000
 		return &entities.Attendance{
 			ID:             c.EventID + "." + a.ActivityID + "." + a.PersonID,
-			Event:          &entities.Event{ID: event.ID},
+			Event:          event,
 			EventActivity:  activitiesMap[a.ActivityID],
 			Attendee:       attendeesMap[a.PersonID],
 			CheckedInBy:    checkinPerson,

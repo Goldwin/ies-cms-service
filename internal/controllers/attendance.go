@@ -43,6 +43,8 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.GET("schedules/:scheduleID/events/:eventID/attendees", attendanceController.listEventAttendance)
 	rg.POST("schedules/:scheduleID/events/:eventID/checkin", attendanceController.checkIn)
 
+	rg.GET("schedules/:scheduleID/events/:eventID/summary", attendanceController.getSummary)
+
 	rg.GET("schedules/:scheduleID/stats", attendanceController.getEventScheduleStats)
 
 	rg.POST("households/search", attendanceController.householdSearch)
@@ -389,4 +391,20 @@ func (a *attendanceController) householdSearch(c *gin.Context) {
 	}
 
 	a.attendanceComponent.SearchHousehold(c, data, output).Wait()
+}
+
+func (a *attendanceController) getSummary(c *gin.Context) {
+	var filter queries.GetEventAttendanceSummaryFilter
+	filter.EventID = c.Param("eventID")
+
+	output := &outputDecorator[queries.GetEventAttendanceSummaryResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, err)
+		},
+		successFunc: func(result queries.GetEventAttendanceSummaryResult) {
+			c.JSON(200, result)
+		},
+	}
+	a.attendanceComponent.GetEventAttendanceSummary(c, filter, output).Wait()
 }

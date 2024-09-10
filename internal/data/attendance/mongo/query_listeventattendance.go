@@ -35,7 +35,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 
 	cursor, err := l.db.Collection(AttendanceCollection).Find(
 		l.ctx, filter,
-		options.Find().SetLimit(int64(query.Limit)),
+		options.Find().SetLimit(int64(query.Limit)).SetSort(bson.D{{Key: "_id", Value: 1}}),
 	)
 
 	if err != nil {

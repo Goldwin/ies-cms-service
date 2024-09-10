@@ -9,12 +9,13 @@ import (
 )
 
 const (
-	AttendanceCollection      = "attendances"
-	EventScheduleCollection   = "event_schedules"
-	EventCollection           = "events"
-	PersonCollection          = "persons"
-	HouseholdCollection       = "households"
-	PersonHouseholdCollection = "person_households"
+	AttendanceCollection        = "attendances"
+	AttendanceSummaryCollection = "attendance_summaries"
+	EventScheduleCollection     = "event_schedules"
+	EventCollection             = "events"
+	PersonCollection            = "persons"
+	HouseholdCollection         = "households"
+	PersonHouseholdCollection   = "person_households"
 )
 
 type EventScheduleModel struct {
@@ -253,5 +254,49 @@ func (e *AttendanceModel) ToAttendance() *entities.Attendance {
 		SecurityNumber: e.SecurityNumber,
 		CheckinTime:    e.CheckinTime,
 		Type:           entities.AttendanceType(e.Type),
+	}
+}
+
+type ActivityAttendanceSummaryModel struct {
+	ID          string         `bson:"_id"`
+	Name        string         `bson:"Name"`
+	Total       int            `bson:"total"`
+	TotalByType map[string]int `bson:"totalByType"`
+}
+
+func (e *ActivityAttendanceSummaryModel) ToDTO() dto.ActivityAttendanceSummaryDTO {
+	return dto.ActivityAttendanceSummaryDTO{
+		Name:        e.Name,
+		Total:       e.Total,
+		TotalByType: e.TotalByType,
+	}
+}
+
+type EventAttendanceSummaryModel struct {
+	ID              string    `bson:"_id"`
+	Date            time.Time `bson:"date"`
+	TotalCheckedIn  int       `bson:"totalCheckedIn"`
+	TotalCheckedOut int       `bson:"totalCheckedOut"`
+	TotalFirstTimer int       `bson:"totalFirstTimer"`
+	Total           int       `bson:"total"`
+
+	TotalByType        map[string]int                   `bson:"totalByType"`
+	AcitivitiesSummary []ActivityAttendanceSummaryModel `bson:"activitiesSummary"`
+	LastUpdated        time.Time                        `bson:"lastUpdated"`
+	NextUpdate         time.Time                        `bson:"nextUpdate"`
+}
+
+func (e *EventAttendanceSummaryModel) ToDTO() dto.EventAttendanceSummaryDTO {
+	return dto.EventAttendanceSummaryDTO{
+		TotalCheckedIn:  e.TotalCheckedIn,
+		TotalCheckedOut: e.TotalCheckedOut,
+		TotalFirstTimer: e.TotalFirstTimer,
+		Total:           e.Total,
+		TotalByType:     e.TotalByType,
+		AcitivitiesSummary: lo.Map(e.AcitivitiesSummary, func(ee ActivityAttendanceSummaryModel, _ int) dto.ActivityAttendanceSummaryDTO {
+			return ee.ToDTO()
+		}),
+		Date: e.Date,
+		ID:   e.ID,
 	}
 }

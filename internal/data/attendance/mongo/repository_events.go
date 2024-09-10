@@ -40,11 +40,12 @@ func (e *EventRepositoryImpl) Get(id string) (*entities.Event, error) {
 
 // List implements repositories.EventRepository.
 func (e *EventRepositoryImpl) List([]string) ([]*entities.Event, error) {
+	var models []EventModel
 	cursor, err := e.collection.Find(e.ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
-	var models []EventModel
+	defer cursor.Close(e.ctx)
 	if err = cursor.All(e.ctx, &models); err != nil {
 		return nil, err
 	}
