@@ -37,6 +37,7 @@ type AttendanceQueryComponent interface {
 	ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult]) out.Waitable
 	SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult]) out.Waitable
 	GetEventAttendanceSummary(ctx context.Context, filter queries.GetEventAttendanceSummaryFilter, output out.Output[queries.GetEventAttendanceSummaryResult]) out.Waitable
+	GetEventScheduleStats(ctx context.Context, filter queries.GetEventScheduleStatsFilter, output out.Output[queries.GetEventScheduleStatsResult]) out.Waitable
 }
 
 type AttendanceComponent interface {
@@ -46,6 +47,12 @@ type AttendanceComponent interface {
 
 type attendanceComponentImpl struct {
 	dataLayer AttendanceDataLayerComponent
+}
+
+// GetEventScheduleStats implements AttendanceComponent.
+func (a *attendanceComponentImpl) GetEventScheduleStats(ctx context.Context, filter queries.GetEventScheduleStatsFilter, output out.Output[queries.GetEventScheduleStatsResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).GetEventScheduleStats()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // GetEventAttendanceSummary implements AttendanceComponent.

@@ -20,6 +20,11 @@ type queryContextImpl struct {
 	searchHousehold queries.SearchHousehold
 }
 
+// GetEventScheduleStats implements queries.QueryContext.
+func (q *queryContextImpl) GetEventScheduleStats() queries.GetEventScheduleStats {
+	return NewGetEventScheduleStats(q.ctx, q.db)
+}
+
 // GetEventAttendanceSummary implements queries.QueryContext.
 func (q *queryContextImpl) GetEventAttendanceSummary() queries.GetEventAttendanceSummary {
 	return NewGetEventAttendanceSummary(q.ctx, q.db)

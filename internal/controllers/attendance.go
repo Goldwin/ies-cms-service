@@ -170,7 +170,22 @@ func (a *attendanceController) archiveEventSchedule(c *gin.Context) {
 }
 
 func (a *attendanceController) getEventScheduleStats(c *gin.Context) {
-	//TODO fill this
+	var input queries.GetEventScheduleStatsFilter
+	input.ScheduleID = c.Param("scheduleID")
+
+	output := &outputDecorator[queries.GetEventScheduleStatsResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result queries.GetEventScheduleStatsResult) {
+			c.JSON(200, result)
+		},
+	}
+
+	a.attendanceComponent.GetEventScheduleStats(c, input, output).Wait()
 }
 
 func (a *attendanceController) listEventsBySchedule(c *gin.Context) {
