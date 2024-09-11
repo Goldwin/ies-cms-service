@@ -259,7 +259,7 @@ func (e *AttendanceModel) ToAttendance() *entities.Attendance {
 
 type ActivityAttendanceSummaryModel struct {
 	ID          string         `bson:"_id"`
-	Name        string         `bson:"Name"`
+	Name        string         `bson:"name"`
 	Total       int            `bson:"total"`
 	TotalByType map[string]int `bson:"totalByType"`
 }
@@ -274,6 +274,7 @@ func (e *ActivityAttendanceSummaryModel) ToDTO() dto.ActivityAttendanceSummaryDT
 
 type EventAttendanceSummaryModel struct {
 	ID              string    `bson:"_id"`
+	ScheduleID      string    `bson:"scheduleId"`
 	Date            time.Time `bson:"date"`
 	TotalCheckedIn  int       `bson:"totalCheckedIn"`
 	TotalCheckedOut int       `bson:"totalCheckedOut"`

@@ -80,14 +80,16 @@ func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendan
 	}
 
 	if err == mongo.ErrNoDocuments {
-		summary.ID = event.ID
-		summary.Date = event.Date
 		summary.NextUpdate = time.Now().Add(-5 * time.Minute)
 	}
 
 	if summary.NextUpdate.After(time.Now()) {
 		return
 	}
+
+	summary.ID = event.ID
+	summary.Date = event.Date
+	summary.ScheduleID = event.ScheduleID
 
 	aggregates, err := g.aggregate(summary.ID)
 	if err != nil {
