@@ -50,6 +50,7 @@ func (g *getEventAttendanceSummaryImpl) Execute(filter GetEventAttendanceSummary
 	if err == mongo.ErrNoDocuments {
 		summaryModel.ID = filter.EventID
 		summaryModel.Date = eventModel.Date
+		summaryModel.TotalByType = map[string]int{}
 	}
 
 	go g.maybeUpdateSummary(summaryModel, eventModel)
@@ -63,7 +64,7 @@ func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendan
 	if summary.NextUpdate.After(time.Now()) || time.Now().Sub(event.Date) > 24*time.Hour {
 		return
 	}
-	
+
 	coll := g.db.Collection(AttendanceSummaryCollection)
 	result := coll.FindOneAndUpdate(g.ctx,
 		bson.M{"_id": summary.ID},
@@ -86,7 +87,7 @@ func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendan
 
 	if summary.NextUpdate.After(time.Now()) {
 		return
-	}	
+	}
 
 	aggregates, err := g.aggregate(summary.ID)
 	if err != nil {
