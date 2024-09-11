@@ -13,7 +13,7 @@ import (
 )
 
 type eventAttendanceAggregateKey struct {
-	ActivityId string `bson:"_id"`
+	ActivityId string `bson:"activityId"`
 	Name       string `bson:"name"`
 	Type       string `bson:"type"`
 }
@@ -94,8 +94,11 @@ func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendan
 		return
 	}
 
-	activitySummaries := make(map[string]ActivityAttendanceSummaryModel, 0)
+	activitySummaries := make(map[string]ActivityAttendanceSummaryModel)
 	summary.TotalByType = make(map[string]int)
+	summary.Total = 0
+	summary.TotalCheckedIn = 0
+	summary.TotalCheckedOut = 0
 
 	for _, aggregate := range aggregates {
 		activitySummary, ok := activitySummaries[aggregate.Key.ActivityId]
@@ -151,7 +154,7 @@ func (g *getEventAttendanceSummaryImpl) aggregate(eventID string) ([]eventAttend
 				Key: "$group",
 				Value: bson.M{
 					"_id": bson.M{
-						"activityId": "$eventActivity.activityId",
+						"activityId": "$eventActivity._id",
 						"name":       "$eventActivity.name",
 						"type":       "$type",
 					},

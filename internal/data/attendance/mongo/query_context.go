@@ -22,7 +22,7 @@ type queryContextImpl struct {
 
 // GetEventAttendanceSummary implements queries.QueryContext.
 func (q *queryContextImpl) GetEventAttendanceSummary() queries.GetEventAttendanceSummary {
-	panic("unimplemented")
+	return NewGetEventAttendanceSummary(q.ctx, q.db)
 }
 
 // SearchHousehold implements queries.QueryContext.

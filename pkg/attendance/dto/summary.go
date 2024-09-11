@@ -3,20 +3,20 @@ package dto
 import "time"
 
 type ActivityAttendanceSummaryDTO struct {
-	Total       int
-	Name        string
-	TotalByType map[string]int
+	Total       int            `json:"total"`
+	Name        string         `json:"name"`
+	TotalByType map[string]int `json:"totalByType"`
 }
 
 type EventAttendanceSummaryDTO struct {
-	TotalCheckedIn  int
-	TotalCheckedOut int
-	TotalFirstTimer int
-	Total           int
+	TotalCheckedIn  int `json:"totalCheckedIn"`
+	TotalCheckedOut int `json:"totalCheckedOut"`
+	TotalFirstTimer int `json:"totalFirstTimer"`
+	Total           int `json:"total"`
 
-	TotalByType        map[string]int
-	AcitivitiesSummary []ActivityAttendanceSummaryDTO
+	TotalByType        map[string]int                 `json:"totalByType"`
+	AcitivitiesSummary []ActivityAttendanceSummaryDTO `json:"activitiesSummary"`
 
-	Date time.Time
-	ID   string
+	Date time.Time `json:"date"`
+	ID   string    `json:"id"`
 }
