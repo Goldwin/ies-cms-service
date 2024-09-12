@@ -49,7 +49,7 @@ func (g *getEventScheduleStatsImpl) Execute(filter GetEventScheduleStatsFilter) 
 	for _, model := range models {
 		result.EventStats = append(result.EventStats, dto.EventStatsDTO{
 			ID:   model.ID,
-			Date: model.Date,
+			Date: model.Date.Format("02 Jan 2006"),
 			AttendanceCount: lo.MapToSlice(model.TotalByType, func(k string, v int) dto.EventAttendanceCountStats {
 				return dto.EventAttendanceCountStats{
 					AttendanceType: k,
