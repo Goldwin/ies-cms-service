@@ -80,7 +80,7 @@ func createNextWeeklyEvent(weeklySchedule *entities.EventSchedule, ctx CommandCo
 				ID:         generateEventId(weeklySchedule.ID, d),
 				ScheduleID: weeklySchedule.ID,
 				Name:       weeklySchedule.Name,
-				Date:       d,
+				Date:       time.Date(d.Year(), d.Month(), d.Day(), weeklySchedule.StartTime.Hour-weeklySchedule.TimezoneOffset, weeklySchedule.StartTime.Minute, 0, 0, time.UTC),
 				EventActivities: lo.Map(weeklySchedule.Activities,
 					func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
 						return &entities.EventActivity{
@@ -114,7 +114,7 @@ func createNextDailyEvent(dailySchedule *entities.EventSchedule, ctx CommandCont
 			ID:         generateEventId(dailySchedule.ID, d),
 			ScheduleID: dailySchedule.ID,
 			Name:       dailySchedule.Name,
-			Date:       d,
+			Date:       time.Date(d.Year(), d.Month(), d.Day(), dailySchedule.StartTime.Hour-dailySchedule.TimezoneOffset, dailySchedule.StartTime.Minute, 0, 0, time.UTC),
 			EventActivities: lo.Map(dailySchedule.Activities,
 				func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
 					return &entities.EventActivity{
@@ -146,7 +146,7 @@ func createNextOneTimeEvent(oneTimeSchedule *entities.EventSchedule, ctx Command
 		ID:         generateEventId(oneTimeSchedule.ID, oneTimeSchedule.Date),
 		ScheduleID: oneTimeSchedule.ID,
 		Name:       oneTimeSchedule.Name,
-		Date:       oneTimeSchedule.Date,
+		Date:       time.Date(oneTimeSchedule.Date.Day(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.StartTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.StartTime.Minute, 0, 0, time.UTC),
 		EventActivities: lo.Map(oneTimeSchedule.Activities,
 			func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
 				return &entities.EventActivity{

@@ -17,6 +17,8 @@ type EventScheduleDTO struct {
 	Days           []time.Weekday             `json:"days"`
 	StartDate      time.Time                  `json:"startDate"`
 	EndDate        time.Time                  `json:"endDate"`
+	StartTime      string                     `json:"startTime"`
+	EndTime        string                     `json:"endTime"`
 }
 
 func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
@@ -32,7 +34,10 @@ func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 		Date:      result.Date,
 		StartDate: result.StartDate,
 		Days:      result.Days,
-		EndDate:   result.EndDate}
+		EndDate:   result.EndDate,
+		StartTime: result.StartTime.String(),
+		EndTime:   result.EndTime.String(),
+	}
 }
 
 type EventScheduleActivityDTO struct {

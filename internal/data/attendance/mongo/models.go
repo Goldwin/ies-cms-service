@@ -28,6 +28,8 @@ type EventScheduleModel struct {
 	Days           []time.Weekday               `bson:"days"`
 	StartDate      time.Time                    `bson:"startDate"`
 	EndDate        time.Time                    `bson:"endDate"`
+	StartTime      string                       `bson:"startTime"`
+	EndTime        string                       `bson:"endTime"`
 }
 
 func toEventScheduleModel(e *entities.EventSchedule) EventScheduleModel {
@@ -43,10 +45,15 @@ func toEventScheduleModel(e *entities.EventSchedule) EventScheduleModel {
 		Days:      e.Days,
 		StartDate: e.StartDate,
 		EndDate:   e.EndDate,
+		StartTime: e.StartTime.String(),
+		EndTime:   e.EndTime.String(),
 	}
 }
 
 func (e *EventScheduleModel) ToEventSchedule() *entities.EventSchedule {
+	var startTime, endTime entities.HourMinute
+	startTime.SetFromStringOrZero(e.StartTime)
+	endTime.SetFromStringOrMaxValue(e.EndTime)
 	return &entities.EventSchedule{
 		ID:             e.ID,
 		Name:           e.Name,
@@ -65,6 +72,8 @@ func (e *EventScheduleModel) ToEventSchedule() *entities.EventSchedule {
 			StartDate: e.StartDate,
 			EndDate:   e.EndDate,
 		},
+		StartTime: startTime,
+		EndTime:   endTime,
 	}
 }
 

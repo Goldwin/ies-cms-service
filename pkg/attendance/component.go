@@ -130,6 +130,8 @@ func (a *attendanceComponentImpl) UpdateEventSchedule(ctx context.Context, sched
 		Date:           schedule.Date,
 		StartDate:      schedule.StartDate,
 		EndDate:        schedule.EndDate,
+		StartTime:      schedule.StartTime,
+		EndTime:        schedule.EndTime,
 	}).WithOutput(
 		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
 			return dto.FromEntities(&e)

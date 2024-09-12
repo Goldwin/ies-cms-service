@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	. "github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
@@ -20,6 +21,15 @@ type getEventScheduleStatsImpl struct {
 // Execute implements queries.GetEventScheduleStats.
 func (g *getEventScheduleStatsImpl) Execute(filter GetEventScheduleStatsFilter) (GetEventScheduleStatsResult, queries.QueryErrorDetail) {
 	var models []EventAttendanceSummaryModel
+	schedule, err := g.getSchedule(filter.ScheduleID)
+
+	if err == mongo.ErrNoDocuments {
+		return GetEventScheduleStatsResult{}, queries.ResourceNotFoundError("Schedule not found")
+	}
+	if err != nil {
+		return GetEventScheduleStatsResult{}, queries.InternalServerError(err)
+	}
+
 	coll := g.db.Collection(AttendanceSummaryCollection)
 	findOption := options.Find().SetSort(bson.D{bson.E{Key: "date", Value: 1}}).
 		SetProjection(bson.D{
@@ -49,7 +59,7 @@ func (g *getEventScheduleStatsImpl) Execute(filter GetEventScheduleStatsFilter) 
 	for _, model := range models {
 		result.EventStats = append(result.EventStats, dto.EventStatsDTO{
 			ID:   model.ID,
-			Date: model.Date.Format("02 Jan 2006"),
+			Date: model.Date.Add(time.Duration(schedule.TimezoneOffset) * time.Hour).Format("02 Jan 2006"),
 			AttendanceCount: lo.MapToSlice(model.TotalByType, func(k string, v int) dto.EventAttendanceCountStats {
 				return dto.EventAttendanceCountStats{
 					AttendanceType: k,
@@ -62,6 +72,16 @@ func (g *getEventScheduleStatsImpl) Execute(filter GetEventScheduleStatsFilter) 
 	return GetEventScheduleStatsResult{
 		Data: result,
 	}, queries.NoQueryError
+}
+
+func (g *getEventScheduleStatsImpl) getSchedule(scheduleID string) (EventScheduleModel, error) {
+	var schedule EventScheduleModel
+	coll := g.db.Collection(EventScheduleCollection)
+	err := coll.FindOne(g.ctx, bson.M{"_id": scheduleID}).Decode(&schedule)
+	if err != nil {
+		return EventScheduleModel{}, err
+	}
+	return schedule, nil
 }
 
 func NewGetEventScheduleStats(ctx context.Context, db *mongo.Database) GetEventScheduleStats {

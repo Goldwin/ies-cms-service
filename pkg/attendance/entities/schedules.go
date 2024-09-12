@@ -31,6 +31,8 @@ type EventSchedule struct {
 	TimezoneOffset int
 	Type           EventScheduleType
 	Activities     []EventScheduleActivity
+	StartTime      HourMinute
+	EndTime        HourMinute
 	OneTimeEventSchedule
 	WeeklyEventSchedule
 	DailyEventSchedule

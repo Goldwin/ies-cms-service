@@ -25,6 +25,8 @@ type UpdateEventScheduleCommand struct {
 	Date           time.Time
 	StartDate      time.Time
 	EndDate        time.Time
+	StartTime      string
+	EndTime        string
 }
 
 func (c UpdateEventScheduleCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.EventSchedule] {
@@ -50,6 +52,29 @@ func (c UpdateEventScheduleCommand) Execute(ctx CommandContext) CommandExecution
 	eventSchedule.Name = c.Name
 	eventSchedule.TimezoneOffset = c.TimezoneOffset
 	eventSchedule.Type = entities.EventScheduleType(c.ScheduleType)
+	err = eventSchedule.StartTime.SetFromString(c.StartTime)
+
+	if err != nil {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetail{
+				Code:    UpdateEventScheduleValidationError,
+				Message: err.Error(),
+			},
+		}
+	}
+
+	err = eventSchedule.EndTime.SetFromString(c.EndTime)
+
+	if err != nil {
+		return CommandExecutionResult[entities.EventSchedule]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetail{
+				Code: UpdateEventScheduleValidationError,
+				Message: err.Error(),
+			},
+		}
+	}
 
 	if eventSchedule.Type == entities.EventScheduleTypeWeekly {
 		eventSchedule.Days = c.Days
