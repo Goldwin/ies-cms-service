@@ -50,6 +50,7 @@ func (g *getEventAttendanceSummaryImpl) Execute(filter GetEventAttendanceSummary
 	if err == mongo.ErrNoDocuments {
 		summaryModel.ID = filter.EventID
 		summaryModel.Date = eventModel.Date
+		summaryModel.LastUpdated = time.Now().Add(-5 * time.Minute)
 		summaryModel.TotalByType = map[string]int{}
 	}
 
@@ -61,7 +62,7 @@ func (g *getEventAttendanceSummaryImpl) Execute(filter GetEventAttendanceSummary
 }
 
 func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendanceSummaryModel, event EventModel) {
-	if summary.NextUpdate.After(time.Now()) || time.Now().Sub(event.Date) > 24*time.Hour {
+	if summary.NextUpdate.After(time.Now()) || summary.LastUpdated.Sub(event.Date) > 24*time.Hour {
 		return
 	}
 
