@@ -48,6 +48,8 @@ func (g *getEventScheduleImpl) Execute(query GetEventScheduleFilter) (GetEventSc
 			Days:      model.Days,
 			StartDate: model.StartDate,
 			EndDate:   model.EndDate,
+			StartTime: model.StartTime,
+			EndTime:   model.EndTime,
 		},
 	}, queries.NoQueryError
 }
