@@ -21,33 +21,33 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	}
 
 	rg := r.Group("attendance")
-	rg.POST("schedules", attendanceController.createSchedule)
-	rg.GET("schedules", attendanceController.listEventSchedules)
+	rg.POST("schedules", middleware.Auth("ATTENDANCE_CREATE_SCHEDULE"), attendanceController.createSchedule)
+	rg.GET("schedules", middleware.Auth("ATTENDANCE_VIEW_SCHEDULE"), attendanceController.listEventSchedules)
 
 	scheduleURL := "schedules/:scheduleID"
-	rg.GET(scheduleURL, attendanceController.getEventSchedule)
-	rg.PUT(scheduleURL, attendanceController.updateEventSchedule)
-	rg.DELETE(scheduleURL, attendanceController.archiveEventSchedule)
+	rg.GET(scheduleURL, middleware.Auth("ATTENDANCE_VIEW_SCHEDULE"), attendanceController.getEventSchedule)
+	rg.PUT(scheduleURL, middleware.Auth("ATTENDANCE_UPDATE_SCHEDULE"), attendanceController.updateEventSchedule)
+	rg.DELETE(scheduleURL, middleware.Auth("ATTENDANCE_DELETE_SCHEDULE"), attendanceController.archiveEventSchedule)
 
-	rg.POST("schedules/:scheduleID/create-next-event", attendanceController.createNextEvent)
+	rg.POST("schedules/:scheduleID/create-next-event", middleware.Auth("ATTENDANCE_CREATE_EVENT"), attendanceController.createNextEvent)
 
 	activitiesUrl := scheduleURL + "/activities"
 	activityUrl := activitiesUrl + "/:activityID"
-	rg.POST(activitiesUrl, attendanceController.createEventScheduleActivity)
-	rg.PUT(activityUrl, attendanceController.updateEventScheduleActivity)
-	rg.DELETE(activityUrl, attendanceController.removeEventScheduleActivity)
+	rg.POST(activitiesUrl, middleware.Auth("ATTENDANCE_CREATE_SCHEDULE_ACTIVITY"), attendanceController.createEventScheduleActivity)
+	rg.PUT(activityUrl, middleware.Auth("ATTENDANCE_UPDATE_SCHEDULE_ACTIVITY"), attendanceController.updateEventScheduleActivity)
+	rg.DELETE(activityUrl, middleware.Auth("ATTENDANCE_DELETE_SCHEDULE_ACTIVITY"), attendanceController.removeEventScheduleActivity)
 
-	rg.GET("schedules/:scheduleID/events", attendanceController.listEventsBySchedule)
-	rg.GET("schedules/:scheduleID/events/:eventID", attendanceController.getEventBySchedule)
+	rg.GET("schedules/:scheduleID/events", middleware.Auth("ATTENDANCE_VIEW_EVENTS"), attendanceController.listEventsBySchedule)
+	rg.GET("schedules/:scheduleID/events/:eventID", middleware.Auth("ATTENDANCE_VIEW_EVENTS"), attendanceController.getEventBySchedule)
 
-	rg.GET("schedules/:scheduleID/events/:eventID/attendees", attendanceController.listEventAttendance)
-	rg.POST("schedules/:scheduleID/events/:eventID/checkin", attendanceController.checkIn)
+	rg.GET("schedules/:scheduleID/events/:eventID/attendees", middleware.Auth("ATTENDANCE_VIEW_EVENT_ATTENDANCE"), attendanceController.listEventAttendance)
+	rg.POST("schedules/:scheduleID/events/:eventID/checkin", middleware.Auth("ATTENDANCE_CREATE_EVENT_ATTENDANCE"), attendanceController.checkIn)
 
-	rg.GET("schedules/:scheduleID/events/:eventID/summary", attendanceController.getSummary)
+	rg.GET("schedules/:scheduleID/events/:eventID/summary", middleware.Auth("ATTENDANCE_VIEW_EVENT_SUMMARY"), attendanceController.getSummary)
 
-	rg.GET("schedules/:scheduleID/stats", attendanceController.getEventScheduleStats)
+	rg.GET("schedules/:scheduleID/stats", middleware.Auth("ATTENDANCE_VIEW_SCHEDULE_STATS"), attendanceController.getEventScheduleStats)
 
-	rg.POST("households/search", attendanceController.householdSearch)
+	rg.POST("households/search", middleware.Auth("ATTENDANCE_VIEW_HOUSEHOLDS"), attendanceController.householdSearch)
 }
 
 func (a *attendanceController) listEventSchedules(c *gin.Context) {
