@@ -40,7 +40,8 @@ func (g *getEventImpl) Execute(query GetEventFilter) (GetEventResult, queries.Qu
 					Time: e.Time,
 				}
 			}),
-			Date: model.Date,
+			StartDate: model.StartDate,
+			EndDate:   model.EndDate,
 		},
 	}, queries.NoQueryError
 }

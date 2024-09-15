@@ -12,7 +12,8 @@ type EventDTO struct {
 	ScheduleID string             `json:"scheduleId"`
 	Name       string             `json:"name"`
 	Activities []EventActivityDTO `json:"activities"`
-	Date       time.Time          `json:"date"`
+	StartDate  time.Time          `json:"startDate"`
+	EndDate    time.Time          `json:"endDate"`
 }
 
 func FromEventEntities(result *entities.Event) EventDTO {
@@ -24,7 +25,8 @@ func FromEventEntities(result *entities.Event) EventDTO {
 			func(ea *entities.EventActivity, _ int) EventActivityDTO {
 				return EventActivityDTO{ID: ea.ID, Name: ea.Name, Time: ea.Time}
 			}),
-		Date: result.Date,
+		StartDate: result.StartDate,
+		EndDate:   result.EndDate,
 	}
 }
 

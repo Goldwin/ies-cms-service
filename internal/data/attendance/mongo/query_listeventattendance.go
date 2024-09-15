@@ -58,7 +58,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 					ID:         e.Event.ID,
 					ScheduleID: e.Event.ScheduleID,
 					Name:       e.Event.Name,
-					Date:       e.Event.Date,
+					StartDate:  e.Event.StartDate,
 				},
 				Activity: dto.EventActivityDTO{
 					ID:   e.EventActivity.ID,

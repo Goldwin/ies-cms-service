@@ -47,7 +47,7 @@ func (l *listEventByScheduleImpl) Execute(query ListEventByScheduleFilter) (List
 					Time: e.Time,
 				}
 			}),
-			Date: eventModel.Date,
+			StartDate: eventModel.StartDate,
 		})
 	}
 	return ListEventByScheduleResult{

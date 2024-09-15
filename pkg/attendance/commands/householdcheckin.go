@@ -12,6 +12,7 @@ import (
 const (
 	HouseholdCheckinCommandEventDoesNotExistsError = 30501
 	HouseholdCheckinCommandPersonMissingError      = 30501
+	HouseholdCheckinCommandEventEndedError         = 30503
 )
 
 var (
@@ -31,6 +32,7 @@ type HouseholdCheckinCommand struct {
 }
 
 func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionResult[[]*entities.Attendance] {
+	checkinTime := time.Now()
 	event, err := ctx.EventRepository().Get(c.EventID)
 
 	if err != nil {
@@ -44,6 +46,13 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 		return CommandExecutionResult[[]*entities.Attendance]{
 			Status: ExecutionStatusFailed,
 			Error:  CommandErrorDetail{Code: HouseholdCheckinCommandEventDoesNotExistsError, Message: "Event not found"},
+		}
+	}
+
+	if event.EndDate.Before(checkinTime) {
+		return CommandExecutionResult[[]*entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetail{Code: HouseholdCheckinCommandEventEndedError, Message: "Failed to checkin. Event already ended"},
 		}
 	}
 
@@ -92,7 +101,7 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 			CheckedInBy:    checkinPerson,
 			SecurityCode:   securityCode,
 			SecurityNumber: securityNumber,
-			CheckinTime:    time.Now(),
+			CheckinTime:    checkinTime,
 			Type:           entities.AttendanceType(a.AttendanceType),
 		}
 	})

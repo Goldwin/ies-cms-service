@@ -107,7 +107,8 @@ type EventModel struct {
 	Name            string               `bson:"name"`
 	ScheduleID      string               `bson:"scheduleId"`
 	EventActivities []EventActivityModel `bson:"eventActivities"`
-	Date            time.Time            `bson:"date"`
+	StartDate       time.Time            `bson:"startDate"`
+	EndDate         time.Time            `bson:"endDate"`
 }
 
 func (e *EventModel) ToEvent() *entities.Event {
@@ -118,7 +119,8 @@ func (e *EventModel) ToEvent() *entities.Event {
 		EventActivities: lo.Map(e.EventActivities, func(e EventActivityModel, _ int) *entities.EventActivity {
 			return e.ToEventActivity()
 		}),
-		Date: e.Date,
+		StartDate: e.StartDate,
+		EndDate:   e.EndDate,
 	}
 }
 
@@ -130,7 +132,8 @@ func toEventModel(e *entities.Event) EventModel {
 		EventActivities: lo.Map(e.EventActivities, func(e *entities.EventActivity, _ int) EventActivityModel {
 			return toEventActivityModel(e)
 		}),
-		Date: e.Date,
+		StartDate: e.StartDate,
+		EndDate:   e.EndDate,
 	}
 }
 
