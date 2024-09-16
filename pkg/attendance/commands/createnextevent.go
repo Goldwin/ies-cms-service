@@ -143,8 +143,8 @@ func createNextOneTimeEvent(oneTimeSchedule *entities.EventSchedule, ctx Command
 		ID:         generateEventId(oneTimeSchedule.ID, oneTimeSchedule.Date),
 		ScheduleID: oneTimeSchedule.ID,
 		Name:       oneTimeSchedule.Name,
-		StartDate:  time.Date(oneTimeSchedule.Date.Day(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.StartTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.StartTime.Minute, 0, 0, time.UTC),
-		EndDate:    time.Date(oneTimeSchedule.Date.Day(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.EndTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.EndTime.Minute, 0, 0, time.UTC),
+		StartDate:  time.Date(oneTimeSchedule.Date.Year(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.StartTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.StartTime.Minute, 0, 0, time.UTC),
+		EndDate:    time.Date(oneTimeSchedule.Date.Year(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.EndTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.EndTime.Minute, 0, 0, time.UTC),
 		EventActivities: lo.Map(oneTimeSchedule.Activities,
 			func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
 				return &entities.EventActivity{
