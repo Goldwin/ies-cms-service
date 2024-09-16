@@ -105,7 +105,7 @@ func createNextWeeklyEvent(weeklySchedule *entities.EventSchedule, ctx CommandCo
 
 func createNextDailyEvent(dailySchedule *entities.EventSchedule, ctx CommandContext) CommandExecutionResult[[]*entities.Event] {
 	resultSet := make([]*entities.Event, 0)
-	for d := dailySchedule.Date; d.Before(dailySchedule.EndDate) || d.Equal(dailySchedule.EndDate); d = d.AddDate(0, 0, 1) {
+	for d := dailySchedule.StartDate; d.Before(dailySchedule.EndDate) || d.Equal(dailySchedule.EndDate); d = d.AddDate(0, 0, 1) {
 		event := entities.Event{
 			ID:         generateEventId(dailySchedule.ID, d),
 			ScheduleID: dailySchedule.ID,
