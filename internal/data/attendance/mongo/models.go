@@ -124,6 +124,23 @@ func (e *EventModel) ToEvent() *entities.Event {
 	}
 }
 
+func (e *EventModel) ToDTO() dto.EventDTO {
+	return dto.EventDTO{
+		ID:         e.ID,
+		ScheduleID: e.ScheduleID,
+		Name:       e.Name,
+		Activities: lo.Map(e.EventActivities, func(e EventActivityModel, _ int) dto.EventActivityDTO {
+			return dto.EventActivityDTO{
+				ID:   e.ID,
+				Name: e.Name,
+				Time: e.Time,
+			}
+		}),
+		StartDate: e.StartDate,
+		EndDate:   e.EndDate,
+	}
+}
+
 func toEventModel(e *entities.Event) EventModel {
 	return EventModel{
 		ID:         e.ID,

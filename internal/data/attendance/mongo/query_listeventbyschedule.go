@@ -6,7 +6,6 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	. "github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
-	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -36,19 +35,7 @@ func (l *listEventByScheduleImpl) Execute(query ListEventByScheduleFilter) (List
 		if err := cursor.Decode(&eventModel); err != nil {
 			return ListEventByScheduleResult{}, queries.InternalServerError(err)
 		}
-		result = append(result, dto.EventDTO{
-			ID:         eventModel.ID,
-			ScheduleID: eventModel.ScheduleID,
-			Name:       eventModel.Name,
-			Activities: lo.Map(eventModel.EventActivities, func(e EventActivityModel, _ int) dto.EventActivityDTO {
-				return dto.EventActivityDTO{
-					ID:   e.ID,
-					Name: e.Name,
-					Time: e.Time,
-				}
-			}),
-			StartDate: eventModel.StartDate,
-		})
+		result = append(result, eventModel.ToDTO())
 	}
 	return ListEventByScheduleResult{
 		Data: result,

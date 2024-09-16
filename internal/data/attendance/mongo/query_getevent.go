@@ -3,10 +3,8 @@ package mongo
 import (
 	"context"
 
-	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	. "github.com/Goldwin/ies-pik-cms/pkg/attendance/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
-	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -29,20 +27,7 @@ func (g *getEventImpl) Execute(query GetEventFilter) (GetEventResult, queries.Qu
 	}
 
 	return GetEventResult{
-		Data: dto.EventDTO{
-			ID:         model.ID,
-			ScheduleID: model.ScheduleID,
-			Name:       model.Name,
-			Activities: lo.Map(model.EventActivities, func(e EventActivityModel, _ int) dto.EventActivityDTO {
-				return dto.EventActivityDTO{
-					ID:   e.ID,
-					Name: e.Name,
-					Time: e.Time,
-				}
-			}),
-			StartDate: model.StartDate,
-			EndDate:   model.EndDate,
-		},
+		Data: model.ToDTO(),
 	}, queries.NoQueryError
 }
 
