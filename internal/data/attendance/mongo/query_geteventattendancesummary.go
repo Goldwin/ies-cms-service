@@ -104,6 +104,7 @@ func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendan
 	summary.Total = 0
 	summary.TotalCheckedIn = 0
 	summary.TotalCheckedOut = 0
+	summary.TotalFirstTimer = 0
 
 	for _, aggregate := range aggregates {
 		activitySummary, ok := activitySummaries[aggregate.Key.ActivityId]
