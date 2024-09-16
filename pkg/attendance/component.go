@@ -72,7 +72,7 @@ func (a *attendanceComponentImpl) HouseholdCheckin(ctx context.Context, input dt
 	x := commands.HouseholdCheckinCommand{
 		EventID:     input.EventID,
 		CheckedInBy: input.CheckedInBy,
-		Attendee: lo.Map(input.Attendees, func(e dto.PersonCheckinDTO, _ int) commands.Attendee {
+		Attendees: lo.Map(input.Attendees, func(e dto.PersonCheckinDTO, _ int) commands.Attendee {
 			return commands.Attendee{
 				PersonID:       e.PersonID,
 				ActivityID:     e.EventActivityID,
