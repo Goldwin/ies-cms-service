@@ -37,8 +37,10 @@ func (g *getEventScheduleStatsImpl) Execute(filter GetEventScheduleStatsFilter) 
 			bson.E{Key: "scheduleId", Value: 1},
 			bson.E{Key: "date", Value: 1},
 			bson.E{Key: "totalByType", Value: 1},
-		})
-	cursor, err := coll.Find(g.ctx, bson.M{"scheduleId": filter.ScheduleID}, findOption)
+		}).SetLimit(20)
+
+	monthsAgo := time.Now().AddDate(0, -1, 0)
+	cursor, err := coll.Find(g.ctx, bson.M{"scheduleId": filter.ScheduleID, "date": bson.M{"$gte": monthsAgo, "$lte": time.Now()}}, findOption)
 
 	if err != nil {
 		return GetEventScheduleStatsResult{}, queries.InternalServerError(err)
