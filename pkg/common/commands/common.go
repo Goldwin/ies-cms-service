@@ -17,6 +17,7 @@ type Command[CTX any, R any] interface {
 type CommandErrorDetail struct {
 	Code    CommandErrorCode `json:"code"`
 	Message string           `json:"message"`
+	Details []string         `json:"detail"`
 }
 
 func (e CommandErrorDetail) Error() string {
