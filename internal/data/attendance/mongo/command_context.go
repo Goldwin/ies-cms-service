@@ -18,6 +18,11 @@ type commandContextImpl struct {
 	personRepositoryImpl repositories.PersonRepository
 }
 
+// PersonAttendanceSummaryRepository implements commands.CommandContext.
+func (c *commandContextImpl) PersonAttendanceSummaryRepository() repositories.PersonAttendanceSummaryRepository {
+	return NewPersonAttendanceSummaryRepository(c.ctx, c.db)
+}
+
 // PersonRepository implements commands.CommandContext.
 func (c *commandContextImpl) PersonRepository() repositories.PersonRepository {
 	if c.personRepositoryImpl == nil {

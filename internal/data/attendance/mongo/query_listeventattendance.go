@@ -85,6 +85,7 @@ func (l *listEventAttendanceImpl) Execute(query ListEventAttendanceFilter) (List
 				SecurityNumber: e.SecurityNumber,
 				CheckinTime:    e.CheckinTime,
 				AttendanceType: e.Type,
+				FirstTime:      e.FirstTime,
 			}
 		}),
 	}, queries.NoQueryError

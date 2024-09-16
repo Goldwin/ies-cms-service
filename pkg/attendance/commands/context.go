@@ -7,4 +7,5 @@ type CommandContext interface {
 	EventScheduleRepository() repositories.EventScheduleRepository
 	AttendanceRepository() repositories.AttendanceRepository
 	PersonRepository() repositories.PersonRepository
+	PersonAttendanceSummaryRepository() repositories.PersonAttendanceSummaryRepository
 }

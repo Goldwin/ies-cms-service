@@ -9,14 +9,42 @@ import (
 )
 
 const (
-	AttendanceCollection        = "attendances"
-	AttendanceSummaryCollection = "attendance_summaries"
-	EventScheduleCollection     = "event_schedules"
-	EventCollection             = "events"
-	PersonCollection            = "persons"
-	HouseholdCollection         = "households"
-	PersonHouseholdCollection   = "person_households"
+	AttendanceCollection              = "attendances"
+	AttendanceSummaryCollection       = "attendance_summaries"
+	EventScheduleCollection           = "event_schedules"
+	EventCollection                   = "events"
+	PersonCollection                  = "persons"
+	HouseholdCollection               = "households"
+	PersonHouseholdCollection         = "person_households"
+	PersonAttendanceSummaryCollection = "person_attendance_summary"
 )
+
+type PersonAttendanceSummaryModel struct {
+	ID                   string          `bson:"_id"`
+	PersonID             string          `bson:"personId"`
+	ScheduleID           string          `bson:"scheduleId"`
+	FirstEventAttendance AttendanceModel `bson:"firstAttendance"`
+	LastEventAttendance  AttendanceModel `bson:"lastAttendance"`
+}
+
+func (m *PersonAttendanceSummaryModel) ToEntity() *entities.PersonAttendanceSummary {
+	return &entities.PersonAttendanceSummary{
+		PersonID:             m.PersonID,
+		ScheduleID:           m.ScheduleID,
+		FirstEventAttendance: m.FirstEventAttendance.ToEntity(),
+		LastEventAttendance:  m.LastEventAttendance.ToEntity(),
+	}
+}
+
+func toPersonAttendanceSummaryModel(e *entities.PersonAttendanceSummary) PersonAttendanceSummaryModel {
+	return PersonAttendanceSummaryModel{
+		ID:                   e.ID(),
+		PersonID:             e.PersonID,
+		ScheduleID:           e.ScheduleID,
+		FirstEventAttendance: toAttendanceModel(e.FirstEventAttendance),
+		LastEventAttendance:  toAttendanceModel(e.LastEventAttendance),
+	}
+}
 
 type EventScheduleModel struct {
 	ID             string                       `bson:"_id"`
@@ -240,7 +268,23 @@ type AttendanceModel struct {
 	SecurityNumber int       `bson:"securityNumber"`
 	CheckinTime    time.Time `bson:"checkinTime"`
 
-	Type string `bson:"type"`
+	Type      string `bson:"type"`
+	FirstTime bool   `bson:"firstTime"`
+}
+
+func (a *AttendanceModel) ToEntity() *entities.Attendance {
+	return &entities.Attendance{
+		ID:             a.ID,
+		Event:          a.Event.ToEvent(),
+		EventActivity:  a.EventActivity.ToEventActivity(),
+		Attendee:       a.Attendee.ToEntity(),
+		CheckedInBy:    a.CheckedInBy.ToEntity(),
+		SecurityCode:   a.SecurityCode,
+		SecurityNumber: a.SecurityNumber,
+		CheckinTime:    a.CheckinTime,
+		Type:           entities.AttendanceType(a.Type),
+		FirstTime:      a.FirstTime,
+	}
 }
 
 func toAttendanceModel(e *entities.Attendance) AttendanceModel {
@@ -270,6 +314,7 @@ func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 		SecurityNumber: e.SecurityNumber,
 		CheckinTime:    e.CheckinTime,
 		Type:           string(e.Type),
+		FirstTime:      e.FirstTime,
 	}
 }
 

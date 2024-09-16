@@ -24,6 +24,7 @@ type EventAttendanceDTO struct {
 	SecurityNumber int              `json:"securityNumber"`
 	CheckinTime    time.Time        `json:"checkinTime"`
 	AttendanceType string           `json:"attendanceType"`
+	FirstTime      bool             `json:"firstTime"`
 }
 
 func FromAttendanceEntities(result *entities.Attendance) EventAttendanceDTO {

@@ -19,8 +19,9 @@ type eventAttendanceAggregateKey struct {
 }
 
 type eventAttendanceAggregateModel struct {
-	Key   eventAttendanceAggregateKey `bson:"_id"`
-	Count int                         `bson:"count"`
+	Key            eventAttendanceAggregateKey `bson:"_id"`
+	Count          int                         `bson:"count"`
+	FirstTimeCount int                         `bson:"firstTimeCount"`
 }
 
 type getEventAttendanceSummaryImpl struct {
@@ -122,6 +123,7 @@ func (g *getEventAttendanceSummaryImpl) maybeUpdateSummary(summary EventAttendan
 		summary.Total += aggregate.Count
 		summary.TotalByType[aggregate.Key.Type] += aggregate.Count
 		summary.TotalCheckedIn += aggregate.Count
+		summary.TotalFirstTimer += aggregate.FirstTimeCount
 	}
 
 	summary.AcitivitiesSummary = make([]ActivityAttendanceSummaryModel, 0)
@@ -164,6 +166,18 @@ func (g *getEventAttendanceSummaryImpl) aggregate(eventID string) ([]eventAttend
 					},
 					"count": bson.M{
 						"$sum": 1,
+					},
+					"firstTimeCount": bson.M{
+						"$sum": bson.M{
+							"$cond": bson.A{
+								bson.M{
+									"$eq": bson.A{
+										"$firstTime", true,
+									},
+								},
+								1, 0,
+							},
+						},
 					},
 				},
 			},

@@ -28,7 +28,8 @@ type Attendance struct {
 	CheckinTime    time.Time
 	CheckoutTime   time.Time
 
-	Type AttendanceType
+	Type      AttendanceType
+	FirstTime bool
 }
 
 func (a *Attendance) IsValid() string {

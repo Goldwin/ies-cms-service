@@ -93,6 +93,23 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 		}
 	}
 
+	personAttendanceSummaries, err := ctx.PersonAttendanceSummaryRepository().List(
+		lo.Map(attendees, func(e *entities.Person, _ int) string {
+			return entities.PersonAttendanceSummary{PersonID: e.PersonID, ScheduleID: event.ScheduleID}.ID()
+		}),
+	)
+
+	if err != nil {
+		return CommandExecutionResult[[]*entities.Attendance]{
+			Status: ExecutionStatusFailed,
+			Error:  CommandErrorDetailWorkerFailure(err),
+		}
+	}
+
+	personToAttendanceSummaryMap := lo.SliceToMap(personAttendanceSummaries, func(e *entities.PersonAttendanceSummary) (string, *entities.PersonAttendanceSummary) {
+		return e.PersonID, e
+	})
+
 	activitiesMap := lo.SliceToMap(event.EventActivities, func(e *entities.EventActivity) (string, *entities.EventActivity) { return e.ID, e })
 
 	attendeesMap := lo.SliceToMap(attendees, func(e *entities.Person) (string, *entities.Person) { return e.PersonID, e })
@@ -126,6 +143,7 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 			SecurityNumber: securityNumber,
 			CheckinTime:    checkinTime,
 			Type:           entities.AttendanceType(a.AttendanceType),
+			FirstTime:      false,
 		}
 	})
 
@@ -137,7 +155,25 @@ func (c HouseholdCheckinCommand) Execute(ctx CommandContext) CommandExecutionRes
 	}
 
 	for _, attendance := range attendances {
+		summary, ok := personToAttendanceSummaryMap[attendance.Attendee.PersonID]
+		if !ok {
+			summary = &entities.PersonAttendanceSummary{
+				PersonID:             attendance.Attendee.PersonID,
+				ScheduleID:           event.ScheduleID,
+				FirstEventAttendance: attendance,
+			}
+			attendance.FirstTime = true
+		}
+		summary.LastEventAttendance = attendance
 		_, err = ctx.AttendanceRepository().Save(attendance)
+		if err != nil {
+			return CommandExecutionResult[[]*entities.Attendance]{
+				Status: ExecutionStatusFailed,
+				Error:  CommandErrorDetailWorkerFailure(err),
+			}
+		}
+		_, err = ctx.PersonAttendanceSummaryRepository().Save(summary)
+
 		if err != nil {
 			return CommandExecutionResult[[]*entities.Attendance]{
 				Status: ExecutionStatusFailed,
