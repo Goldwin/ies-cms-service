@@ -32,6 +32,10 @@ func main() {
 		})
 	})
 
+	r.GET("/robots.txt", func(c *gin.Context) {
+		c.String(http.StatusOK, "User-agent: *\nDisallow: /")
+	})
+
 	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent, eventBusComponent)
 
 	r.Run()

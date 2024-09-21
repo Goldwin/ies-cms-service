@@ -9,7 +9,6 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/data"
 	attendanceData "github.com/Goldwin/ies-pik-cms/internal/data/attendance"
 	authData "github.com/Goldwin/ies-pik-cms/internal/data/auth"
-	eventData "github.com/Goldwin/ies-pik-cms/internal/data/events"
 	peopleData "github.com/Goldwin/ies-pik-cms/internal/data/people"
 
 	out "github.com/Goldwin/ies-pik-cms/internal/out/auth"
@@ -19,7 +18,6 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
-	"github.com/Goldwin/ies-pik-cms/pkg/events"
 	"github.com/Goldwin/ies-pik-cms/pkg/people"
 	"github.com/gin-gonic/gin"
 )
@@ -44,12 +42,10 @@ func main() {
 			UseTransaction: true,
 		},
 	}, infraComponent)
-	eventDataLayer := eventData.NewChurchEventDataLayerComponent(config.DataConfig["EVENTS"], infraComponent)
 	attendanceDataLayer := attendanceData.NewAttendanceDataLayerComponent(config.DataConfig["ATTENDANCE"], infraComponent)
 
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
 	peopleManagementComponent := people.NewPeopleManagementComponent(peopleDataLayer)
-	churchEventComponent := events.NewChurchEventComponent(eventDataLayer)
 
 	attendanceComponent := attendance.NewAttendanceComponent(attendanceDataLayer)
 
@@ -73,7 +69,6 @@ func main() {
 
 	controller.InitializePeopleManagementController(r, middlewareComponent, peopleManagementComponent, eventBusComponent)
 	controller.InitializeAuthController(r, authComponent, eventBusComponent, authOutputComponent, middlewareComponent)
-	controller.InitializeEventsController(r, middlewareComponent, churchEventComponent, eventBusComponent)
 	controller.InitializeCMSController(r, authComponent, peopleManagementComponent, middlewareComponent, emailClient)
 	controller.InitializeAttendanceController(r, middlewareComponent, attendanceComponent)
 

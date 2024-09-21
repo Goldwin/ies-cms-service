@@ -36,6 +36,10 @@ func main() {
 		})
 	})
 
+	r.GET("/robots.txt", func(c *gin.Context) {
+		c.String(http.StatusOK, "User-agent: *\nDisallow: /")
+	})
+
 	authComponent.Start()
 	controller.InitializeAuthController(r, authComponent, eventBus, authOutputComponent, middlewareComponent)
 
