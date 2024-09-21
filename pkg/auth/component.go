@@ -9,6 +9,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/utils"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 )
 
@@ -22,7 +23,8 @@ type AuthComponent interface {
 	CompleteRegistration(ctx context.Context, input dto.CompleteRegistrationInput, output out.Output[dto.AuthData])
 	Auth(ctx context.Context, input dto.AuthInput, output out.Output[dto.AuthData])
 	ResetPassword(ctx context.Context, input dto.PasswordResetInput, output out.Output[dto.PasswordResult])
-	GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetCodeResult])
+	GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetCodeResult]) out.Waitable
+	GrantAdminRole(ctx context.Context, email string, output out.Output[dto.AuthData]) out.Waitable
 	common.Component
 }
 
@@ -31,24 +33,18 @@ type authComponentImpl struct {
 	secretKey []byte
 }
 
-// GenerateResetToken implements AuthComponent.
-func (a *authComponentImpl) GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetCodeResult]) {
-	var res CommandExecutionResult[dto.PasswordResetCodeResult]
-	a.worker.Execute(context.Background(), func(ctx commands.CommandContext) error {
-		res = commands.GenerateResetTokenCommand{
-			Email: email,
-		}.Execute(ctx)
-		if res.Status != ExecutionStatusSuccess {
-			return res.Error
-		}
-		return nil
-	})
+// GrantAdminRole implements AuthComponent.
+func (a *authComponentImpl) GrantAdminRole(ctx context.Context, email string, output out.Output[dto.AuthData]) out.Waitable {
+	return utils.SingleCommandExecution(a.worker, commands.GrantAdminRoleCommand{
+		Email: email,
+	}).WithOutput(output).Execute(ctx)
+}
 
-	if res.Status == ExecutionStatusSuccess {
-		output.OnSuccess(res.Result)
-	} else {
-		output.OnError(out.ConvertCommandErrorDetail(res.Error))
-	}
+// GenerateResetToken implements AuthComponent.
+func (a *authComponentImpl) GenerateResetToken(ctx context.Context, email string, output out.Output[dto.PasswordResetCodeResult]) out.Waitable {
+	return utils.SingleCommandExecution(a.worker, commands.GenerateResetTokenCommand{
+		Email: email,
+	}).WithOutput(output).Execute(ctx)
 }
 
 // ResetPassword implements AuthComponent.

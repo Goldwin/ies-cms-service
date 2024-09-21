@@ -22,7 +22,7 @@ type searchPersonImpl struct {
 func (s *searchPersonImpl) Execute(query queries.SearchPersonQuery) (queries.SearchPersonResult, QueryErrorDetail) {
 	opts := options.Find().SetSort(bson.D{{Key: "_id", Value: 1}}).SetLimit(int64(query.Limit))
 	regexOp := "$regex"
-	cursor, err := s.db.Collection("person").Find(s.ctx,
+	cursor, err := s.db.Collection(personCollectionName).Find(s.ctx,
 		bson.M{
 			"_id": bson.M{"$gt": query.LastID},
 			"$or": []interface{}{

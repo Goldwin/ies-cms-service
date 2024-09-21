@@ -165,7 +165,7 @@ func (a *cmsController) forgotPassword(ctx *gin.Context) {
 		successFunc: func(token dto.PasswordResetCodeResult) {
 			ctx.JSON(204, gin.H{})
 		},
-	})
+	}).Wait() //wait for the task to complete, otherwise Gin will close the connection before the task is done
 }
 
 func (a *cmsController) UpdateProfile(ctx *gin.Context) {

@@ -6,8 +6,8 @@ import (
 )
 
 type SearchPersonQuery struct {
-	LastID     string `json:"last_id"`
-	NamePrefix string `json:"name_prefix"`
+	LastID     string `json:"lastId"`
+	NamePrefix string `json:"namePrefix"`
 	Limit      int    `json:"limit"`
 }
 

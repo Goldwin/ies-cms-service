@@ -100,6 +100,6 @@ func NewPersonRepository(ctx context.Context, db *mongo.Database) repositories.P
 	return &personRepositoryImpl{
 		ctx:        ctx,
 		db:         db,
-		collection: db.Collection("person"),
+		collection: db.Collection(personCollectionName),
 	}
 }

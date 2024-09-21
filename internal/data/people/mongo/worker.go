@@ -17,7 +17,6 @@ type unitOfWorkImpl struct {
 
 type queryWorkerImpl struct {
 	mongoDatabase  *mongo.Database
-	dbName         string
 	useTransaction bool
 }
 

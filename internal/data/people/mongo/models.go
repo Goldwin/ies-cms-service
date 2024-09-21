@@ -7,6 +7,12 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
 )
 
+const (
+	personHouseholdCollectionName = "person_households"
+	personCollectionName      = "persons"
+	householdCollectionName   = "households"
+)
+
 type Person struct {
 	ID                string  `bson:"_id"`
 	FirstName         string  `bson:"firstName"`

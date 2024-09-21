@@ -11,21 +11,21 @@ type Address struct {
 	Line2      string `json:"line2"`
 	City       string `json:"city"`
 	Province   string `json:"province"`
-	PostalCode string `json:"postal_code"`
+	PostalCode string `json:"postalCode"`
 }
 
 type YearMonthDay string
 
 type Person struct {
 	ID                string        `json:"id"`
-	FirstName         string        `json:"first_name"`
-	MiddleName        string        `json:"middle_name"`
-	LastName          string        `json:"last_name"`
-	ProfilePictureUrl string        `json:"profile_picture_url"`
+	FirstName         string        `json:"firstName"`
+	MiddleName        string        `json:"middleName"`
+	LastName          string        `json:"lastName"`
+	ProfilePictureUrl string        `json:"profilePictureUrl"`
 	Address           string        `json:"address"`
-	PhoneNumber       string        `json:"phone_number"`
-	EmailAddress      string        `json:"email_address"`
-	MaritalStatus     string        `json:"marital_status"`
+	PhoneNumber       string        `json:"phoneNumber"`
+	EmailAddress      string        `json:"emailAddress"`
+	MaritalStatus     string        `json:"maritalStatus"`
 	Birthday          *YearMonthDay `json:"birthday"`
 	Gender            string        `json:"gender"`
 }
