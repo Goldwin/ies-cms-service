@@ -9,9 +9,9 @@ import (
 
 const (
 	OTPCollection               = "otp"
-	AccountCollection           = "account"
-	PasswordCollection          = "password"
-	ResetPasswordCodeCollection = "reset_password_code"
+	AccountCollection           = "accounts"
+	PasswordCollection          = "passwords"
+	ResetPasswordCodeCollection = "reset_password_codes"
 )
 
 type PasswordResetCodeModel struct {
