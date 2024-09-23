@@ -34,3 +34,25 @@ func toPasswordResetCodeModel(e *entities.PasswordResetCode) PasswordResetCodeMo
 		ExpiryAt: e.ExpiryAt,
 	}
 }
+
+type PasswordModel struct {
+	EmailAddress string `bson:"_id"`
+	Salt         []byte `bson:"salt"`
+	PasswordHash []byte `bson:"passwordHash"`
+}
+
+func (m *PasswordModel) toEntity() *entities.PasswordDetail {
+	return &entities.PasswordDetail{
+		EmailAddress: entities.EmailAddress(m.EmailAddress),
+		Salt:         m.Salt,
+		PasswordHash: m.PasswordHash,
+	}
+}
+
+func fromPasswordDetailEntity(e *entities.PasswordDetail) PasswordModel {
+	return PasswordModel{
+		EmailAddress: string(e.EmailAddress),
+		Salt:         e.Salt,
+		PasswordHash: e.PasswordHash,
+	}
+}
