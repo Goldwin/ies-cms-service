@@ -27,15 +27,15 @@ func InitializePeopleManagementController(
 	}
 	personIdUrl := "person/:id"
 	rg := r.Group("people")
-	rg.POST("person", c.addPersonInfo)
-	rg.PUT(personIdUrl, c.updatePersonInfo)
-	rg.DELETE(personIdUrl, c.deletePersonInfo)
-	rg.GET(personIdUrl, c.viewPerson)
-	rg.GET("person/:id/household", c.viewPersonHousehold)
-	rg.POST("search", c.searchPerson)
-	rg.POST("household", c.addHousehold)
-	rg.PUT("household/:id", c.updateHousehold)
-	rg.DELETE("household/:id", c.deleteHousehold)
+	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
+	rg.PUT(personIdUrl, middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
+	rg.DELETE(personIdUrl, middlewareComponent.Auth("PERSON_DELETE"), c.deletePersonInfo)
+	rg.GET(personIdUrl, middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
+	rg.GET("person/:id/household", middlewareComponent.Auth("PERSON_VIEW"), c.viewPersonHousehold)
+	rg.POST("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
+	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
+	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
+	rg.DELETE("household/:id", middlewareComponent.Auth("HOUSEHOLD_DELETE"), c.deleteHousehold)
 }
 
 func (c *peopleManagementController) addPersonInfo(ctx *gin.Context) {
