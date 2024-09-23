@@ -67,7 +67,7 @@ func (o *otpRepositoryImpl) Save(otp *entities.Otp) (*entities.Otp, error) {
 		return nil, err
 	}
 	key := getOtpKey(string(otp.EmailAddress))
-	ttl := otp.ExpiredTime.Sub(time.Now())
+	ttl := otp.ExpiresAt.Sub(time.Now())
 	_, err = o.txPipeline.Set(o.ctx, key, string(bytes), ttl).Result()
 	return otp, err
 }

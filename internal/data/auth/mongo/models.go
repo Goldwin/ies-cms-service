@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
+	"github.com/samber/lo"
 )
 
 const (
@@ -14,24 +15,24 @@ const (
 )
 
 type PasswordResetCodeModel struct {
-	Email    string    `bson:"_id"`
-	Code     string    `bson:"code"`
-	ExpiryAt time.Time `bson:"expiryAt"`
+	Email     string    `bson:"_id"`
+	Code      string    `bson:"code"`
+	ExpiresAt time.Time `bson:"expiryAt"`
 }
 
 func (m *PasswordResetCodeModel) toEntity() *entities.PasswordResetCode {
 	return &entities.PasswordResetCode{
-		Email:    m.Email,
-		Code:     m.Code,
-		ExpiryAt: m.ExpiryAt,
+		Email:     m.Email,
+		Code:      m.Code,
+		ExpiresAt: m.ExpiresAt,
 	}
 }
 
 func toPasswordResetCodeModel(e *entities.PasswordResetCode) PasswordResetCodeModel {
 	return PasswordResetCodeModel{
-		Email:    e.Email,
-		Code:     e.Code,
-		ExpiryAt: e.ExpiryAt,
+		Email:     e.Email,
+		Code:      e.Code,
+		ExpiresAt: e.ExpiresAt,
 	}
 }
 
@@ -61,15 +62,15 @@ type OTPModel struct {
 	EmailAddress string `bson:"_id"`
 	PasswordHash []byte `bson:"passwordHash"`
 	Salt         []byte `bson:"salt"`
-	ExpiredTime  time.Time
+	ExpiresAt    time.Time
 }
 
-func fromOtpEntity(e *entities.Otp) OTPModel{
+func fromOtpEntity(e *entities.Otp) OTPModel {
 	return OTPModel{
 		EmailAddress: string(e.EmailAddress),
 		PasswordHash: e.PasswordHash,
 		Salt:         e.Salt,
-		ExpiredTime:  e.ExpiredTime,
+		ExpiresAt:    e.ExpiresAt,
 	}
 }
 
@@ -78,7 +79,50 @@ func (m *OTPModel) toEntity() *entities.Otp {
 		EmailAddress: entities.EmailAddress(m.EmailAddress),
 		PasswordHash: m.PasswordHash,
 		Salt:         m.Salt,
-		ExpiredTime:  m.ExpiredTime,
+		ExpiresAt:    m.ExpiresAt,
 	}
 }
 
+type AccountModel struct {
+	Email string      `bson:"_id"`
+	Roles []RoleModel `bson:"roles"`
+}
+
+func (m *AccountModel) toEntity() *entities.Account {
+	return &entities.Account{
+		Email: entities.EmailAddress(m.Email),
+		Roles: []entities.Role{},
+	}
+}
+
+func fromAccountEntity(e *entities.Account) AccountModel {
+	return AccountModel{
+		Email: string(e.Email),
+	}
+}
+
+type RoleModel struct {
+	ID     string   `bson:"_id"`
+	Name   string   `bson:"name"`
+	Scopes []string `bson:"scopes"`
+}
+
+func fromRoleEntity(e *entities.Role) RoleModel {
+	return RoleModel{
+		ID:   e.ID,
+		Name: e.Name,
+		Scopes: lo.Map(e.Scopes, func(scope entities.Scope, _ int) string {
+			return string(scope)
+		}),
+	}
+}
+
+func (m *RoleModel) toEntity() *entities.Role {
+	return &entities.Role{
+		ID:   m.ID,
+		Name: m.Name,
+		Scopes: lo.Map(m.Scopes, func(scope string, _ int) entities.Scope {
+			return entities.Scope(scope)
+		}),
+	}
+}

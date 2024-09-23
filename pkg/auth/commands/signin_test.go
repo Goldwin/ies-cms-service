@@ -257,7 +257,7 @@ func (t *SignInCommandTest) TestExecuteWithPasswordLoginThenFailed() {
 	email := "p6bqK@example.com"
 	password := []byte("password")
 
-	t.passwordRepository.EXPECT().Get(mock.AnythingOfType("entities.EmailAddress")).Return(
+	t.passwordRepository.EXPECT().Get(mock.Anything).Return(
 		nil,
 		errors.New("Failed to Retrieve stored password"),
 	)

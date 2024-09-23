@@ -45,7 +45,7 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 		}
 	}
 
-	if code.ExpiryAt.Before(time.Now()) {
+	if code.ExpiresAt.Before(time.Now()) {
 		defer ctx.PasswordResetCodeRepository().Delete(code)
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,

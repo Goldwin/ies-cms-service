@@ -117,7 +117,7 @@ func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpFailedOtpExistsFailed() {
 		EmailAddress: "",
 		PasswordHash: []byte{},
 		Salt:         []byte{},
-		ExpiredTime:  time.Now().Add(time.Minute),
+		ExpiresAt:    time.Now().Add(time.Minute),
 	}, nil)
 	result := commands.GenerateOtpCommand{
 		Email:     "p6bqK@example.com",

@@ -137,7 +137,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	if otp.ExpiredTime.Before(time.Now()) {
+	if otp.ExpiresAt.Before(time.Now()) {
 		return CommandExecutionResult[*entities.Account]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{

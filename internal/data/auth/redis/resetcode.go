@@ -58,7 +58,7 @@ func (p *passwordResetCodeRepositoryImpl) Save(e *entities.PasswordResetCode) (*
 	if err != nil {
 		return nil, err
 	}
-	return e, p.txPipeline.Set(p.ctx, getPasswordKey(entities.EmailAddress(e.Email)), string(bytes), e.ExpiryAt.Sub(time.Now())).Err()
+	return e, p.txPipeline.Set(p.ctx, getPasswordKey(entities.EmailAddress(e.Email)), string(bytes), e.ExpiresAt.Sub(time.Now())).Err()
 }
 
 func NewPasswordResetCodeRepository(ctx context.Context, redisClient redis.UniversalClient, txPipeline redis.Pipeliner) repositories.PasswordResetCodeRepository {
