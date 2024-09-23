@@ -7,6 +7,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type passwordResetCodeRepositoryImpl struct {
@@ -60,7 +61,7 @@ func (p *passwordResetCodeRepositoryImpl) List(emails []string) ([]*entities.Pas
 func (p *passwordResetCodeRepositoryImpl) Save(e *entities.PasswordResetCode) (*entities.PasswordResetCode, error) {
 	model := toPasswordResetCodeModel(e)
 
-	_, err := p.collection.UpdateOne(p.ctx, bson.M{"_id": e.Email}, bson.M{"$set": model})
+	_, err := p.collection.UpdateByID(p.ctx, e.Email, bson.M{"$set": model}, options.Update().SetUpsert(true))
 	if err != nil {
 		return nil, err
 	}

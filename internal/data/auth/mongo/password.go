@@ -7,6 +7,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type PasswordRepositoryImpl struct {
@@ -62,7 +63,7 @@ func (p *PasswordRepositoryImpl) Save(e *entities.PasswordDetail) (*entities.Pas
 	var model PasswordModel
 
 	model = fromPasswordDetailEntity(e)
-	_, err := p.collection.UpdateOne(p.ctx, bson.M{"_id": e.EmailAddress}, bson.M{"$set": model})
+	_, err := p.collection.UpdateByID(p.ctx, e.EmailAddress, bson.M{"$set": model}, options.Update().SetUpsert(true))
 	if err != nil {
 		return nil, err
 	}

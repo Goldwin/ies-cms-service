@@ -56,3 +56,29 @@ func fromPasswordDetailEntity(e *entities.PasswordDetail) PasswordModel {
 		PasswordHash: e.PasswordHash,
 	}
 }
+
+type OTPModel struct {
+	EmailAddress string `bson:"_id"`
+	PasswordHash []byte `bson:"passwordHash"`
+	Salt         []byte `bson:"salt"`
+	ExpiredTime  time.Time
+}
+
+func fromOtpEntity(e *entities.Otp) OTPModel{
+	return OTPModel{
+		EmailAddress: string(e.EmailAddress),
+		PasswordHash: e.PasswordHash,
+		Salt:         e.Salt,
+		ExpiredTime:  e.ExpiredTime,
+	}
+}
+
+func (m *OTPModel) toEntity() *entities.Otp {
+	return &entities.Otp{
+		EmailAddress: entities.EmailAddress(m.EmailAddress),
+		PasswordHash: m.PasswordHash,
+		Salt:         m.Salt,
+		ExpiredTime:  m.ExpiredTime,
+	}
+}
+
