@@ -39,7 +39,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 	if account == nil {
 		_, err = ctx.AccountRepository().Save(&entities.Account{
 			Email: entities.EmailAddress(cmd.Email),
-			Roles: []entities.Role{},
+			Roles: []*entities.Role{},
 		})
 
 		if err != nil {

@@ -13,7 +13,7 @@ type Person struct {
 
 type Account struct {
 	Email EmailAddress
-	Roles []Role
+	Roles []*Role
 }
 
 func (e EmailAddress) IsValid() bool {

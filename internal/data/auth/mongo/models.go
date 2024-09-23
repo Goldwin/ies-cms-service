@@ -91,13 +91,18 @@ type AccountModel struct {
 func (m *AccountModel) toEntity() *entities.Account {
 	return &entities.Account{
 		Email: entities.EmailAddress(m.Email),
-		Roles: []entities.Role{},
+		Roles: lo.Map(m.Roles, func(role RoleModel, _ int) *entities.Role {
+			return role.toEntity()
+		}),
 	}
 }
 
 func fromAccountEntity(e *entities.Account) AccountModel {
 	return AccountModel{
 		Email: string(e.Email),
+		Roles: lo.Map(e.Roles, func(role *entities.Role, _ int) RoleModel {
+			return fromRoleEntity(role)
+		}),
 	}
 }
 

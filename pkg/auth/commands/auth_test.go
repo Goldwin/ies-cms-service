@@ -102,7 +102,7 @@ func (t *AuthCommandTest) TestExecuteAccountExistsSuccess() {
 	t.accountRepository.EXPECT().Get(mock.Anything).Return(
 		&entities.Account{
 			Email: "example@email.com",
-			Roles: []entities.Role{
+			Roles: []*entities.Role{
 				{
 					Name: "Member",
 					Scopes: []entities.Scope{

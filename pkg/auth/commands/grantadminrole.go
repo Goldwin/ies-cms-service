@@ -40,7 +40,7 @@ func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) CommandExecutionRes
 		}
 	}
 
-	account.Roles = []entities.Role{entities.Admin}
+	account.Roles = []*entities.Role{&entities.Admin}
 	_, err = ctx.AccountRepository().Save(account)
 
 	if err != nil {

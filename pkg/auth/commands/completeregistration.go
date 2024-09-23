@@ -69,8 +69,8 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	account.Roles = []entities.Role{
-		entities.ChurchMember,
+	account.Roles = []*entities.Role{
+		&entities.ChurchMember,
 	}
 
 	account, err = ctx.AccountRepository().Save(account)
