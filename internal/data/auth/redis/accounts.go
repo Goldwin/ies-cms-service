@@ -38,8 +38,17 @@ func (a *accountRepositoryImpl) Get(email string) (*entities.Account, error) {
 }
 
 // List implements repositories.AccountRepository.
-func (a *accountRepositoryImpl) List([]string) ([]*entities.Account, error) {
-	panic("unimplemented")
+func (a *accountRepositoryImpl) List(emails []string) ([]*entities.Account, error) {
+	var result []*entities.Account
+
+	for _, email := range emails {
+		account, err := a.Get(email)
+		if err != nil {
+			return nil, fmt.Errorf("account %s not found", email)
+		}
+		result = append(result, account)
+	}
+	return result, nil
 }
 
 // Save implements repositories.AccountRepository.

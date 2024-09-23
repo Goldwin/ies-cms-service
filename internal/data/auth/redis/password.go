@@ -17,23 +17,41 @@ type PasswordRepositoryImpl struct {
 	txPipeline redis.Pipeliner
 }
 
+// Delete implements repositories.PasswordRepository.
+func (p *PasswordRepositoryImpl) Delete(e *entities.PasswordDetail) error {
+	return p.client.Del(p.ctx, getPasswordKey(e.EmailAddress)).Err()
+}
+
+// List implements repositories.PasswordRepository.
+func (p *PasswordRepositoryImpl) List(emails []string) ([]*entities.PasswordDetail, error) {
+	var result []*entities.PasswordDetail
+	for _, email := range emails {
+		password, err := p.Get(email)
+		if err != nil {
+			return nil, fmt.Errorf("password for email %s not found", email)
+		}
+		result = append(result, password)
+	}
+	return result, nil
+}
+
 // DeleteResetToken implements repositories.PasswordRepository.
 func (p *PasswordRepositoryImpl) DeleteResetToken(e entities.EmailAddress) error {
 	return p.client.Del(p.ctx, getPasswordResetCodeKey(e)).Err()
 }
 
 // Save implements repositories.PasswordRepository.
-func (p *PasswordRepositoryImpl) Save(e entities.PasswordDetail) error {
+func (p *PasswordRepositoryImpl) Save(e *entities.PasswordDetail) (*entities.PasswordDetail, error) {
 	bytes, err := msgpack.Marshal(e)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return p.txPipeline.Set(p.ctx, getPasswordKey(e.EmailAddress), string(bytes), 0).Err()
+	return e, p.txPipeline.Set(p.ctx, getPasswordKey(e.EmailAddress), string(bytes), 0).Err()
 }
 
 // Get implements repositories.PasswordRepository.
-func (p *PasswordRepositoryImpl) Get(e entities.EmailAddress) (*entities.PasswordDetail, error) {
-	val, err := p.client.Get(p.ctx, getPasswordKey(e)).Bytes()
+func (p *PasswordRepositoryImpl) Get(e string) (*entities.PasswordDetail, error) {
+	val, err := p.client.Get(p.ctx, getPasswordKey(entities.EmailAddress(e))).Bytes()
 	if err != nil && err != redis.Nil {
 		return nil, err
 	}

@@ -74,7 +74,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 	passwordHash := sha256.Sum256(passwordAndSalt)
 	password.PasswordHash = passwordHash[:]
 
-	err = ctx.PasswordRepository().Save(password)
+	_, err = ctx.PasswordRepository().Save(&password)
 	if err != nil {
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
