@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
@@ -9,8 +10,9 @@ import (
 )
 
 const (
-	ResetPasswordErrorInvalidInput          CommandErrorCode = 20401
-	ResetPasswordErrorFailedToVerifyAccount CommandErrorCode = 20402
+	ResetPasswordErrorInvalidInput          CommandErrorCode = 20403
+	ResetPasswordErrorFailedToVerifyAccount CommandErrorCode = 20404
+	ResetPasswordErrorTokenExpired          CommandErrorCode = 20405
 )
 
 type ResetPasswordCommand struct {
@@ -19,7 +21,7 @@ type ResetPasswordCommand struct {
 
 func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
-	token, err := ctx.PasswordRepository().GetResetCode(entities.EmailAddress(cmd.Input.Email))
+	code, err := ctx.PasswordResetCodeRepository().Get(cmd.Input.Email)
 
 	if err != nil {
 		return CommandExecutionResult[dto.PasswordResult]{
@@ -31,12 +33,24 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 		}
 	}
 
+	token := code.Code
+
 	if token != cmd.Input.Code {
 		return CommandExecutionResult[dto.PasswordResult]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
 				Code:    SavePasswordErrorInvalidInput,
 				Message: fmt.Sprintf("Reset Token Mismatched"),
+			},
+		}
+	}
+
+	if code.ExpiryAt.Before(time.Now()) {
+		return CommandExecutionResult[dto.PasswordResult]{
+			Status: ExecutionStatusFailed,
+			Error: CommandErrorDetail{
+				Code:    SavePasswordErrorInvalidInput,
+				Message: fmt.Sprintf("Reset Token Expired"),
 			},
 		}
 	}
@@ -52,7 +66,7 @@ func (cmd ResetPasswordCommand) Execute(ctx CommandContext) CommandExecutionResu
 		return result
 	}
 
-	err = ctx.PasswordRepository().DeleteResetToken(entities.EmailAddress(cmd.Input.Email))
+	err = ctx.PasswordResetCodeRepository().Delete(code)
 
 	return result
 }
