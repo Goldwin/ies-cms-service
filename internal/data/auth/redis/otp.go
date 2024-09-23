@@ -72,41 +72,6 @@ func (o *otpRepositoryImpl) Save(otp *entities.Otp) (*entities.Otp, error) {
 	return otp, err
 }
 
-// AddOtp implements repositories.OtpRepository.
-func (o *otpRepositoryImpl) AddOtp(otp entities.Otp) error {
-	bytes, err := msgpack.Marshal(otp)
-	if err != nil {
-		return err
-	}
-	key := getOtpKey(string(otp.EmailAddress))
-	ttl := otp.ExpiredTime.Sub(time.Now())
-	res, err := o.txPipeline.Set(o.ctx, key, string(bytes), ttl).Result()
-	fmt.Printf("key: %s, ttl: %s, res: %s\n", key, ttl, res)
-	return err
-}
-
-// GetOtp implements repositories.OtpRepository.
-func (o *otpRepositoryImpl) GetOtp(email entities.EmailAddress) (*entities.Otp, error) {
-	val, err := o.client.Get(o.ctx, getOtpKey(string(email))).Bytes()
-	if err != nil && err != redis.Nil {
-		return nil, err
-	}
-	otp := entities.Otp{}
-	if len(val) == 0 {
-		return nil, nil
-	}
-	err = msgpack.Unmarshal(val, &otp)
-	if err != nil {
-		return nil, err
-	}
-	return &otp, nil
-}
-
-// RemoveOtp implements repositories.OtpRepository.
-func (o *otpRepositoryImpl) RemoveOtp(otp entities.Otp) error {
-	return o.txPipeline.Del(o.ctx, getOtpKey(string(otp.EmailAddress))).Err()
-}
-
 func NewOtpRepository(ctx context.Context, client redis.UniversalClient, txPipeline redis.Pipeliner) repositories.OtpRepository {
 	return &otpRepositoryImpl{
 		ctx:        ctx,

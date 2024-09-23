@@ -84,7 +84,7 @@ func (cmd SigninCommand) passwordLogin(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
+	account, err := ctx.AccountRepository().Get(cmd.Email)
 
 	if err != nil {
 		return CommandExecutionResult[dto.SignInResult]{

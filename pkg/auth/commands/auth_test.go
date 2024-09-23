@@ -27,8 +27,8 @@ func (t *AuthCommandTest) SetupTest() {
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)
 }
 
-func (t *AuthCommandTest) TestExecute_InvalidToken_Failed() {
-	secretKey := []byte("secret-key")
+func (t *AuthCommandTest) TestExecuteInvalidTokenFailed() {
+	secretKey := []byte("secret-key3")
 	result := commands.AuthCommand{
 		Token:     "token",
 		SecretKey: secretKey,
@@ -37,8 +37,8 @@ func (t *AuthCommandTest) TestExecute_InvalidToken_Failed() {
 	assert.Equal(t.T(), commands.AuthErrorInvalidToken, result.Error.Code)
 }
 
-func (t *AuthCommandTest) TestExecute_MalformedToken_Failed() {
-	secretKey := []byte("secret-key")
+func (t *AuthCommandTest) TestExecuteMalformedTokenFailed() {
+	secretKey := []byte("secret-key4")
 	token := createInvalidToken(secretKey)
 	result := commands.AuthCommand{
 		Token:     token,
@@ -48,8 +48,8 @@ func (t *AuthCommandTest) TestExecute_MalformedToken_Failed() {
 	assert.Equal(t.T(), commands.AuthErrorInvalidToken, result.Error.Code)
 }
 
-func (t *AuthCommandTest) TestExecute_InvalidEmail_Failed() {
-	secretKey := []byte("secret-key")
+func (t *AuthCommandTest) TestExecuteInvalidEmailFailed() {
+	secretKey := []byte("secret-key1")
 	token := createValidToken("invalid@@email.com", secretKey)
 	result := commands.AuthCommand{
 		Token:     token,
@@ -59,10 +59,10 @@ func (t *AuthCommandTest) TestExecute_InvalidEmail_Failed() {
 	assert.Equal(t.T(), commands.AuthErrorInvalidToken, result.Error.Code)
 }
 
-func (t *AuthCommandTest) TestExecute_WrongKey_Failed() {
-	secretKey := []byte("secret-key")
+func (t *AuthCommandTest) TestExecuteWrongKeyFailed() {
+	secretKey := []byte("secret-key2")
 	temperedKey := []byte("tempered-key")
-	token := createValidToken("example@email.com", temperedKey)
+	token := createValidToken("example1@email.com", temperedKey)
 	result := commands.AuthCommand{
 		Token:     token,
 		SecretKey: secretKey,
@@ -71,10 +71,10 @@ func (t *AuthCommandTest) TestExecute_WrongKey_Failed() {
 	assert.Equal(t.T(), commands.AuthErrorInvalidToken, result.Error.Code)
 }
 
-func (t *AuthCommandTest) TestExecute_FailedToRetrieveAccountInfo_Failed() {
-	secretKey := []byte("secret-key")
-	token := createValidToken("example@email.com", secretKey)
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(nil, errors.New("Failed to Fetch Account"))
+func (t *AuthCommandTest) TestExecuteFailedToRetrieveAccountInfoFailed() {
+	secretKey := []byte("secret-key3")
+	token := createValidToken("example2@email.com", secretKey)
+	t.accountRepository.EXPECT().Get(mock.Anything).Return(nil, errors.New("Failed to Fetch Account"))
 	result := commands.AuthCommand{
 		Token:     token,
 		SecretKey: secretKey,
@@ -83,10 +83,10 @@ func (t *AuthCommandTest) TestExecute_FailedToRetrieveAccountInfo_Failed() {
 	assert.Equal(t.T(), commands.AuthErrorFailedToRetrieveAccount, result.Error.Code)
 }
 
-func (t *AuthCommandTest) TestExecute_AccountNotExists_Failed() {
+func (t *AuthCommandTest) TestExecuteAccountNotExistsFailed() {
 	secretKey := []byte("secret-key")
-	token := createValidToken("example@email.com", secretKey)
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
+	token := createValidToken("example5@email.com", secretKey)
+	t.accountRepository.EXPECT().Get(mock.Anything).Return(nil, nil)
 	result := commands.AuthCommand{
 		Token:     token,
 		SecretKey: secretKey,
@@ -95,10 +95,10 @@ func (t *AuthCommandTest) TestExecute_AccountNotExists_Failed() {
 	assert.Equal(t.T(), commands.AuthErrorAccountDoesNotExist, result.Error.Code)
 }
 
-func (t *AuthCommandTest) TestExecute_AccountExists_Success() {
+func (t *AuthCommandTest) TestExecuteAccountExistsSuccess() {
 	secretKey := []byte("secret-key")
 	token := createValidToken("example@email.com", secretKey)
-	t.accountRepository.EXPECT().GetAccount(mock.AnythingOfType("entities.EmailAddress")).Return(
+	t.accountRepository.EXPECT().Get(mock.Anything).Return(
 		&entities.Account{
 			Email: "example@email.com",
 			Roles: []entities.Role{

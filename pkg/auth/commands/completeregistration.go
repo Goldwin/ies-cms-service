@@ -33,7 +33,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Input.Email))
+	account, err := ctx.AccountRepository().Get(cmd.Input.Email)
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
@@ -73,7 +73,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		entities.ChurchMember,
 	}
 
-	account, err = ctx.AccountRepository().UpdateAccount(*account)
+	account, err = ctx.AccountRepository().Save(account)
 
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{
@@ -175,7 +175,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 
 	err = otpRepository.Delete(otp)
 
-	account, err := accountRepository.GetAccount(entities.EmailAddress(cmd.Input.Email))
+	account, err := accountRepository.Get(cmd.Input.Email)
 
 	if err != nil {
 		return CommandExecutionResult[*entities.Account]{
@@ -188,7 +188,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 	}
 
 	if account == nil {
-		account, err = accountRepository.AddAccount(entities.Account{Email: entities.EmailAddress(cmd.Input.Email)})
+		account, err = accountRepository.Save(&entities.Account{Email: entities.EmailAddress(cmd.Input.Email)})
 		if err != nil {
 			return CommandExecutionResult[*entities.Account]{
 				Status: ExecutionStatusFailed,

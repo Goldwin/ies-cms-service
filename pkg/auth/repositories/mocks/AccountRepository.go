@@ -20,78 +20,66 @@ func (_m *AccountRepository) EXPECT() *AccountRepository_Expecter {
 	return &AccountRepository_Expecter{mock: &_m.Mock}
 }
 
-// AddAccount provides a mock function with given fields: _a0
-func (_m *AccountRepository) AddAccount(_a0 entities.Account) (*entities.Account, error) {
+// Delete provides a mock function with given fields: _a0
+func (_m *AccountRepository) Delete(_a0 *entities.Account) error {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AddAccount")
+		panic("no return value specified for Delete")
 	}
 
-	var r0 *entities.Account
-	var r1 error
-	if rf, ok := ret.Get(0).(func(entities.Account) (*entities.Account, error)); ok {
-		return rf(_a0)
-	}
-	if rf, ok := ret.Get(0).(func(entities.Account) *entities.Account); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*entities.Account) error); ok {
 		r0 = rf(_a0)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Account)
-		}
+		r0 = ret.Error(0)
 	}
 
-	if rf, ok := ret.Get(1).(func(entities.Account) error); ok {
-		r1 = rf(_a0)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
-// AccountRepository_AddAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddAccount'
-type AccountRepository_AddAccount_Call struct {
+// AccountRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type AccountRepository_Delete_Call struct {
 	*mock.Call
 }
 
-// AddAccount is a helper method to define mock.On call
-//   - _a0 entities.Account
-func (_e *AccountRepository_Expecter) AddAccount(_a0 interface{}) *AccountRepository_AddAccount_Call {
-	return &AccountRepository_AddAccount_Call{Call: _e.mock.On("AddAccount", _a0)}
+// Delete is a helper method to define mock.On call
+//   - _a0 *entities.Account
+func (_e *AccountRepository_Expecter) Delete(_a0 interface{}) *AccountRepository_Delete_Call {
+	return &AccountRepository_Delete_Call{Call: _e.mock.On("Delete", _a0)}
 }
 
-func (_c *AccountRepository_AddAccount_Call) Run(run func(_a0 entities.Account)) *AccountRepository_AddAccount_Call {
+func (_c *AccountRepository_Delete_Call) Run(run func(_a0 *entities.Account)) *AccountRepository_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.Account))
+		run(args[0].(*entities.Account))
 	})
 	return _c
 }
 
-func (_c *AccountRepository_AddAccount_Call) Return(_a0 *entities.Account, _a1 error) *AccountRepository_AddAccount_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *AccountRepository_Delete_Call) Return(_a0 error) *AccountRepository_Delete_Call {
+	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *AccountRepository_AddAccount_Call) RunAndReturn(run func(entities.Account) (*entities.Account, error)) *AccountRepository_AddAccount_Call {
+func (_c *AccountRepository_Delete_Call) RunAndReturn(run func(*entities.Account) error) *AccountRepository_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetAccount provides a mock function with given fields: _a0
-func (_m *AccountRepository) GetAccount(_a0 entities.EmailAddress) (*entities.Account, error) {
+// Get provides a mock function with given fields: _a0
+func (_m *AccountRepository) Get(_a0 string) (*entities.Account, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetAccount")
+		panic("no return value specified for Get")
 	}
 
 	var r0 *entities.Account
 	var r1 error
-	if rf, ok := ret.Get(0).(func(entities.EmailAddress) (*entities.Account, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (*entities.Account, error)); ok {
 		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func(entities.EmailAddress) *entities.Account); ok {
+	if rf, ok := ret.Get(0).(func(string) *entities.Account); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -99,7 +87,7 @@ func (_m *AccountRepository) GetAccount(_a0 entities.EmailAddress) (*entities.Ac
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(entities.EmailAddress) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
@@ -108,56 +96,56 @@ func (_m *AccountRepository) GetAccount(_a0 entities.EmailAddress) (*entities.Ac
 	return r0, r1
 }
 
-// AccountRepository_GetAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAccount'
-type AccountRepository_GetAccount_Call struct {
+// AccountRepository_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type AccountRepository_Get_Call struct {
 	*mock.Call
 }
 
-// GetAccount is a helper method to define mock.On call
-//   - _a0 entities.EmailAddress
-func (_e *AccountRepository_Expecter) GetAccount(_a0 interface{}) *AccountRepository_GetAccount_Call {
-	return &AccountRepository_GetAccount_Call{Call: _e.mock.On("GetAccount", _a0)}
+// Get is a helper method to define mock.On call
+//   - _a0 string
+func (_e *AccountRepository_Expecter) Get(_a0 interface{}) *AccountRepository_Get_Call {
+	return &AccountRepository_Get_Call{Call: _e.mock.On("Get", _a0)}
 }
 
-func (_c *AccountRepository_GetAccount_Call) Run(run func(_a0 entities.EmailAddress)) *AccountRepository_GetAccount_Call {
+func (_c *AccountRepository_Get_Call) Run(run func(_a0 string)) *AccountRepository_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.EmailAddress))
+		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *AccountRepository_GetAccount_Call) Return(_a0 *entities.Account, _a1 error) *AccountRepository_GetAccount_Call {
+func (_c *AccountRepository_Get_Call) Return(_a0 *entities.Account, _a1 error) *AccountRepository_Get_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AccountRepository_GetAccount_Call) RunAndReturn(run func(entities.EmailAddress) (*entities.Account, error)) *AccountRepository_GetAccount_Call {
+func (_c *AccountRepository_Get_Call) RunAndReturn(run func(string) (*entities.Account, error)) *AccountRepository_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateAccount provides a mock function with given fields: _a0
-func (_m *AccountRepository) UpdateAccount(_a0 entities.Account) (*entities.Account, error) {
+// List provides a mock function with given fields: _a0
+func (_m *AccountRepository) List(_a0 []string) ([]*entities.Account, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for UpdateAccount")
+		panic("no return value specified for List")
 	}
 
-	var r0 *entities.Account
+	var r0 []*entities.Account
 	var r1 error
-	if rf, ok := ret.Get(0).(func(entities.Account) (*entities.Account, error)); ok {
+	if rf, ok := ret.Get(0).(func([]string) ([]*entities.Account, error)); ok {
 		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func(entities.Account) *entities.Account); ok {
+	if rf, ok := ret.Get(0).(func([]string) []*entities.Account); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Account)
+			r0 = ret.Get(0).([]*entities.Account)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(entities.Account) error); ok {
+	if rf, ok := ret.Get(1).(func([]string) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
@@ -166,30 +154,88 @@ func (_m *AccountRepository) UpdateAccount(_a0 entities.Account) (*entities.Acco
 	return r0, r1
 }
 
-// AccountRepository_UpdateAccount_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAccount'
-type AccountRepository_UpdateAccount_Call struct {
+// AccountRepository_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type AccountRepository_List_Call struct {
 	*mock.Call
 }
 
-// UpdateAccount is a helper method to define mock.On call
-//   - _a0 entities.Account
-func (_e *AccountRepository_Expecter) UpdateAccount(_a0 interface{}) *AccountRepository_UpdateAccount_Call {
-	return &AccountRepository_UpdateAccount_Call{Call: _e.mock.On("UpdateAccount", _a0)}
+// List is a helper method to define mock.On call
+//   - _a0 []string
+func (_e *AccountRepository_Expecter) List(_a0 interface{}) *AccountRepository_List_Call {
+	return &AccountRepository_List_Call{Call: _e.mock.On("List", _a0)}
 }
 
-func (_c *AccountRepository_UpdateAccount_Call) Run(run func(_a0 entities.Account)) *AccountRepository_UpdateAccount_Call {
+func (_c *AccountRepository_List_Call) Run(run func(_a0 []string)) *AccountRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.Account))
+		run(args[0].([]string))
 	})
 	return _c
 }
 
-func (_c *AccountRepository_UpdateAccount_Call) Return(_a0 *entities.Account, _a1 error) *AccountRepository_UpdateAccount_Call {
+func (_c *AccountRepository_List_Call) Return(_a0 []*entities.Account, _a1 error) *AccountRepository_List_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *AccountRepository_UpdateAccount_Call) RunAndReturn(run func(entities.Account) (*entities.Account, error)) *AccountRepository_UpdateAccount_Call {
+func (_c *AccountRepository_List_Call) RunAndReturn(run func([]string) ([]*entities.Account, error)) *AccountRepository_List_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Save provides a mock function with given fields: _a0
+func (_m *AccountRepository) Save(_a0 *entities.Account) (*entities.Account, error) {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Save")
+	}
+
+	var r0 *entities.Account
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*entities.Account) (*entities.Account, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(*entities.Account) *entities.Account); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.Account)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*entities.Account) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// AccountRepository_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
+type AccountRepository_Save_Call struct {
+	*mock.Call
+}
+
+// Save is a helper method to define mock.On call
+//   - _a0 *entities.Account
+func (_e *AccountRepository_Expecter) Save(_a0 interface{}) *AccountRepository_Save_Call {
+	return &AccountRepository_Save_Call{Call: _e.mock.On("Save", _a0)}
+}
+
+func (_c *AccountRepository_Save_Call) Run(run func(_a0 *entities.Account)) *AccountRepository_Save_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*entities.Account))
+	})
+	return _c
+}
+
+func (_c *AccountRepository_Save_Call) Return(_a0 *entities.Account, _a1 error) *AccountRepository_Save_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *AccountRepository_Save_Call) RunAndReturn(run func(*entities.Account) (*entities.Account, error)) *AccountRepository_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }

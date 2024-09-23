@@ -23,7 +23,7 @@ type SavePasswordCommand struct {
 
 func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.PasswordResult] {
 
-	account, err := ctx.AccountRepository().GetAccount(cmd.Email)
+	account, err := ctx.AccountRepository().Get(string(cmd.Email))
 
 	if err != nil {
 
@@ -37,7 +37,7 @@ func (cmd SavePasswordCommand) Execute(ctx CommandContext) CommandExecutionResul
 	}
 
 	if account == nil {
-		_, err = ctx.AccountRepository().AddAccount(entities.Account{
+		_, err = ctx.AccountRepository().Save(&entities.Account{
 			Email: entities.EmailAddress(cmd.Email),
 			Roles: []entities.Role{},
 		})

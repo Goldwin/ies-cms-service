@@ -124,64 +124,6 @@ func (_c *OtpRepository_Get_Call) RunAndReturn(run func(string) (*entities.Otp, 
 	return _c
 }
 
-// GetOtp provides a mock function with given fields: _a0
-func (_m *OtpRepository) GetOtp(_a0 entities.EmailAddress) (*entities.Otp, error) {
-	ret := _m.Called(_a0)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetOtp")
-	}
-
-	var r0 *entities.Otp
-	var r1 error
-	if rf, ok := ret.Get(0).(func(entities.EmailAddress) (*entities.Otp, error)); ok {
-		return rf(_a0)
-	}
-	if rf, ok := ret.Get(0).(func(entities.EmailAddress) *entities.Otp); ok {
-		r0 = rf(_a0)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Otp)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(entities.EmailAddress) error); ok {
-		r1 = rf(_a0)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// OtpRepository_GetOtp_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOtp'
-type OtpRepository_GetOtp_Call struct {
-	*mock.Call
-}
-
-// GetOtp is a helper method to define mock.On call
-//   - _a0 entities.EmailAddress
-func (_e *OtpRepository_Expecter) GetOtp(_a0 interface{}) *OtpRepository_GetOtp_Call {
-	return &OtpRepository_GetOtp_Call{Call: _e.mock.On("GetOtp", _a0)}
-}
-
-func (_c *OtpRepository_GetOtp_Call) Run(run func(_a0 entities.EmailAddress)) *OtpRepository_GetOtp_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.EmailAddress))
-	})
-	return _c
-}
-
-func (_c *OtpRepository_GetOtp_Call) Return(_a0 *entities.Otp, _a1 error) *OtpRepository_GetOtp_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *OtpRepository_GetOtp_Call) RunAndReturn(run func(entities.EmailAddress) (*entities.Otp, error)) *OtpRepository_GetOtp_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // List provides a mock function with given fields: _a0
 func (_m *OtpRepository) List(_a0 []string) ([]*entities.Otp, error) {
 	ret := _m.Called(_a0)

@@ -1,10 +1,11 @@
 //go:generate mockery --output "mocks" --all --with-expecter=true
 package repositories
 
-import "github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
+import (
+	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/repositories"
+)
 
 type AccountRepository interface {
-	AddAccount(entities.Account) (*entities.Account, error)
-	GetAccount(entities.EmailAddress) (*entities.Account, error)
-	UpdateAccount(entities.Account) (*entities.Account, error)
+	repositories.Repository[string, entities.Account]
 }
