@@ -8,6 +8,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories"
 	"github.com/redis/go-redis/v9"
+	"github.com/samber/lo"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -17,13 +18,67 @@ type otpRepositoryImpl struct {
 	client     redis.UniversalClient
 }
 
+// Delete implements repositories.OtpRepository.
+func (o *otpRepositoryImpl) Delete(otp *entities.Otp) error {
+	return o.txPipeline.Del(o.ctx, getOtpKey(string(otp.EmailAddress))).Err()
+}
+
+// Get implements repositories.OtpRepository.
+func (o *otpRepositoryImpl) Get(email string) (*entities.Otp, error) {
+	val, err := o.client.Get(o.ctx, getOtpKey(email)).Bytes()
+	if err != nil && err != redis.Nil {
+		return nil, err
+	}
+	otp := entities.Otp{}
+	if len(val) == 0 {
+		return nil, nil
+	}
+	err = msgpack.Unmarshal(val, &otp)
+	if err != nil {
+		return nil, err
+	}
+	return &otp, nil
+}
+
+// List implements repositories.OtpRepository.
+func (o *otpRepositoryImpl) List(emails []string) ([]*entities.Otp, error) {
+	var err error
+	result := lo.Map(emails, func(e string, _ int) *entities.Otp {
+		var otp entities.Otp
+		key := getOtpKey(e)
+		val, err2 := o.client.Get(o.ctx, key).Bytes()
+		if err != nil {
+			return nil
+		}
+		if err2 != nil && err2 != redis.Nil {
+			err = err2
+			return nil
+		}
+		err = msgpack.Unmarshal(val, &otp)
+		return &otp
+	})
+	return result, err
+}
+
+// Save implements repositories.OtpRepository.
+func (o *otpRepositoryImpl) Save(otp *entities.Otp) (*entities.Otp, error) {
+	bytes, err := msgpack.Marshal(otp)
+	if err != nil {
+		return nil, err
+	}
+	key := getOtpKey(string(otp.EmailAddress))
+	ttl := otp.ExpiredTime.Sub(time.Now())
+	_, err = o.txPipeline.Set(o.ctx, key, string(bytes), ttl).Result()
+	return otp, err
+}
+
 // AddOtp implements repositories.OtpRepository.
 func (o *otpRepositoryImpl) AddOtp(otp entities.Otp) error {
 	bytes, err := msgpack.Marshal(otp)
 	if err != nil {
 		return err
 	}
-	key := getOtpKey(otp.EmailAddress)
+	key := getOtpKey(string(otp.EmailAddress))
 	ttl := otp.ExpiredTime.Sub(time.Now())
 	res, err := o.txPipeline.Set(o.ctx, key, string(bytes), ttl).Result()
 	fmt.Printf("key: %s, ttl: %s, res: %s\n", key, ttl, res)
@@ -32,7 +87,7 @@ func (o *otpRepositoryImpl) AddOtp(otp entities.Otp) error {
 
 // GetOtp implements repositories.OtpRepository.
 func (o *otpRepositoryImpl) GetOtp(email entities.EmailAddress) (*entities.Otp, error) {
-	val, err := o.client.Get(o.ctx, getOtpKey(email)).Bytes()
+	val, err := o.client.Get(o.ctx, getOtpKey(string(email))).Bytes()
 	if err != nil && err != redis.Nil {
 		return nil, err
 	}
@@ -49,7 +104,7 @@ func (o *otpRepositoryImpl) GetOtp(email entities.EmailAddress) (*entities.Otp, 
 
 // RemoveOtp implements repositories.OtpRepository.
 func (o *otpRepositoryImpl) RemoveOtp(otp entities.Otp) error {
-	return o.txPipeline.Del(o.ctx, getOtpKey(otp.EmailAddress)).Err()
+	return o.txPipeline.Del(o.ctx, getOtpKey(string(otp.EmailAddress))).Err()
 }
 
 func NewOtpRepository(ctx context.Context, client redis.UniversalClient, txPipeline redis.Pipeliner) repositories.OtpRepository {
@@ -60,6 +115,6 @@ func NewOtpRepository(ctx context.Context, client redis.UniversalClient, txPipel
 	}
 }
 
-func getOtpKey(email entities.EmailAddress) string {
+func getOtpKey(email string) string {
 	return fmt.Sprintf("auth:otp:email#%s", email)
 }

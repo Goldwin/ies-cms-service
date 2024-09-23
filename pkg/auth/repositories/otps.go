@@ -1,9 +1,10 @@
 package repositories
 
-import "github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
+import (
+	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/repositories"
+)
 
 type OtpRepository interface {
-	AddOtp(entities.Otp) error
-	RemoveOtp(entities.Otp) error
-	GetOtp(entities.EmailAddress) (*entities.Otp, error)
+	repositories.Repository[string, entities.Otp]
 }

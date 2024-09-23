@@ -25,7 +25,7 @@ const (
 )
 
 func (cmd GenerateOtpCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.OtpResult] {
-	otp, _ := ctx.OtpRepository().GetOtp(entities.EmailAddress(cmd.Email))
+	otp, _ := ctx.OtpRepository().Get(cmd.Email)
 	if otp != nil {
 		expireSecond := otp.ExpiredTime.Sub(time.Now()).Seconds()
 		if expireSecond > 0 {
@@ -84,7 +84,7 @@ func (cmd GenerateOtpCommand) Execute(ctx CommandContext) CommandExecutionResult
 		}
 	}
 
-	err = ctx.OtpRepository().AddOtp(result)
+	_, err = ctx.OtpRepository().Save(&result)
 	if err != nil {
 		return CommandExecutionResult[dto.OtpResult]{
 			Status: ExecutionStatusFailed,

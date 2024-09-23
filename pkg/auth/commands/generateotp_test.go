@@ -43,15 +43,15 @@ func (t *GenerateOtpCommandTest) SetupTest() {
 	t.ctx.EXPECT().OtpRepository().Maybe().Return(t.otpRepository)
 }
 
-func (t *GenerateOtpCommandTest) TestExecute_GenerateOtp_Success() {
-	var otp entities.Otp
-	t.otpRepository.EXPECT().GetOtp(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
-	t.otpRepository.EXPECT().AddOtp(mock.AnythingOfType("entities.Otp")).RunAndReturn(func(o entities.Otp) error {
+func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpSuccess() {
+	var otp *entities.Otp
+	t.otpRepository.EXPECT().Get(mock.Anything).Return(nil, nil)
+	t.otpRepository.EXPECT().Save(mock.Anything).RunAndReturn(func(o *entities.Otp) (*entities.Otp, error) {
 		otp = o
-		return nil
+		return o, nil
 	})
 	result := commands.GenerateOtpCommand{
-		Email:     "p6bqK@example.com",
+		Email:     "p6bq1@example.com",
 		TTLMillis: 0,
 	}.Execute(t.ctx)
 
@@ -59,12 +59,11 @@ func (t *GenerateOtpCommandTest) TestExecute_GenerateOtp_Success() {
 	resultHash := sha256.Sum256(append(result.Result.OTP, otp.Salt[:]...))
 	assert.Equal(t.T(), otp.PasswordHash[:], resultHash[:])
 }
-
-func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedToStore_Failed() {
-	t.otpRepository.EXPECT().GetOtp(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
-	t.otpRepository.EXPECT().AddOtp(mock.AnythingOfType("entities.Otp")).Return(fmt.Errorf("failed to add otp"))
+func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpFailedToStoreFailed() {
+	t.otpRepository.EXPECT().Get(mock.Anything).Return(nil, nil)
+	t.otpRepository.EXPECT().Save(mock.Anything).Return(nil, fmt.Errorf("failed to add otp"))
 	result := commands.GenerateOtpCommand{
-		Email:     "p6bqK@example.com",
+		Email:     "p6bq2@example.com",
 		TTLMillis: 0,
 	}.Execute(t.ctx)
 
@@ -72,10 +71,10 @@ func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedToStore_Failed() {
 	assert.Equal(t.T(), commands.GenerateOtpErrorFailedToStoreOtp, result.Error.Code)
 }
 
-func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpInvalidEmail_Failed() {
-	t.otpRepository.EXPECT().GetOtp(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
+func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpInvalidEmailFailed() {
+	t.otpRepository.EXPECT().Get(mock.Anything).Return(nil, nil)
 	result := commands.GenerateOtpCommand{
-		Email:     "p6bqK@@example.com",
+		Email:     "p6bq3@@example.com",
 		TTLMillis: 0,
 	}.Execute(t.ctx)
 
@@ -83,12 +82,12 @@ func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpInvalidEmail_Failed() {
 	assert.Equal(t.T(), commands.GenerateOtpErrorInvalidEmail, result.Error.Code)
 }
 
-func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedToGenOtp_Failed() {
-	t.otpRepository.EXPECT().GetOtp(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
+func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpFailedToGenOtpFailed() {
+	t.otpRepository.EXPECT().Get(mock.Anything).Return(nil, nil)
 	oldReader := rand.Reader
 	rand.Reader = &ToggleRandReader{willFail: true, reader: rand.Reader}
 	result := commands.GenerateOtpCommand{
-		Email:     "p6bqK@example.com",
+		Email:     "p6bq4@example.com",
 		TTLMillis: -1,
 	}.Execute(t.ctx)
 
@@ -97,13 +96,13 @@ func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedToGenOtp_Failed() 
 	assert.Equal(t.T(), commands.GenerateOtpErrorFailedToGenOtp, result.Error.Code)
 }
 
-func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedToGenSalt_Failed() {
-	t.otpRepository.EXPECT().GetOtp(mock.AnythingOfType("entities.EmailAddress")).Return(nil, nil)
+func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpFailedToGenSaltFailed() {
+	t.otpRepository.EXPECT().Get(mock.Anything).Return(nil, nil)
 	oldReader := rand.Reader
 	newReader := &ToggleRandReader{willFail: false, reader: rand.Reader}
 	rand.Reader = newReader
 	result := commands.GenerateOtpCommand{
-		Email:     "p6bqK@example.com",
+		Email:     "p6bq5@example.com",
 		TTLMillis: -1,
 	}.Execute(t.ctx)
 
@@ -112,8 +111,8 @@ func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedToGenSalt_Failed()
 	assert.Equal(t.T(), commands.GenerateOtpErrorFailedToGenOtp, result.Error.Code)
 }
 
-func (t *GenerateOtpCommandTest) TestExecute_GenerateOtpFailedOtpExists_Failed() {
-	t.otpRepository.EXPECT().GetOtp(mock.AnythingOfType("entities.EmailAddress")).Return(&entities.Otp{
+func (t *GenerateOtpCommandTest) TestExecuteGenerateOtpFailedOtpExistsFailed() {
+	t.otpRepository.EXPECT().Get(mock.Anything).Return(&entities.Otp{
 		EmailAddress: "",
 		PasswordHash: []byte{},
 		Salt:         []byte{},

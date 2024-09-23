@@ -117,7 +117,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandContext) CommandExecutionResult[*entities.Account] {
 	otpRepository := ctx.OtpRepository()
 	accountRepository := ctx.AccountRepository()
-	otp, err := otpRepository.GetOtp(entities.EmailAddress(cmd.Input.Email))
+	otp, err := otpRepository.Get(cmd.Input.Email)
 	if err != nil {
 		return CommandExecutionResult[*entities.Account]{
 			Status: ExecutionStatusFailed,
@@ -162,7 +162,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	err = otpRepository.RemoveOtp(*otp)
+	err = otpRepository.Delete(otp)
 	if err != nil {
 		return CommandExecutionResult[*entities.Account]{
 			Status: ExecutionStatusFailed,
@@ -173,7 +173,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	err = otpRepository.RemoveOtp(*otp)
+	err = otpRepository.Delete(otp)
 
 	account, err := accountRepository.GetAccount(entities.EmailAddress(cmd.Input.Email))
 
