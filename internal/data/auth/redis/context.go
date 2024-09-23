@@ -9,9 +9,15 @@ import (
 )
 
 type redisAuthContext struct {
-	otpRepository      repositories.OtpRepository
-	accountRepository  repositories.AccountRepository
-	passwordRepository repositories.PasswordRepository
+	otpRepository               repositories.OtpRepository
+	accountRepository           repositories.AccountRepository
+	passwordRepository          repositories.PasswordRepository
+	passwordResetCodeRepository repositories.PasswordResetCodeRepository
+}
+
+// PasswordResetCodeRepository implements commands.CommandContext.
+func (c *redisAuthContext) PasswordResetCodeRepository() repositories.PasswordResetCodeRepository {
+	return c.passwordResetCodeRepository
 }
 
 // PasswordRepository implements repositories.CommandContext.
@@ -34,5 +40,6 @@ func NewContext(ctx context.Context, client redis.UniversalClient, txPipeline re
 		otpRepository:      NewOtpRepository(ctx, client, txPipeline),
 		accountRepository:  NewAccountRepository(ctx, client, txPipeline),
 		passwordRepository: NewPasswordRepository(ctx, client, txPipeline),
+		passwordResetCodeRepository: NewPasswordResetCodeRepository(ctx, client, txPipeline),
 	}
 }

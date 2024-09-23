@@ -5,6 +5,6 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/common/repositories"
 )
 
-type OtpRepository interface {
-	repositories.Repository[string, entities.Otp]
+type PasswordResetCodeRepository interface {
+	repositories.Repository[string, entities.PasswordResetCode]
 }

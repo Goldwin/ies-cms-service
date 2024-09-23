@@ -6,7 +6,6 @@ import (
 	"github.com/Goldwin/ies-pik-cms/internal/bus"
 	"github.com/Goldwin/ies-pik-cms/internal/config"
 	controller "github.com/Goldwin/ies-pik-cms/internal/controllers"
-	"github.com/Goldwin/ies-pik-cms/internal/data"
 	attendanceData "github.com/Goldwin/ies-pik-cms/internal/data/attendance"
 	authData "github.com/Goldwin/ies-pik-cms/internal/data/auth"
 	peopleData "github.com/Goldwin/ies-pik-cms/internal/data/people"
@@ -30,18 +29,7 @@ func main() {
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	peopleDataLayer := peopleData.NewPeopleDataLayerComponent(config.DataConfig["PEOPLE"], infraComponent)
-	authDataLayer := authData.NewAuthDataLayerComponent(data.DataLayerConfig{
-		CommandConfig: &data.WorkerConfig{
-			Mode:           "redis",
-			DB:             "",
-			UseTransaction: true,
-		},
-		QueryConfig: &data.WorkerConfig{
-			Mode:           "redis",
-			DB:             "",
-			UseTransaction: true,
-		},
-	}, infraComponent)
+	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)
 	attendanceDataLayer := attendanceData.NewAttendanceDataLayerComponent(config.DataConfig["ATTENDANCE"], infraComponent)
 
 	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)

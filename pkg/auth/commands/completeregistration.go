@@ -33,7 +33,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Input.Email))
+	account, err := ctx.AccountRepository().Get(cmd.Input.Email)
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
@@ -69,11 +69,11 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 		}
 	}
 
-	account.Roles = []entities.Role{
-		entities.ChurchMember,
+	account.Roles = []*entities.Role{
+		&entities.ChurchMember,
 	}
 
-	account, err = ctx.AccountRepository().UpdateAccount(*account)
+	account, err = ctx.AccountRepository().Save(account)
 
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{
@@ -117,7 +117,7 @@ func (cmd CompleteRegistrationCommand) Execute(ctx CommandContext) CommandExecut
 func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandContext) CommandExecutionResult[*entities.Account] {
 	otpRepository := ctx.OtpRepository()
 	accountRepository := ctx.AccountRepository()
-	otp, err := otpRepository.GetOtp(entities.EmailAddress(cmd.Input.Email))
+	otp, err := otpRepository.Get(cmd.Input.Email)
 	if err != nil {
 		return CommandExecutionResult[*entities.Account]{
 			Status: ExecutionStatusFailed,
@@ -137,7 +137,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	if otp.ExpiredTime.Before(time.Now()) {
+	if otp.ExpiresAt.Before(time.Now()) {
 		return CommandExecutionResult[*entities.Account]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
@@ -162,7 +162,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	err = otpRepository.RemoveOtp(*otp)
+	err = otpRepository.Delete(otp)
 	if err != nil {
 		return CommandExecutionResult[*entities.Account]{
 			Status: ExecutionStatusFailed,
@@ -173,9 +173,9 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 		}
 	}
 
-	err = otpRepository.RemoveOtp(*otp)
+	err = otpRepository.Delete(otp)
 
-	account, err := accountRepository.GetAccount(entities.EmailAddress(cmd.Input.Email))
+	account, err := accountRepository.Get(cmd.Input.Email)
 
 	if err != nil {
 		return CommandExecutionResult[*entities.Account]{
@@ -188,7 +188,7 @@ func (cmd CompleteRegistrationCommand) verifyOTPAndCreateAccount(ctx CommandCont
 	}
 
 	if account == nil {
-		account, err = accountRepository.AddAccount(entities.Account{Email: entities.EmailAddress(cmd.Input.Email)})
+		account, err = accountRepository.Save(&entities.Account{Email: entities.EmailAddress(cmd.Input.Email)})
 		if err != nil {
 			return CommandExecutionResult[*entities.Account]{
 				Status: ExecutionStatusFailed,

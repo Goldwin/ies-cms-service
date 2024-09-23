@@ -5,6 +5,7 @@ import (
 
 	. "github.com/Goldwin/ies-pik-cms/internal/data"
 	"github.com/Goldwin/ies-pik-cms/internal/data/auth/local"
+	"github.com/Goldwin/ies-pik-cms/internal/data/auth/mongo"
 	"github.com/Goldwin/ies-pik-cms/internal/data/auth/redis"
 	"github.com/Goldwin/ies-pik-cms/internal/infra"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth"
@@ -31,6 +32,8 @@ func NewAuthDataLayerComponent(config DataLayerConfig, infra infra.InfraComponen
 		component.commandWorker = redis.NewUnitOfWork(infra.Redis())
 	case ModeLocal:
 		component.commandWorker = local.NewUnitOfWork()
+	case ModeMongo:
+		component.commandWorker = mongo.NewUnitOfWork(infra.Mongo(), config.CommandConfig.UseTransaction)
 	default:
 		log.Fatalf("Command mode %s is not supported", config.CommandConfig.Mode)
 	}

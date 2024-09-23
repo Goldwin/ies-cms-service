@@ -3,7 +3,7 @@ package entities
 type Scope string
 
 type Role struct {
-	ID     int
+	ID     string
 	Name   string
 	Scopes []Scope
 }
@@ -20,7 +20,7 @@ const (
 
 var (
 	ChurchMember = Role{
-		ID:   1,
+		ID:   "1",
 		Name: "Church Member",
 		Scopes: []Scope{
 			EventCheckIn,
@@ -30,7 +30,7 @@ var (
 		},
 	}
 	Admin = Role{
-		ID:   0,
+		ID:   "2",
 		Name: "Admin",
 		Scopes: []Scope{
 			AllAccess,

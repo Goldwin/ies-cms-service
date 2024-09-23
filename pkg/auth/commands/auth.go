@@ -57,7 +57,7 @@ func (cmd AuthCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.Au
 		}
 	}
 
-	account, err := ctx.AccountRepository().GetAccount(email)
+	account, err := ctx.AccountRepository().Get(string(email))
 
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{

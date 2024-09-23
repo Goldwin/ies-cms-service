@@ -4,11 +4,12 @@ import (
 	"testing"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories/mocks"
+	commandMock "github.com/Goldwin/ies-pik-cms/pkg/auth/commands/mocks"
 	"github.com/stretchr/testify/suite"
 )
 
 type CompleteRegistrationCommandTest struct {
-	ctx                *mocks.CommandContext
+	ctx                *commandMock.CommandContext
 	accountRepository  *mocks.AccountRepository
 	passwordRepository *mocks.PasswordRepository
 	suite.Suite
@@ -21,7 +22,7 @@ const (
 )
 
 func (t *CompleteRegistrationCommandTest) SetupTest() {
-	t.ctx = mocks.NewCommandContext(t.T())
+	t.ctx = commandMock.NewCommandContext(t.T())
 	t.accountRepository = mocks.NewAccountRepository(t.T())
 	t.passwordRepository = mocks.NewPasswordRepository(t.T())
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)

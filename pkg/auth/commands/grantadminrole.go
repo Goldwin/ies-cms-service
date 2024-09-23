@@ -13,14 +13,13 @@ const (
 	GrantAdminRoleErrorFailedToUpdateAccount CommandErrorCode = 20502
 )
 
-// A hacky command to grant admin role to user
-// TODO refactor
+// A command to grant admin role to user
 type GrantAdminRoleCommand struct {
 	Email string
 }
 
 func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.AuthData] {
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
+	account, err := ctx.AccountRepository().Get(cmd.Email)
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{
 			Status: ExecutionStatusFailed,
@@ -41,8 +40,8 @@ func (cmd GrantAdminRoleCommand) Execute(ctx CommandContext) CommandExecutionRes
 		}
 	}
 
-	account.Roles = []entities.Role{entities.Admin}
-	_, err = ctx.AccountRepository().UpdateAccount(*account)
+	account.Roles = []*entities.Role{&entities.Admin}
+	_, err = ctx.AccountRepository().Save(account)
 
 	if err != nil {
 		return CommandExecutionResult[dto.AuthData]{

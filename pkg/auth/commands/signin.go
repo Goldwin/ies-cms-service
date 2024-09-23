@@ -40,7 +40,7 @@ func (cmd SigninCommand) Execute(ctx CommandContext) CommandExecutionResult[dto.
 
 func (cmd SigninCommand) passwordLogin(ctx CommandContext) CommandExecutionResult[dto.SignInResult] {
 	passwordRepository := ctx.PasswordRepository()
-	password, err := passwordRepository.Get(entities.EmailAddress(cmd.Email))
+	password, err := passwordRepository.Get(cmd.Email)
 	if err != nil {
 		return CommandExecutionResult[dto.SignInResult]{
 			Status: ExecutionStatusFailed,
@@ -84,7 +84,7 @@ func (cmd SigninCommand) passwordLogin(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	account, err := ctx.AccountRepository().GetAccount(entities.EmailAddress(cmd.Email))
+	account, err := ctx.AccountRepository().Get(cmd.Email)
 
 	if err != nil {
 		return CommandExecutionResult[dto.SignInResult]{

@@ -20,16 +20,16 @@ func (_m *OtpRepository) EXPECT() *OtpRepository_Expecter {
 	return &OtpRepository_Expecter{mock: &_m.Mock}
 }
 
-// AddOtp provides a mock function with given fields: _a0
-func (_m *OtpRepository) AddOtp(_a0 entities.Otp) error {
+// Delete provides a mock function with given fields: _a0
+func (_m *OtpRepository) Delete(_a0 *entities.Otp) error {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for AddOtp")
+		panic("no return value specified for Delete")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(entities.Otp) error); ok {
+	if rf, ok := ret.Get(0).(func(*entities.Otp) error); ok {
 		r0 = rf(_a0)
 	} else {
 		r0 = ret.Error(0)
@@ -38,48 +38,48 @@ func (_m *OtpRepository) AddOtp(_a0 entities.Otp) error {
 	return r0
 }
 
-// OtpRepository_AddOtp_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddOtp'
-type OtpRepository_AddOtp_Call struct {
+// OtpRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type OtpRepository_Delete_Call struct {
 	*mock.Call
 }
 
-// AddOtp is a helper method to define mock.On call
-//   - _a0 entities.Otp
-func (_e *OtpRepository_Expecter) AddOtp(_a0 interface{}) *OtpRepository_AddOtp_Call {
-	return &OtpRepository_AddOtp_Call{Call: _e.mock.On("AddOtp", _a0)}
+// Delete is a helper method to define mock.On call
+//   - _a0 *entities.Otp
+func (_e *OtpRepository_Expecter) Delete(_a0 interface{}) *OtpRepository_Delete_Call {
+	return &OtpRepository_Delete_Call{Call: _e.mock.On("Delete", _a0)}
 }
 
-func (_c *OtpRepository_AddOtp_Call) Run(run func(_a0 entities.Otp)) *OtpRepository_AddOtp_Call {
+func (_c *OtpRepository_Delete_Call) Run(run func(_a0 *entities.Otp)) *OtpRepository_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.Otp))
+		run(args[0].(*entities.Otp))
 	})
 	return _c
 }
 
-func (_c *OtpRepository_AddOtp_Call) Return(_a0 error) *OtpRepository_AddOtp_Call {
+func (_c *OtpRepository_Delete_Call) Return(_a0 error) *OtpRepository_Delete_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *OtpRepository_AddOtp_Call) RunAndReturn(run func(entities.Otp) error) *OtpRepository_AddOtp_Call {
+func (_c *OtpRepository_Delete_Call) RunAndReturn(run func(*entities.Otp) error) *OtpRepository_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetOtp provides a mock function with given fields: _a0
-func (_m *OtpRepository) GetOtp(_a0 entities.EmailAddress) (*entities.Otp, error) {
+// Get provides a mock function with given fields: _a0
+func (_m *OtpRepository) Get(_a0 string) (*entities.Otp, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetOtp")
+		panic("no return value specified for Get")
 	}
 
 	var r0 *entities.Otp
 	var r1 error
-	if rf, ok := ret.Get(0).(func(entities.EmailAddress) (*entities.Otp, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (*entities.Otp, error)); ok {
 		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func(entities.EmailAddress) *entities.Otp); ok {
+	if rf, ok := ret.Get(0).(func(string) *entities.Otp); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -87,7 +87,7 @@ func (_m *OtpRepository) GetOtp(_a0 entities.EmailAddress) (*entities.Otp, error
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(entities.EmailAddress) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
@@ -96,76 +96,146 @@ func (_m *OtpRepository) GetOtp(_a0 entities.EmailAddress) (*entities.Otp, error
 	return r0, r1
 }
 
-// OtpRepository_GetOtp_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetOtp'
-type OtpRepository_GetOtp_Call struct {
+// OtpRepository_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type OtpRepository_Get_Call struct {
 	*mock.Call
 }
 
-// GetOtp is a helper method to define mock.On call
-//   - _a0 entities.EmailAddress
-func (_e *OtpRepository_Expecter) GetOtp(_a0 interface{}) *OtpRepository_GetOtp_Call {
-	return &OtpRepository_GetOtp_Call{Call: _e.mock.On("GetOtp", _a0)}
+// Get is a helper method to define mock.On call
+//   - _a0 string
+func (_e *OtpRepository_Expecter) Get(_a0 interface{}) *OtpRepository_Get_Call {
+	return &OtpRepository_Get_Call{Call: _e.mock.On("Get", _a0)}
 }
 
-func (_c *OtpRepository_GetOtp_Call) Run(run func(_a0 entities.EmailAddress)) *OtpRepository_GetOtp_Call {
+func (_c *OtpRepository_Get_Call) Run(run func(_a0 string)) *OtpRepository_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.EmailAddress))
+		run(args[0].(string))
 	})
 	return _c
 }
 
-func (_c *OtpRepository_GetOtp_Call) Return(_a0 *entities.Otp, _a1 error) *OtpRepository_GetOtp_Call {
+func (_c *OtpRepository_Get_Call) Return(_a0 *entities.Otp, _a1 error) *OtpRepository_Get_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OtpRepository_GetOtp_Call) RunAndReturn(run func(entities.EmailAddress) (*entities.Otp, error)) *OtpRepository_GetOtp_Call {
+func (_c *OtpRepository_Get_Call) RunAndReturn(run func(string) (*entities.Otp, error)) *OtpRepository_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// RemoveOtp provides a mock function with given fields: _a0
-func (_m *OtpRepository) RemoveOtp(_a0 entities.Otp) error {
+// List provides a mock function with given fields: _a0
+func (_m *OtpRepository) List(_a0 []string) ([]*entities.Otp, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for RemoveOtp")
+		panic("no return value specified for List")
 	}
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(entities.Otp) error); ok {
+	var r0 []*entities.Otp
+	var r1 error
+	if rf, ok := ret.Get(0).(func([]string) ([]*entities.Otp, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func([]string) []*entities.Otp); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*entities.Otp)
+		}
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func([]string) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
-// OtpRepository_RemoveOtp_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RemoveOtp'
-type OtpRepository_RemoveOtp_Call struct {
+// OtpRepository_List_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'List'
+type OtpRepository_List_Call struct {
 	*mock.Call
 }
 
-// RemoveOtp is a helper method to define mock.On call
-//   - _a0 entities.Otp
-func (_e *OtpRepository_Expecter) RemoveOtp(_a0 interface{}) *OtpRepository_RemoveOtp_Call {
-	return &OtpRepository_RemoveOtp_Call{Call: _e.mock.On("RemoveOtp", _a0)}
+// List is a helper method to define mock.On call
+//   - _a0 []string
+func (_e *OtpRepository_Expecter) List(_a0 interface{}) *OtpRepository_List_Call {
+	return &OtpRepository_List_Call{Call: _e.mock.On("List", _a0)}
 }
 
-func (_c *OtpRepository_RemoveOtp_Call) Run(run func(_a0 entities.Otp)) *OtpRepository_RemoveOtp_Call {
+func (_c *OtpRepository_List_Call) Run(run func(_a0 []string)) *OtpRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entities.Otp))
+		run(args[0].([]string))
 	})
 	return _c
 }
 
-func (_c *OtpRepository_RemoveOtp_Call) Return(_a0 error) *OtpRepository_RemoveOtp_Call {
-	_c.Call.Return(_a0)
+func (_c *OtpRepository_List_Call) Return(_a0 []*entities.Otp, _a1 error) *OtpRepository_List_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *OtpRepository_RemoveOtp_Call) RunAndReturn(run func(entities.Otp) error) *OtpRepository_RemoveOtp_Call {
+func (_c *OtpRepository_List_Call) RunAndReturn(run func([]string) ([]*entities.Otp, error)) *OtpRepository_List_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Save provides a mock function with given fields: _a0
+func (_m *OtpRepository) Save(_a0 *entities.Otp) (*entities.Otp, error) {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Save")
+	}
+
+	var r0 *entities.Otp
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*entities.Otp) (*entities.Otp, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(*entities.Otp) *entities.Otp); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.Otp)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*entities.Otp) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// OtpRepository_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
+type OtpRepository_Save_Call struct {
+	*mock.Call
+}
+
+// Save is a helper method to define mock.On call
+//   - _a0 *entities.Otp
+func (_e *OtpRepository_Expecter) Save(_a0 interface{}) *OtpRepository_Save_Call {
+	return &OtpRepository_Save_Call{Call: _e.mock.On("Save", _a0)}
+}
+
+func (_c *OtpRepository_Save_Call) Run(run func(_a0 *entities.Otp)) *OtpRepository_Save_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*entities.Otp))
+	})
+	return _c
+}
+
+func (_c *OtpRepository_Save_Call) Return(_a0 *entities.Otp, _a1 error) *OtpRepository_Save_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *OtpRepository_Save_Call) RunAndReturn(run func(*entities.Otp) (*entities.Otp, error)) *OtpRepository_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }

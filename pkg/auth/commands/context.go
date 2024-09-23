@@ -7,4 +7,5 @@ type CommandContext interface {
 	AccountRepository() repositories.AccountRepository
 	OtpRepository() repositories.OtpRepository
 	PasswordRepository() repositories.PasswordRepository
+	PasswordResetCodeRepository() repositories.PasswordResetCodeRepository
 }
