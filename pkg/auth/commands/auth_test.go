@@ -8,6 +8,7 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories/mocks"
+	. "github.com/Goldwin/ies-pik-cms/pkg/auth/commands/mocks"
 	common "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/golang-jwt/jwt"
 	"github.com/stretchr/testify/assert"
@@ -16,14 +17,14 @@ import (
 )
 
 type AuthCommandTest struct {
-	ctx               *mocks.CommandContext
+	ctx               *CommandContext
 	accountRepository *mocks.AccountRepository
 	suite.Suite
 }
 
 func (t *AuthCommandTest) SetupTest() {
 	t.accountRepository = mocks.NewAccountRepository(t.T())
-	t.ctx = mocks.NewCommandContext(t.T())
+	t.ctx = NewCommandContext(t.T())
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)
 }
 

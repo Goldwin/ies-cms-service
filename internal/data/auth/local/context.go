@@ -9,6 +9,12 @@ type localAuthContext struct {
 	otpRepository      repositories.OtpRepository
 	accountRepository  repositories.AccountRepository
 	passwordRepository repositories.PasswordRepository
+	passwordResetCodeRepository repositories.PasswordResetCodeRepository
+}
+
+// PasswordResetCodeRepository implements commands.CommandContext.
+func (c *localAuthContext) PasswordResetCodeRepository() repositories.PasswordResetCodeRepository {
+	return c.passwordResetCodeRepository
 }
 
 // PasswordRepository implements repositories.CommandContext.
@@ -30,5 +36,7 @@ func NewContext() commands.CommandContext {
 	return &localAuthContext{
 		otpRepository:     NewOtpRepository(),
 		accountRepository: NewAccountRepository(),
+		passwordRepository: NewPasswordRepository(),
+		passwordResetCodeRepository: NewPasswordResetCodeRepository(),
 	}
 }

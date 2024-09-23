@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
+	commandMock "github.com/Goldwin/ies-pik-cms/pkg/auth/commands/mocks"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories/mocks"
 	common "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
@@ -31,14 +32,14 @@ func (f *ToggleRandReader) Read(p []byte) (n int, err error) {
 }
 
 type GenerateOtpCommandTest struct {
-	ctx           *mocks.CommandContext
+	ctx           *commandMock.CommandContext
 	otpRepository *mocks.OtpRepository
 	suite.Suite
 }
 
 func (t *GenerateOtpCommandTest) SetupTest() {
 	t.otpRepository = mocks.NewOtpRepository(t.T())
-	t.ctx = mocks.NewCommandContext(t.T())
+	t.ctx = commandMock.NewCommandContext(t.T())
 
 	t.ctx.EXPECT().OtpRepository().Maybe().Return(t.otpRepository)
 }

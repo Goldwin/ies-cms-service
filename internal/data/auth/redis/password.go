@@ -87,7 +87,3 @@ func NewPasswordRepository(ctx context.Context, client redis.UniversalClient, tx
 func getPasswordKey(email entities.EmailAddress) string {
 	return fmt.Sprintf("auth:password:email#%s", email)
 }
-
-func getPasswordResetCodeKey(email entities.EmailAddress) string {
-	return fmt.Sprintf("auth:password-reset-code:email#%s", email)
-}

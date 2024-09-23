@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
+	commandMock "github.com/Goldwin/ies-pik-cms/pkg/auth/commands/mocks"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/repositories/mocks"
 	common "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,7 @@ import (
 )
 
 type SignInCommandTest struct {
-	ctx                *mocks.CommandContext
+	ctx                *commandMock.CommandContext
 	otpRepository      *mocks.OtpRepository
 	accountRepository  *mocks.AccountRepository
 	passwordRepository *mocks.PasswordRepository
@@ -24,7 +25,7 @@ func (t *SignInCommandTest) SetupTest() {
 	t.otpRepository = mocks.NewOtpRepository(t.T())
 	t.accountRepository = mocks.NewAccountRepository(t.T())
 	t.passwordRepository = mocks.NewPasswordRepository(t.T())
-	t.ctx = mocks.NewCommandContext(t.T())
+	t.ctx = commandMock.NewCommandContext(t.T())
 
 	t.ctx.EXPECT().OtpRepository().Maybe().Return(t.otpRepository)
 	t.ctx.EXPECT().AccountRepository().Maybe().Return(t.accountRepository)
