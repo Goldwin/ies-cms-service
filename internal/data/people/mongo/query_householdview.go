@@ -20,7 +20,7 @@ type viewHouseholdByPersonImpl struct {
 
 // Execute implements queries.ViewHouseholdByPerson.
 func (v *viewHouseholdByPersonImpl) Execute(query queries.ViewHouseholdByPersonQuery) (queries.ViewHouseholdByPersonResult, QueryErrorDetail) {
-	personHousehold := PersonHousehold{}
+	personHousehold := PersonHouseholdModel{}
 	err := v.personHouseholdCollection.FindOne(v.ctx, bson.M{"_id": query.PersonID}).Decode(&personHousehold)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewHouseholdByPersonResult{}, QueryErrorDetail{
@@ -34,7 +34,7 @@ func (v *viewHouseholdByPersonImpl) Execute(query queries.ViewHouseholdByPersonQ
 			Message: "Failed to connect to database",
 		}
 	}
-	household := Household{}
+	household := HouseholdModel{}
 	err = v.householdCollection.FindOne(v.ctx, bson.M{"_id": personHousehold.HouseholdID}).Decode(&household)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewHouseholdByPersonResult{}, QueryErrorDetail{

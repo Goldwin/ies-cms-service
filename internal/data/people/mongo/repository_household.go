@@ -18,25 +18,46 @@ type householdRepositoryImpl struct {
 	personHouseholdCollection *mongo.Collection
 }
 
-// DeleteHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) DeleteHousehold(e entities.Household) error {
+// Delete implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) Delete(e *entities.Household) error {
 	_, err := h.householdCollection.DeleteOne(h.ctx, bson.M{"_id": e.ID})
 	return err
 }
 
-// GetHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) GetHousehold(id string) (*entities.Household, error) {
-	var household Household
+// Get implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) Get(id string) (*entities.Household, error) {
+	var household HouseholdModel
 	err := h.householdCollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&household)
 	if err != nil {
 		return nil, err
 	}
-	entities := toHouseholdEntities(household)
-	return &entities, nil
+	entities := toEntity(household)
+	return entities, nil
+}
+
+// List implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) List([]string) ([]*entities.Household, error) {
+	panic("unimplemented")
+}
+
+// Save implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) Save(*entities.Household) (*entities.Household, error) {
+	panic("unimplemented")
+}
+
+// GetHousehold implements repositories.HouseholdRepository.
+func (h *householdRepositoryImpl) GetHousehold(id string) (*entities.Household, error) {
+	var household HouseholdModel
+	err := h.householdCollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&household)
+	if err != nil {
+		return nil, err
+	}
+	entities := toEntity(household)
+	return entities, nil
 }
 
 // AddHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) AddHousehold(e entities.Household) (*entities.Household, error) {
+func (h *householdRepositoryImpl) AddHousehold(e *entities.Household) (*entities.Household, error) {
 	//share with head's id
 	e.ID = uuid.NewString()
 	_, err := h.householdCollection.InsertOne(h.ctx, toHouseholdModel(e))
@@ -55,14 +76,14 @@ func (h *householdRepositoryImpl) AddHousehold(e entities.Household) (*entities.
 	if err != nil {
 		return nil, err
 	}
-	return &e, nil
+	return e, nil
 }
 
 // UpdateHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entities.Household, error) {
+func (h *householdRepositoryImpl) UpdateHousehold(e *entities.Household) (*entities.Household, error) {
 	var err error
 	newHousehold := toHouseholdModel(e)
-	oldHousehold, err := h.GetHousehold(e.ID)
+	oldHousehold, err := h.Get(e.ID)
 
 	if err != nil {
 		return nil, err
@@ -118,7 +139,7 @@ func (h *householdRepositoryImpl) UpdateHousehold(e entities.Household) (*entiti
 		}
 	}
 
-	return &e, nil
+	return e, nil
 }
 
 func NewHouseholdRepository(ctx context.Context, db *mongo.Database) repositories.HouseholdRepository {

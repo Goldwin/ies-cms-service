@@ -5,12 +5,13 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
+	"github.com/samber/lo"
 )
 
 const (
 	personHouseholdCollectionName = "person_households"
-	personCollectionName      = "persons"
-	householdCollectionName   = "households"
+	personCollectionName          = "persons"
+	householdCollectionName       = "households"
 )
 
 type Person struct {
@@ -27,7 +28,7 @@ type Person struct {
 	Gender            string  `bson:"gender"`
 }
 
-func toPersonMongoModel(e entities.Person) Person {
+func toPersonModel(e *entities.Person) Person {
 	var birthday *string
 	if e.Birthday != nil {
 		str := fmt.Sprintf("%04d-%02d-%02d", e.Birthday.Year, e.Birthday.Month, e.Birthday.Day)
@@ -51,7 +52,7 @@ func toPersonMongoModel(e entities.Person) Person {
 	}
 }
 
-func toPersonEntities(p Person) entities.Person {
+func (p *Person) toEntity() *entities.Person {
 	var birthday *entities.YearMonthDay
 
 	phones := make([]entities.PhoneNumber, len(p.PhoneNumber))
@@ -67,7 +68,7 @@ func toPersonEntities(p Person) entities.Person {
 		fmt.Sscanf(*p.Birthday, "%d-%d-%d", &birthday.Year, &birthday.Month, &birthday.Day)
 	}
 
-	return entities.Person{
+	return &entities.Person{
 		ID:                p.ID,
 		FirstName:         p.FirstName,
 		MiddleName:        p.MiddleName,
@@ -82,15 +83,39 @@ func toPersonEntities(p Person) entities.Person {
 	}
 }
 
-type Household struct {
-	ID               string            `bson:"_id"`
-	Name             string            `bson:"name"`
-	HouseholdHead    HouseholdMember   `bson:"householdHead"`
-	PictureUrl       string            `bson:"pictureUrl"`
-	HouseholdMembers []HouseholdMember `bson:"householdMembers"`
+type HouseholdModel struct {
+	ID               string                 `bson:"_id"`
+	Name             string                 `bson:"name"`
+	HouseholdHead    HouseholdMemberModel   `bson:"householdHead"`
+	PictureUrl       string                 `bson:"pictureUrl"`
+	HouseholdMembers []HouseholdMemberModel `bson:"householdMembers"`
 }
 
-type HouseholdMember struct {
+func toHouseholdModel(e *entities.Household) HouseholdModel {
+	return HouseholdModel{
+		ID:            e.ID,
+		Name:          e.Name,
+		HouseholdHead: toHouseholdMemberModel(e.HouseholdHead),
+		PictureUrl:    e.PictureUrl,
+		HouseholdMembers: lo.Map(e.Members, func(e *entities.Person, _ int) HouseholdMemberModel {
+			return toHouseholdMemberModel(e)
+		}),
+	}
+}
+
+func toEntity(householdModel HouseholdModel) *entities.Household {
+	return &entities.Household{
+		ID:            householdModel.ID,
+		Name:          householdModel.Name,
+		HouseholdHead: householdModel.HouseholdHead.toEntity(),
+		PictureUrl:    householdModel.PictureUrl,
+		Members: lo.Map(householdModel.HouseholdMembers, func(e HouseholdMemberModel, _ int) *entities.Person {
+			return e.toEntity()
+		}),
+	}
+}
+
+type HouseholdMemberModel struct {
 	PersonID          string `bson:"personID"`
 	FirstName         string `bson:"firstName"`
 	LastName          string `bson:"lastName"`
@@ -99,23 +124,8 @@ type HouseholdMember struct {
 	PhoneNumber       string `bson:"phoneNumber"`
 }
 
-type PersonHousehold struct {
-	ID          string `bson:"_id"`
-	HouseholdID string `bson:"householdID"`
-}
-
-func toHouseholdEntities(householdModel Household) entities.Household {
-	return entities.Household{
-		ID:            householdModel.ID,
-		Name:          householdModel.Name,
-		HouseholdHead: toHouseholdMemberEntities(householdModel.HouseholdHead),
-		PictureUrl:    householdModel.PictureUrl,
-		Members:       getMembersEntities(householdModel),
-	}
-}
-
-func toHouseholdMemberEntities(e HouseholdMember) entities.Person {
-	return entities.Person{
+func (e *HouseholdMemberModel) toEntity() *entities.Person {
+	return &entities.Person{
 		ID:                e.PersonID,
 		FirstName:         e.FirstName,
 		LastName:          e.LastName,
@@ -125,19 +135,8 @@ func toHouseholdMemberEntities(e HouseholdMember) entities.Person {
 	}
 }
 
-func toHouseholdModel(e entities.Household) *Household {
-	householdMembers := getMembersModel(e)
-	return &Household{
-		ID:               e.ID,
-		Name:             e.Name,
-		HouseholdHead:    toHouseholdMemberModel(e.HouseholdHead),
-		PictureUrl:       e.PictureUrl,
-		HouseholdMembers: householdMembers,
-	}
-}
-
-func toHouseholdMemberModel(e entities.Person) HouseholdMember {
-	return HouseholdMember{
+func toHouseholdMemberModel(e *entities.Person) HouseholdMemberModel {
+	return HouseholdMemberModel{
 		PersonID:          e.ID,
 		FirstName:         e.FirstName,
 		LastName:          e.LastName,
@@ -147,7 +146,7 @@ func toHouseholdMemberModel(e entities.Person) HouseholdMember {
 	}
 }
 
-func toHouseholdMemberDto(e HouseholdMember) dto.HouseholdPerson {
+func toHouseholdMemberDto(e HouseholdMemberModel) dto.HouseholdPerson {
 	return dto.HouseholdPerson{
 		ID:                e.PersonID,
 		FirstName:         e.FirstName,
@@ -158,18 +157,7 @@ func toHouseholdMemberDto(e HouseholdMember) dto.HouseholdPerson {
 	}
 }
 
-func getMembersEntities(e Household) []entities.Person {
-	householdMembers := make([]entities.Person, 0)
-	for _, member := range e.HouseholdMembers {
-		householdMembers = append(householdMembers, toHouseholdMemberEntities(member))
-	}
-	return householdMembers
-}
-
-func getMembersModel(e entities.Household) []HouseholdMember {
-	householdMembers := make([]HouseholdMember, 0)
-	for _, member := range e.Members {
-		householdMembers = append(householdMembers, toHouseholdMemberModel(member))
-	}
-	return householdMembers
+type PersonHouseholdModel struct {
+	ID          string `bson:"_id"`
+	HouseholdID string `bson:"householdID"`
 }

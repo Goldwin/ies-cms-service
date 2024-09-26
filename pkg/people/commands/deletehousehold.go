@@ -17,7 +17,7 @@ const (
 )
 
 func (cmd DeleteHouseholdCommand) Execute(ctx CommandContext) CommandExecutionResult[bool] {
-	e, err := ctx.HouseholdRepository().GetHousehold(cmd.Input.ID)
+	e, err := ctx.HouseholdRepository().Get(cmd.Input.ID)
 	if err != nil {
 		return CommandExecutionResult[bool]{
 			Status: ExecutionStatusFailed,
@@ -38,7 +38,7 @@ func (cmd DeleteHouseholdCommand) Execute(ctx CommandContext) CommandExecutionRe
 		}
 	}
 
-	err = ctx.HouseholdRepository().DeleteHousehold(*e)
+	err = ctx.HouseholdRepository().Delete(e)
 	if(err != nil) {
 		return CommandExecutionResult[bool]{
 			Status: ExecutionStatusFailed,

@@ -43,8 +43,8 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	person := entities.Person{
-		ID:                c.ID,
+	person := &entities.Person{
+		ID:                personResult.ID,
 		FirstName:         c.FirstName,
 		MiddleName:        c.MiddleName,
 		LastName:          c.LastName,
@@ -90,7 +90,7 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	result, err := ctx.PersonRepository().UpdatePerson(person)
+	result, err := ctx.PersonRepository().Save(person)
 
 	if err != nil {
 		return CommandExecutionResult[dto.Person]{
