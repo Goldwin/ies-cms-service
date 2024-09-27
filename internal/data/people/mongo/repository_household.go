@@ -5,17 +5,19 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
-	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type personSlice []*entities.Person
+
 type householdRepositoryImpl struct {
-	ctx                       context.Context
-	db                        *mongo.Database
-	householdCollection       *mongo.Collection
-	personHouseholdCollection *mongo.Collection
+	ctx                 context.Context
+	db                  *mongo.Database
+	householdCollection *mongo.Collection
+	personCollection    *mongo.Collection
 }
 
 // Delete implements repositories.HouseholdRepository.
@@ -26,127 +28,123 @@ func (h *householdRepositoryImpl) Delete(e *entities.Household) error {
 
 // Get implements repositories.HouseholdRepository.
 func (h *householdRepositoryImpl) Get(id string) (*entities.Household, error) {
-	var household HouseholdModel
-	err := h.householdCollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&household)
+	var model HouseholdModel
+	err := h.householdCollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&model)
 	if err != nil {
 		return nil, err
 	}
-	entities := toEntity(household)
-	return entities, nil
+	household := toEntity(model)
+	personList, err := h.listPersonByHouseholdID(id)
+
+	if err != nil {
+		return nil, err
+	}
+	household.Members = lo.Filter(personList, func(e *entities.Person, _ int) bool {
+		return e.ID != household.HouseholdHead.ID
+	})
+
+	household.HouseholdHead = lo.FindOrElse(personList, nil, func(e *entities.Person) bool {
+		return e.ID == household.HouseholdHead.ID
+	})
+
+	return household, nil
 }
 
 // List implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) List([]string) ([]*entities.Household, error) {
-	panic("unimplemented")
+func (h *householdRepositoryImpl) List(householdIDList []string) ([]*entities.Household, error) {
+	var householdList []HouseholdModel
+	cursor, err := h.householdCollection.Find(h.ctx, bson.M{"_id": bson.M{"$in": householdIDList}})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(h.ctx, &householdList); err != nil {
+		return nil, err
+	}
+	households := lo.Map(householdList, func(model HouseholdModel, _ int) *entities.Household {
+		result := toEntity(model)
+		result.HouseholdHead = &entities.Person{ID: model.HouseholdHeadID}
+		return result
+	})
+
+	personMaps, err := h.mapPersonByHouseholdIDList(householdIDList...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, household := range households {
+		household.Members = lo.Filter(personMaps[household.ID], func(e *entities.Person, _ int) bool {
+			return e.ID != household.HouseholdHead.ID
+		})
+		household.HouseholdHead = lo.FindOrElse(personMaps[household.ID], nil, func(item *entities.Person) bool {
+			return item.ID == household.HouseholdHead.ID
+		})
+	}
+
+	return households, nil
 }
 
 // Save implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) Save(*entities.Household) (*entities.Household, error) {
-	panic("unimplemented")
-}
+func (h *householdRepositoryImpl) Save(e *entities.Household) (*entities.Household, error) {
+	model := toHouseholdModel(e)
 
-// GetHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) GetHousehold(id string) (*entities.Household, error) {
-	var household HouseholdModel
-	err := h.householdCollection.FindOne(h.ctx, bson.M{"_id": id}).Decode(&household)
+	_, err := h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": model}, options.Update().SetUpsert(true))
 	if err != nil {
 		return nil, err
 	}
-	entities := toEntity(household)
-	return entities, nil
-}
 
-// AddHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) AddHousehold(e *entities.Household) (*entities.Household, error) {
-	//share with head's id
-	e.ID = uuid.NewString()
-	_, err := h.householdCollection.InsertOne(h.ctx, toHouseholdModel(e))
+	personIDList := lo.Map(e.Members, func(e *entities.Person, _ int) string { return e.ID })
+	personIDList = append(personIDList, e.HouseholdHead.ID)
 
-	totalMembers := len(e.Members) + 1
-	personIds := make([]string, totalMembers)
-	for i, member := range e.Members {
-		personIds[i] = member.ID
-	}
-	personIds[totalMembers-1] = e.HouseholdHead.ID
-
-	for _, id := range personIds {
-		h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
-	}
+	_, err = h.personCollection.UpdateMany(h.ctx, bson.M{"_id": bson.M{"$in": personIDList}}, bson.M{"$set": bson.M{"householdId": e.ID}})
 
 	if err != nil {
 		return nil, err
 	}
+
 	return e, nil
 }
 
-// UpdateHousehold implements repositories.HouseholdRepository.
-func (h *householdRepositoryImpl) UpdateHousehold(e *entities.Household) (*entities.Household, error) {
-	var err error
-	newHousehold := toHouseholdModel(e)
-	oldHousehold, err := h.Get(e.ID)
-
+func (h *householdRepositoryImpl) listPersonByHouseholdID(householdID string) ([]*entities.Person, error) {
+	var personList []PersonModel
+	cursor, err := h.personCollection.Find(h.ctx, bson.M{"householdId": householdID})
 	if err != nil {
 		return nil, err
 	}
-
-	oldMemberIdSet := make(map[string]bool, len(oldHousehold.Members)+1)
-	for _, member := range oldHousehold.Members {
-		oldMemberIdSet[member.ID] = true
+	if err = cursor.All(h.ctx, &personList); err != nil {
+		return nil, err
 	}
-	oldMemberIdSet[oldHousehold.HouseholdHead.ID] = true
+	return lo.Map(personList, func(model PersonModel, _ int) *entities.Person {
+		return model.toEntity()
+	}), nil
+}
 
-	_, err = h.householdCollection.UpdateOne(h.ctx, bson.M{"_id": e.ID}, bson.M{"$set": newHousehold})
-
+func (h *householdRepositoryImpl) mapPersonByHouseholdIDList(householdIDList ...string) (map[string][]*entities.Person, error) {
+	var personList []PersonModel
+	cursor, err := h.personCollection.Find(h.ctx, bson.M{"householdId": householdIDList})
 	if err != nil {
 		return nil, err
 	}
-
-	totalMembers := len(e.Members) + 1
-
-	personIds := make([]string, totalMembers)
-	oldPersonIds := make([]string, 0)
-	personIds[totalMembers-1] = e.HouseholdHead.ID
-
-	if oldMemberIdSet[e.HouseholdHead.ID] {
-		oldMemberIdSet[e.HouseholdHead.ID] = false
-	}
-	for i, member := range e.Members {
-		personIds[i] = member.ID
-		if oldMemberIdSet[member.ID] {
-			oldMemberIdSet[member.ID] = false
-		}
+	if err = cursor.All(h.ctx, &personList); err != nil {
+		return nil, err
 	}
 
-	for id, isDiscarded := range oldMemberIdSet {
-		if isDiscarded {
-			oldPersonIds = append(oldPersonIds, id)
-		}
-	}
+	personModelByHouseholdID := lo.GroupBy(personList, func(model PersonModel) string {
+		return model.HouseholdID
+	})
 
-	for _, id := range oldPersonIds {
-		h.personHouseholdCollection.UpdateByID(h.ctx,
-			id,
-			bson.M{"$set": bson.M{"householdID": ""}},
-			options.Update().SetUpsert(true),
-		)
-	}
-
-	//replace member's household id with new ids
-	for _, id := range personIds {
-		_, err = h.personHouseholdCollection.UpdateByID(h.ctx, id, bson.M{"$set": bson.M{"householdID": e.ID}}, options.Update().SetUpsert(true))
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return e, nil
+	return lo.MapValues(personModelByHouseholdID, func(personList []PersonModel, _ string) []*entities.Person {
+		return lo.Map(personList, func(model PersonModel, _ int) *entities.Person {
+			return model.toEntity()
+		})
+	}), nil
 }
 
 func NewHouseholdRepository(ctx context.Context, db *mongo.Database) repositories.HouseholdRepository {
 	return &householdRepositoryImpl{
-		ctx:                       ctx,
-		db:                        db,
-		householdCollection:       db.Collection(householdCollectionName),
-		personHouseholdCollection: db.Collection(personHouseholdCollectionName),
+		ctx:                 ctx,
+		db:                  db,
+		householdCollection: db.Collection(householdCollectionName),
+		personCollection:    db.Collection(personCollectionName),
 	}
 }

@@ -6,7 +6,5 @@ import (
 )
 
 type HouseholdRepository interface {		
-	UpdateHousehold(*entities.Household) (*entities.Household, error)
-
 	repositories.Repository[string, entities.Household]
 }

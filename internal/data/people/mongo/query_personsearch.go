@@ -44,7 +44,7 @@ func (s *searchPersonImpl) Execute(query queries.SearchPersonQuery) (queries.Sea
 	var result = make([]dto.Person, 0)
 
 	for cursor.Next(s.ctx) {
-		var person Person
+		var person PersonModel
 		if err := cursor.Decode(&person); err != nil {
 			return queries.SearchPersonResult{}, QueryErrorDetail{
 				Code:    500,

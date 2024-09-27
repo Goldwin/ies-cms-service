@@ -24,7 +24,7 @@ func (p *personRepositoryImpl) Delete(e *entities.Person) error {
 
 // List implements repositories.PersonRepository.
 func (p *personRepositoryImpl) List(id []string) ([]*entities.Person, error) {
-	models := make([]Person, 0)
+	models := make([]PersonModel, 0)
 	if len(id) == 0 {
 		return make([]*entities.Person, 0), nil
 	}
@@ -57,7 +57,7 @@ func (p *personRepositoryImpl) Save(e *entities.Person) (*entities.Person, error
 
 // Get implements repositories.PersonRepository.
 func (p *personRepositoryImpl) Get(id string) (*entities.Person, error) {
-	var person Person
+	var person PersonModel
 	err := p.collection.FindOne(p.ctx, bson.M{"_id": id}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return nil, nil
@@ -71,7 +71,7 @@ func (p *personRepositoryImpl) Get(id string) (*entities.Person, error) {
 
 // GetByEmail implements repositories.PersonRepository.
 func (p *personRepositoryImpl) GetByEmail(email entities.EmailAddress) (*entities.Person, error) {
-	var person Person
+	var person PersonModel
 	err := p.collection.FindOne(p.ctx, bson.M{"emailAddress": string(email)}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return nil, nil
@@ -85,7 +85,7 @@ func (p *personRepositoryImpl) GetByEmail(email entities.EmailAddress) (*entitie
 
 // ListByID implements repositories.PersonRepository.
 func (p *personRepositoryImpl) ListByID(id []string) ([]entities.Person, error) {
-	models := make([]Person, 0)
+	models := make([]PersonModel, 0)
 	if len(id) == 0 {
 		return make([]entities.Person, 0), nil
 	}
