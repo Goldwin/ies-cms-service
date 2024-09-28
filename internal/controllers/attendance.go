@@ -46,8 +46,6 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.GET("schedules/:scheduleID/events/:eventID/summary", middleware.Auth("ATTENDANCE_VIEW_EVENT_SUMMARY"), attendanceController.getSummary)
 
 	rg.GET("schedules/:scheduleID/stats", middleware.Auth("ATTENDANCE_VIEW_SCHEDULE_STATS"), attendanceController.getEventScheduleStats)
-
-	rg.POST("households/search", middleware.Auth("ATTENDANCE_VIEW_HOUSEHOLDS"), attendanceController.householdSearch)
 }
 
 func (a *attendanceController) listEventSchedules(c *gin.Context) {
@@ -379,33 +377,6 @@ func (a *attendanceController) checkIn(c *gin.Context) {
 	}
 
 	a.attendanceComponent.HouseholdCheckin(c, data, output).Wait()
-}
-
-func (a *attendanceController) householdSearch(c *gin.Context) {
-	var data queries.SearchHouseholdFilter
-	err := c.ShouldBindJSON(&data)
-	if err != nil {
-		c.JSON(400, gin.H{
-			"error": gin.H{
-				"code":    "400",
-				"message": err.Error(),
-			},
-		})
-	}
-
-	output := &outputDecorator[queries.SearchHouseholdResult]{
-		output: nil,
-		errFunction: func(err out.AppErrorDetail) {
-			c.JSON(400, gin.H{
-				"error": err,
-			})
-		},
-		successFunc: func(result queries.SearchHouseholdResult) {
-			c.JSON(200, result)
-		},
-	}
-
-	a.attendanceComponent.SearchHousehold(c, data, output).Wait()
 }
 
 func (a *attendanceController) getSummary(c *gin.Context) {
