@@ -5,4 +5,5 @@ type QueryContext interface {
 	ViewPerson() ViewPerson
 	ViewPersonByEmail() ViewPersonByEmail
 	ViewHouseholdByPerson() ViewHouseholdByPerson
+	SearchHousehold() SearchHousehold
 }

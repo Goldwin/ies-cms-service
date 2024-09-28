@@ -26,7 +26,6 @@ type YearMonthDay struct {
 
 type Person struct {
 	ID                string
-	HouseholdID       string
 	FirstName         string
 	MiddleName        string
 	LastName          string

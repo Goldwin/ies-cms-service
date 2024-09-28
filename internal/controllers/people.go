@@ -25,17 +25,18 @@ func InitializePeopleManagementController(
 		peopleComponent: peopleComponent,
 		middleware:      middlewareComponent,
 	}
-	personIdUrl := "person/:id"
+	personIdUrl := "persons/:id"
 	rg := r.Group("people")
-	rg.POST("person", middlewareComponent.Auth("PERSON_ADD"), c.addPersonInfo)
+	rg.POST("persons", middlewareComponent.Auth("PERSON_CREATE"), c.addPersonInfo)
 	rg.PUT(personIdUrl, middlewareComponent.Auth("PERSON_UPDATE"), c.updatePersonInfo)
 	rg.DELETE(personIdUrl, middlewareComponent.Auth("PERSON_DELETE"), c.deletePersonInfo)
 	rg.GET(personIdUrl, middlewareComponent.Auth("PERSON_VIEW"), c.viewPerson)
-	rg.GET("person/:id/household", middlewareComponent.Auth("PERSON_VIEW"), c.viewPersonHousehold)
+	rg.GET("persons/:id/household", middlewareComponent.Auth("PERSON_VIEW"), c.viewPersonHousehold)
 	rg.POST("search", middlewareComponent.Auth("PERSON_SEARCH"), c.searchPerson)
-	rg.POST("household", middlewareComponent.Auth("HOUSEHOLD_ADD"), c.addHousehold)
-	rg.PUT("household/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
-	rg.DELETE("household/:id", middlewareComponent.Auth("HOUSEHOLD_DELETE"), c.deleteHousehold)
+	rg.POST("households", middlewareComponent.Auth("HOUSEHOLD_CREATE"), c.addHousehold)
+	rg.PUT("households/:id", middlewareComponent.Auth("HOUSEHOLD_UPDATE"), c.updateHousehold)
+	rg.DELETE("households/:id", middlewareComponent.Auth("HOUSEHOLD_DELETE"), c.deleteHousehold)
+	rg.POST("households/search", middlewareComponent.Auth("HOUSEHOLDS_VIEW"), c.householdSearch)
 }
 
 func (c *peopleManagementController) addPersonInfo(ctx *gin.Context) {
@@ -206,4 +207,31 @@ func (c *peopleManagementController) searchPerson(ctx *gin.Context) {
 			ctx.JSON(200, result)
 		},
 	})
+}
+
+func (a *peopleManagementController) householdSearch(c *gin.Context) {
+	var data queries.SearchHouseholdFilter
+	err := c.ShouldBindJSON(&data)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": gin.H{
+				"code":    "400",
+				"message": err.Error(),
+			},
+		})
+	}
+
+	output := &outputDecorator[queries.SearchHouseholdResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(result queries.SearchHouseholdResult) {
+			c.JSON(200, result)
+		},
+	}
+
+	a.peopleComponent.SearchHousehold(c, data, output).Wait()
 }

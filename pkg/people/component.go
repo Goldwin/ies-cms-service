@@ -6,6 +6,7 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/out"
 	q "github.com/Goldwin/ies-pik-cms/pkg/common/queries"
+	"github.com/Goldwin/ies-pik-cms/pkg/common/utils"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/worker"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
@@ -17,17 +18,26 @@ type PeopleDataLayerComponent interface {
 	QueryWorker() worker.QueryWorker[queries.QueryContext]
 }
 
-type PeopleManagementComponent interface {
-	ViewPerson(context.Context, queries.ViewPersonQuery, out.Output[queries.ViewPersonResult])
-	ViewPersonByEmail(context.Context, queries.ViewPersonByEmailQuery, out.Output[queries.ViewPersonResult])
-	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
+type PeopleManagementQueryComponent interface {
 	AddPerson(context.Context, dto.Person, out.Output[dto.Person])
 	UpdatePerson(context.Context, dto.Person, out.Output[dto.Person])
 	DeletePerson(context.Context, dto.Person, out.Output[bool])
 	AddHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	UpdateHousehold(context.Context, dto.HouseHoldInput, out.Output[dto.Household])
 	DeleteHousehold(context.Context, dto.HouseHoldInput, out.Output[bool])
+}
+
+type PeopleManagementCommandComponent interface {
+	ViewPerson(context.Context, queries.ViewPersonQuery, out.Output[queries.ViewPersonResult])
+	ViewPersonByEmail(context.Context, queries.ViewPersonByEmailQuery, out.Output[queries.ViewPersonResult])
+	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
 	ViewHouseholdByPerson(context.Context, queries.ViewHouseholdByPersonQuery, out.Output[queries.ViewHouseholdByPersonResult])
+	SearchHousehold(context.Context, queries.SearchHouseholdFilter, out.Output[queries.SearchHouseholdResult]) out.Waitable
+}
+
+type PeopleManagementComponent interface {
+	PeopleManagementQueryComponent
+	PeopleManagementCommandComponent
 }
 
 func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext]) PeopleManagementComponent {
@@ -39,6 +49,12 @@ func PeopleManagementComponents(worker worker.UnitOfWork[commands.CommandContext
 type peopleManagementComponent struct {
 	worker      worker.UnitOfWork[commands.CommandContext]
 	queryWorker worker.QueryWorker[queries.QueryContext]
+}
+
+// SearchHousehold implements PeopleManagementComponent.
+func (p *peopleManagementComponent) SearchHousehold(ctx context.Context, filter queries.SearchHouseholdFilter, output out.Output[queries.SearchHouseholdResult]) out.Waitable {
+	query := p.queryWorker.Query(ctx).SearchHousehold()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // ViewPersonByEmail implements PeopleManagementComponent.
