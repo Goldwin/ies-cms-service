@@ -42,6 +42,7 @@ func main() {
 
 	authOutputComponent := out.NewAuthOutputComponent(emailClient, eventBusComponent)
 
+	gin.SetMode(config.ControllerConfig.Mode)
 	r := gin.Default()
 	r.Use(middlewareComponent.Cors())
 
@@ -49,6 +50,10 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
+	})
+
+	r.GET("", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "Church Management API at your service...")
 	})
 
 	r.GET("/robots.txt", func(c *gin.Context) {
