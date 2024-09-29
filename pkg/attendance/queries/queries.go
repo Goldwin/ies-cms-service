@@ -6,7 +6,6 @@ type QueryContext interface {
 	ListEventsBySchedule() ListEventBySchedule
 	GetEvent() GetEvent
 	ListEventAttendance() ListEventAttendance
-	SearchHousehold() SearchHousehold
 	GetEventAttendanceSummary() GetEventAttendanceSummary
 	GetEventScheduleStats() GetEventScheduleStats
 }

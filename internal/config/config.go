@@ -28,11 +28,7 @@ func LoadConfigEnv() Config {
 	}
 	serviceName := os.Getenv("SERVICE_NAME")
 
-	opts := env.Options{
-		Prefix: serviceName + "_",
-	}
-
-	if err := env.ParseWithOptions(&config, opts); err != nil {
+	if err := env.Parse(&config); err != nil {
 		log.Fatal(err.Error())
 	}
 

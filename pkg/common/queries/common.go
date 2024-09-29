@@ -21,6 +21,7 @@ type QueryResult[T any] struct {
 	Data *T `json:"data"`
 }
 
+// Common error code. coincides with http status codes
 const (
 	ResourceNotFound QueryErrorCode = 404
 	InternalError    QueryErrorCode = 500

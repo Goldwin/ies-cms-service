@@ -3,7 +3,7 @@ package entities
 type Household struct {
 	ID            string
 	Name          string
-	HouseholdHead Person
+	HouseholdHead *Person
 	PictureUrl    string
-	Members       []Person
+	Members       []*Person
 }

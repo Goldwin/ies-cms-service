@@ -1,13 +1,16 @@
 package dto
 
+import "time"
+
 type HouseholdPerson struct {
-	ID                string `json:"id"`
-	FirstName         string `json:"firstName"`
-	MiddleName        string `json:"middleName"`
-	LastName          string `json:"lastName"`
-	PhoneNumber       string `json:"phoneNumber"`
-	EmailAddress      string `json:"emailAddress"`
-	ProfilePictureUrl string `json:"profilePictureUrl"`
+	ID                string    `json:"id"`
+	FirstName         string    `json:"firstName"`
+	MiddleName        string    `json:"middleName"`
+	LastName          string    `json:"lastName"`
+	PhoneNumber       string    `json:"phoneNumber"`
+	EmailAddress      string    `json:"emailAddress"`
+	ProfilePictureUrl string    `json:"profilePictureUrl"`
+	Birthday          time.Time `json:"birthday"`
 }
 
 type Household struct {

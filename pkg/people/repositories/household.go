@@ -1,10 +1,10 @@
 package repositories
 
-import "github.com/Goldwin/ies-pik-cms/pkg/people/entities"
+import (
+	"github.com/Goldwin/ies-pik-cms/pkg/common/repositories"
+	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
+)
 
-type HouseholdRepository interface {
-	GetHousehold(string) (*entities.Household, error)
-	AddHousehold(entities.Household) (*entities.Household, error)
-	UpdateHousehold(entities.Household) (*entities.Household, error)
-	DeleteHousehold(entities.Household) error
+type HouseholdRepository interface {		
+	repositories.Repository[string, entities.Household]
 }

@@ -42,7 +42,7 @@ func (cmd DeletePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	err = ctx.PersonRepository().DeletePerson(*personResult)
+	err = ctx.PersonRepository().Delete(personResult)
 
 	if err != nil {
 		return CommandExecutionResult[bool]{

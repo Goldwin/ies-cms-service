@@ -6,6 +6,7 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
+	"github.com/google/uuid"
 )
 
 /*
@@ -25,8 +26,8 @@ func (cmd AddPersonCommand) Execute(ctx CommandContext) CommandExecutionResult[d
 	var err error
 	c := cmd.Input
 
-	person := entities.Person{
-		ID:                c.ID,
+	person := &entities.Person{
+		ID:                uuid.NewString(),
 		FirstName:         c.FirstName,
 		MiddleName:        c.MiddleName,
 		LastName:          c.LastName,
@@ -72,29 +73,8 @@ func (cmd AddPersonCommand) Execute(ctx CommandContext) CommandExecutionResult[d
 			},
 		}
 	}
-	// accounts, err := ctx.AccountRepository().FindAccountByEmails(emails)
 
-	// if err != nil {
-	// 	return AppExecutionResult[dto.Person]{
-	// 		Status: ExecutionStatusFailed,
-	// 		Error: AppErrorDetail{
-	// 			Code:    AddHouseholdErrorCodeDBError,
-	// 			Message: fmt.Sprintf("Can't Add New Person Info, Error: %s", err.Error()),
-	// 		},
-	// 	}
-	// }
-
-	// if len(accounts) > 0 {
-	// 	return AppExecutionResult[dto.Person]{
-	// 		Status: ExecutionStatusFailed,
-	// 		Error: AppErrorDetail{
-	// 			Code:    AddPersonErrorCodeEmailsExist,
-	// 			Message: "Can't Add New Person Info, Email already exists in the database",
-	// 		},
-	// 	}
-	// }
-
-	result, err := ctx.PersonRepository().AddPerson(person)
+	result, err := ctx.PersonRepository().Save(person)
 
 	if err != nil {
 		return CommandExecutionResult[dto.Person]{

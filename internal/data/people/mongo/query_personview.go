@@ -18,7 +18,7 @@ type viewPersonImpl struct {
 
 // Execute implements queries.ViewPerson.
 func (v *viewPersonImpl) Execute(query queries.ViewPersonQuery) (queries.ViewPersonResult, QueryErrorDetail) {
-	person := Person{}
+	person := PersonModel{}
 	err := v.db.Collection(personCollectionName).FindOne(v.ctx, bson.M{"_id": query.ID}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewPersonResult{
@@ -49,7 +49,7 @@ type viewPersonByEmailImpl struct {
 
 // Execute implements queries.ViewPersonByEmail.
 func (v *viewPersonByEmailImpl) Execute(query queries.ViewPersonByEmailQuery) (queries.ViewPersonResult, QueryErrorDetail) {
-	person := Person{}
+	person := PersonModel{}
 	err := v.db.Collection(personCollectionName).FindOne(v.ctx, bson.M{"email": query.Email}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return queries.ViewPersonResult{
@@ -87,7 +87,7 @@ func ViewPersonByEmail(ctx context.Context, db *mongo.Database) queries.ViewPers
 	}
 }
 
-func toPersonDTO(person Person) dto.Person {
+func toPersonDTO(person PersonModel) dto.Person {
 
 	result := dto.Person{
 		ID:                person.ID,

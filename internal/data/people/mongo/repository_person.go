@@ -5,9 +5,9 @@ import (
 
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/repositories"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type personRepositoryImpl struct {
@@ -16,43 +16,48 @@ type personRepositoryImpl struct {
 	collection *mongo.Collection
 }
 
-// DeletePerson implements repositories.PersonRepository.
-func (p *personRepositoryImpl) DeletePerson(e entities.Person) error {
+// Delete implements repositories.PersonRepository.
+func (p *personRepositoryImpl) Delete(e *entities.Person) error {
 	_, err := p.collection.DeleteOne(p.ctx, bson.M{"_id": e.ID})
 	return err
 }
 
-// GetByEmail implements repositories.PersonRepository.
-func (p *personRepositoryImpl) GetByEmail(email entities.EmailAddress) (*entities.Person, error) {
-	var person Person
-	err := p.collection.FindOne(p.ctx, bson.M{"emailAddress": string(email)}).Decode(&person)
-	if err != nil && err == mongo.ErrNoDocuments {
-		return nil, nil
+// List implements repositories.PersonRepository.
+func (p *personRepositoryImpl) List(id []string) ([]*entities.Person, error) {
+	models := make([]PersonModel, 0)
+	if len(id) == 0 {
+		return make([]*entities.Person, 0), nil
 	}
+	result, err := p.collection.Find(p.ctx, bson.M{"_id": bson.M{"$in": id}})
 	if err != nil {
 		return nil, err
 	}
-	result := toPersonEntities(person)
-	return &result, nil
+	defer result.Close(p.ctx)
+	err = result.All(p.ctx, &models)
+	if err != nil {
+		return nil, err
+	}
+	entities := make([]*entities.Person, len(models))
+	for i, model := range models {
+		entities[i] = model.toEntity()
+	}
+	return entities, nil
 }
 
-// AddPerson implements repositories.PersonRepository.
-func (p *personRepositoryImpl) AddPerson(person entities.Person) (*entities.Person, error) {
-	if person.ID == "" {
-		person.ID = uuid.NewString()
-	}
-	pp := toPersonMongoModel(person)
-	_, err := p.collection.InsertOne(p.ctx, pp)
+// Save implements repositories.PersonRepository.
+func (p *personRepositoryImpl) Save(e *entities.Person) (*entities.Person, error) {
+	pp := toPersonModel(e)
+	_, err := p.collection.UpdateByID(p.ctx, e.ID, bson.M{"$set": pp}, options.Update().SetUpsert(true))
 	if err != nil {
 		return nil, err
 	}
 
-	return &person, nil
+	return e, nil
 }
 
 // Get implements repositories.PersonRepository.
 func (p *personRepositoryImpl) Get(id string) (*entities.Person, error) {
-	var person Person
+	var person PersonModel
 	err := p.collection.FindOne(p.ctx, bson.M{"_id": id}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
 		return nil, nil
@@ -60,13 +65,27 @@ func (p *personRepositoryImpl) Get(id string) (*entities.Person, error) {
 	if err != nil {
 		return nil, err
 	}
-	result := toPersonEntities(person)
-	return &result, nil
+	result := person.toEntity()
+	return result, nil
+}
+
+// GetByEmail implements repositories.PersonRepository.
+func (p *personRepositoryImpl) GetByEmail(email entities.EmailAddress) (*entities.Person, error) {
+	var person PersonModel
+	err := p.collection.FindOne(p.ctx, bson.M{"emailAddress": string(email)}).Decode(&person)
+	if err != nil && err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	result := person.toEntity()
+	return result, nil
 }
 
 // ListByID implements repositories.PersonRepository.
 func (p *personRepositoryImpl) ListByID(id []string) ([]entities.Person, error) {
-	models := make([]Person, 0)
+	models := make([]PersonModel, 0)
 	if len(id) == 0 {
 		return make([]entities.Person, 0), nil
 	}
@@ -81,19 +100,9 @@ func (p *personRepositoryImpl) ListByID(id []string) ([]entities.Person, error) 
 	}
 	entities := make([]entities.Person, len(models))
 	for i, model := range models {
-		entities[i] = toPersonEntities(model)
+		entities[i] = *model.toEntity()
 	}
 	return entities, nil
-}
-
-// UpdatePerson implements repositories.PersonRepository.
-func (p *personRepositoryImpl) UpdatePerson(person entities.Person) (*entities.Person, error) {
-	model := toPersonMongoModel(person)
-	_, err := p.collection.UpdateOne(p.ctx, bson.M{"_id": person.ID}, bson.M{"$set": model})
-	if err != nil {
-		return nil, err
-	}
-	return &person, nil
 }
 
 func NewPersonRepository(ctx context.Context, db *mongo.Database) repositories.PersonRepository {

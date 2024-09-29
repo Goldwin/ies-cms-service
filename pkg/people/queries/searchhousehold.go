@@ -3,7 +3,7 @@ package queries
 import (
 	"fmt"
 
-	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
+	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 )
 
@@ -29,7 +29,7 @@ func (query SearchHouseholdFilter) Validate() error {
 }
 
 type SearchHouseholdResult struct {
-	Data []dto.HouseholdDTO `json:"data" form:"data"`
+	Data []dto.Household `json:"data" form:"data"`
 }
 
 type SearchHousehold interface {

@@ -41,7 +41,7 @@ func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) CommandExecutionRe
 		}
 	}
 
-	persons, err := ctx.PersonRepository().ListByID(cmd.Input.MemberPersonsIds)
+	persons, err := ctx.PersonRepository().List(cmd.Input.MemberPersonsIds)
 	if err != nil {
 		return CommandExecutionResult[dto.Household]{
 			Status: ExecutionStatusFailed,
@@ -69,14 +69,14 @@ func (cmd UpdateHouseholdCommand) Execute(ctx CommandContext) CommandExecutionRe
 		}
 	}
 
-	household := entities.Household{
-		HouseholdHead: *householdHead,
+	household := &entities.Household{
+		HouseholdHead: householdHead,
 		Members:       persons,
 		Name:          cmd.Input.Name,
 		ID:            cmd.Input.ID,
 	}
 
-	result, err := ctx.HouseholdRepository().UpdateHousehold(household)
+	result, err := ctx.HouseholdRepository().Save(household)
 
 	householdHeadDto := dto.HouseholdPerson{
 		ID:           result.HouseholdHead.ID,

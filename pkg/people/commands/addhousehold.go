@@ -6,6 +6,7 @@ import (
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/entities"
+	"github.com/google/uuid"
 )
 
 const (
@@ -41,7 +42,7 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	persons, err := ctx.PersonRepository().ListByID(cmd.Input.MemberPersonsIds)
+	persons, err := ctx.PersonRepository().List(cmd.Input.MemberPersonsIds)
 	if err != nil {
 		return CommandExecutionResult[dto.Household]{
 			Status: ExecutionStatusFailed,
@@ -69,13 +70,14 @@ func (cmd AddHouseholdCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	household := entities.Household{
-		HouseholdHead: *householdHead,
+	household := &entities.Household{
+		ID:            uuid.NewString(),
+		HouseholdHead: householdHead,
 		Members:       persons,
 		Name:          cmd.Input.Name,
 	}
 
-	result, err := ctx.HouseholdRepository().AddHousehold(household)
+	result, err := ctx.HouseholdRepository().Save(household)
 
 	householdHeadDto := dto.HouseholdPerson{
 		ID:           result.HouseholdHead.ID,
