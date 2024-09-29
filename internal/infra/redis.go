@@ -24,7 +24,7 @@ type RedisConfig struct {
 func NewRedisClient(r *RedisConfig) redis.UniversalClient {
 	var redisClient redis.UniversalClient
 	var option redis.UniversalOptions
-	if r == nil {
+	if r == nil || r.Hosts == "" {
 		return nil
 	}
 	addresses := strings.Split(r.Hosts, ",")
