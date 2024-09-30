@@ -147,7 +147,7 @@ func (a *authController) passwordSignIn(c *gin.Context) {
 	var input dto.SignInInput
 	c.BindJSON(&input)
 	output := &outputDecorator[dto.SignInResult]{
-		output: a.authOutputComponent.SignInOutput(),
+		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err,

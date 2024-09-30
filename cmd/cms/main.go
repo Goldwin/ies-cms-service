@@ -32,7 +32,7 @@ func main() {
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)
 	attendanceDataLayer := attendanceData.NewAttendanceDataLayerComponent(config.DataConfig["ATTENDANCE"], infraComponent)
 
-	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
+	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret, config.RootEmail(), config.RootPassword())
 	peopleManagementComponent := people.NewPeopleManagementComponent(peopleDataLayer)
 
 	attendanceComponent := attendance.NewAttendanceComponent(attendanceDataLayer)
@@ -41,6 +41,8 @@ func main() {
 	eventBusComponent := bus.Local()
 
 	authOutputComponent := out.NewAuthOutputComponent(emailClient, eventBusComponent)
+
+	authComponent.Start()
 
 	gin.SetMode(config.ControllerConfig.Mode)
 	r := gin.Default()

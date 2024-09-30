@@ -64,3 +64,11 @@ func LoadConfigEnv() Config {
 
 	return config
 }
+
+func (c *Config) RootEmail() string {
+	return os.Getenv("ADMIN_EMAIL")
+}
+
+func (c *Config) RootPassword() []byte {
+	return []byte(os.Getenv("ADMIN_PASSWORD"))
+}

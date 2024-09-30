@@ -21,7 +21,7 @@ func main() {
 	emailClient := infra.NewEmailClient(config.EmailConfig)
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)
-	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
+	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret, config.RootEmail(), config.RootPassword())
 	eventBus := bus.Redis(infraComponent)
 	authOutputComponent := out.NewAuthOutputComponent(emailClient, eventBus)
 	middlewareComponent := middleware.NewMiddlewareComponent(config.MiddlewareConfig)

@@ -17,6 +17,7 @@ type registerOutputHandler struct {
 
 // OnError implements out.Output.
 func (*registerOutputHandler) OnError(err out.AppErrorDetail) {
+	log.Default().Printf("Error Found when registering: %s", err.Error())
 }
 
 // OnSuccess implements out.Output.

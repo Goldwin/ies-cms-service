@@ -32,7 +32,7 @@ func main() {
 
 	infraComponent := infra.NewInfraComponent(config.InfraConfig)
 	authDataLayer := authData.NewAuthDataLayerComponent(config.DataConfig["AUTH"], infraComponent)
-	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret)
+	authComponent := auth.NewAuthComponent(authDataLayer, config.Secret, config.RootEmail(), config.RootPassword())
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter Username to be granted admin access: ")

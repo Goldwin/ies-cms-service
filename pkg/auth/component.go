@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"log"
+	"sync"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/commands"
 	"github.com/Goldwin/ies-pik-cms/pkg/auth/dto"
@@ -29,8 +30,11 @@ type AuthComponent interface {
 }
 
 type authComponentImpl struct {
-	worker    worker.UnitOfWork[commands.CommandContext]
-	secretKey []byte
+	worker       worker.UnitOfWork[commands.CommandContext]
+	secretKey    []byte
+	rootEmail    string
+	rootPassword []byte
+	once         sync.Once
 }
 
 // GrantAdminRole implements AuthComponent.
@@ -69,7 +73,16 @@ func (a *authComponentImpl) ResetPassword(ctx context.Context, input dto.Passwor
 
 // Start implements AuthComponent.
 func (a *authComponentImpl) Start() {
-	//no op
+	a.once.Do(func() {
+		_ = utils.SingleCommandExecution(a.worker, commands.InitializeRootAccountCommand{
+			Email:    a.rootEmail,
+			Password: a.rootPassword,
+		}).Execute(context.Background())
+
+		a.rootEmail = ""
+		a.rootPassword = nil
+	})
+	log.Default().Printf("Auth Component Started!")
 }
 
 // Stop implements AuthComponent.
@@ -158,9 +171,11 @@ func (a *authComponentImpl) SignIn(ctx context.Context, input dto.SignInInput, o
 	}
 }
 
-func NewAuthComponent(component AuthDataLayerComponent, secretKey []byte) AuthComponent {
+func NewAuthComponent(component AuthDataLayerComponent, secretKey []byte, rootEmail string, rootPassword []byte) AuthComponent {
 	return &authComponentImpl{
-		worker:    component.CommandWorker(),
-		secretKey: secretKey,
+		worker:       component.CommandWorker(),
+		secretKey:    secretKey,
+		rootEmail:    rootEmail,
+		rootPassword: rootPassword,
 	}
 }
