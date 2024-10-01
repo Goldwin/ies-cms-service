@@ -127,8 +127,19 @@ func (a *authController) auth(c *gin.Context) {
 
 func (a *authController) otp(c *gin.Context) {
 	var input dto.OtpInput
+	output := &outputDecorator[dto.OtpResult]{
+		output: a.authOutputComponent.OTPOutput(),
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, gin.H{
+				"error": err,
+			})
+		},
+		successFunc: func(dto.OtpResult) {
+			c.JSON(204, gin.H{})
+		},
+	}
 	c.BindJSON(&input)
-	a.authComponent.GenerateOtp(c, input, a.authOutputComponent.OTPOutput())
+	a.authComponent.GenerateOtp(c, input, output)
 	c.JSON(204, gin.H{})
 }
 
@@ -136,7 +147,7 @@ func (a *authController) passwordSignIn(c *gin.Context) {
 	var input dto.SignInInput
 	c.BindJSON(&input)
 	output := &outputDecorator[dto.SignInResult]{
-		output: a.authOutputComponent.SignInOutput(),
+		output: nil,
 		errFunction: func(err out.AppErrorDetail) {
 			c.JSON(400, gin.H{
 				"error": err,

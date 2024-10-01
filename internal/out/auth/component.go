@@ -45,7 +45,6 @@ func (a *authOutputComponentImpl) OTPOutput() out.Output[dto.OtpResult] {
 func NewAuthOutputComponent(emailClient infra.EmailClient, eventBus bus.EventBusComponent) AuthOutputComponent {
 	return &authOutputComponentImpl{
 		otpOutput:             newOtpOutputHandler(emailClient),
-		signInOutputHandler:   newSampleSignInOutputHandler(),
 		registerOutputHandler: newRegisterOutputHandler(eventBus),
 	}
 }
