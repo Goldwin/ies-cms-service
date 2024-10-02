@@ -48,6 +48,7 @@ func toPersonModel(e *entities.Person) PersonModel {
 		MaritalStatus:     e.MaritalStatus,
 		Birthday:          birthday,
 		Gender:            string(e.Gender),
+		HouseholdID:       e.HouseholdID,
 	}
 }
 
@@ -79,6 +80,7 @@ func (p *PersonModel) toEntity() *entities.Person {
 		MaritalStatus:     p.MaritalStatus,
 		Birthday:          birthday,
 		Gender:            entities.Gender(p.Gender),
+		HouseholdID:       p.HouseholdID,
 	}
 }
 

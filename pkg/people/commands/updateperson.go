@@ -31,9 +31,9 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 		phones[i] = entities.PhoneNumber(phone)
 	}
 
-	personResult, err := ctx.PersonRepository().Get(c.ID)
+	person, err := ctx.PersonRepository().Get(c.ID)
 
-	if personResult == nil {
+	if person == nil {
 		return CommandExecutionResult[dto.Person]{
 			Status: ExecutionStatusFailed,
 			Error: CommandErrorDetail{
@@ -43,19 +43,17 @@ func (cmd UpdatePersonCommand) Execute(ctx CommandContext) CommandExecutionResul
 		}
 	}
 
-	person := &entities.Person{
-		ID:                personResult.ID,
-		FirstName:         c.FirstName,
-		MiddleName:        c.MiddleName,
-		LastName:          c.LastName,
-		Address:           c.Address,
-		PhoneNumber:       entities.PhoneNumber(c.PhoneNumber),
-		ProfilePictureUrl: c.ProfilePictureUrl,
-		EmailAddress:      entities.EmailAddress(c.EmailAddress),
-		MaritalStatus:     c.MaritalStatus,
-		Birthday:          c.Birthday.ToEntity(),
-		Gender:            entities.Gender(c.Gender),
-	}
+	person.FirstName = c.FirstName 		
+	person.MiddleName = c.MiddleName
+	person.LastName = c.LastName
+	person.Address = c.Address
+	person.PhoneNumber = entities.PhoneNumber(c.PhoneNumber)
+	person.ProfilePictureUrl = c.ProfilePictureUrl
+	person.EmailAddress = entities.EmailAddress(c.EmailAddress)
+	person.MaritalStatus = c.MaritalStatus
+	person.Birthday = c.Birthday.ToEntity()
+	person.Gender = entities.Gender(c.Gender)
+
 
 	err = person.Validate()
 
