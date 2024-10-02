@@ -36,6 +36,7 @@ type Person struct {
 	MaritalStatus     string
 	Birthday          *YearMonthDay
 	Gender            Gender
+	HouseholdID       string
 }
 
 func (p *Person) Validate() error {
