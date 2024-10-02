@@ -85,7 +85,7 @@ func (p *PersonModel) toEntity() *entities.Person {
 type HouseholdModel struct {
 	ID              string `bson:"_id"`
 	Name            string `bson:"name"`
-	HouseholdHeadID string `bson:"householdHeadID"`
+	HouseholdHeadID string `bson:"householdHeadId"`
 	PictureUrl      string `bson:"pictureUrl"`
 }
 
@@ -107,7 +107,7 @@ func toEntity(householdModel HouseholdModel) *entities.Household {
 }
 
 type HouseholdMemberModel struct {
-	PersonID          string `bson:"personID"`
+	PersonID          string `bson:"personId"`
 	FirstName         string `bson:"firstName"`
 	LastName          string `bson:"lastName"`
 	ProfilePictureUrl string `bson:"profilePictureUrl"`
@@ -139,5 +139,5 @@ func toHouseholdMemberModel(e *entities.Person) HouseholdMemberModel {
 
 type PersonHouseholdModel struct {
 	ID          string `bson:"_id"`
-	HouseholdID string `bson:"householdID"`
+	HouseholdID string `bson:"householdId"`
 }
