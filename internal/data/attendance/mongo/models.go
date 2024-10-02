@@ -206,7 +206,7 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 
 type PersonModel struct {
 	ID                string `bson:"_id"`
-	PersonID          string `bson:"personID"`
+	PersonID          string `bson:"personId"`
 	FirstName         string `bson:"firstName"`
 	MiddleName        string `bson:"middleName"`
 	LastName          string `bson:"lastName"`
@@ -241,11 +241,6 @@ func (p *PersonModel) ToDTO() dto.PersonDTO {
 		ProfilePictureUrl: p.ProfilePictureUrl,
 		Age:               int(time.Now().Sub(p.Birthday).Hours() / 24 / 365),
 	}
-}
-
-type PersonHouseholdModel struct {
-	ID          string `bson:"_id"`
-	HouseholdID string `bson:"householdID"`
 }
 
 type HouseholdModel struct {
