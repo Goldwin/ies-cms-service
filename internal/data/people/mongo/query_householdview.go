@@ -19,6 +19,10 @@ type viewHouseholdByPersonImpl struct {
 	personCollection    *mongo.Collection
 }
 
+const (
+	connectionFailureMessage = "Failed to connect to database"
+)
+
 // Execute implements queries.ViewHouseholdByPerson.
 func (v *viewHouseholdByPersonImpl) Execute(query queries.ViewHouseholdByPersonQuery) (queries.ViewHouseholdByPersonResult, QueryErrorDetail) {
 	personModel, queryError := v.getPerson(query.PersonID)
@@ -88,7 +92,7 @@ func (v *viewHouseholdByPersonImpl) getPerson(personID string) (PersonModel, Que
 	if err != nil {
 		return PersonModel{}, QueryErrorDetail{
 			Code:    500,
-			Message: "Failed to connect to database",
+			Message: connectionFailureMessage,
 		}
 	}
 	return person, NoQueryError
@@ -101,14 +105,14 @@ func (v *viewHouseholdByPersonImpl) listHouseholdMembers(householdID string) ([]
 	if err != nil {
 		return nil, QueryErrorDetail{
 			Code:    500,
-			Message: "Failed to connect to database",
+			Message: connectionFailureMessage,
 		}
 	}
 
 	if err = cursor.All(v.ctx, &personList); err != nil {
 		return nil, QueryErrorDetail{
 			Code:    500,
-			Message: "Failed to connect to database",
+			Message: connectionFailureMessage,
 		}
 	}
 	return personList, NoQueryError
