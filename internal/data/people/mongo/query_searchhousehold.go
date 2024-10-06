@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/queries"
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
@@ -102,6 +103,7 @@ func (s *searchHouseholdImpl) listHousehold(householdIdList []string) ([]dto.Hou
 					PhoneNumber:       e.PhoneNumber,
 					EmailAddress:      e.EmailAddress,
 					ProfilePictureUrl: e.ProfilePictureUrl,
+					Birthday:          parseBirthdayString(*e.Birthday),
 				}
 			}),
 			HouseholdHead: dto.HouseholdPerson{
@@ -112,29 +114,38 @@ func (s *searchHouseholdImpl) listHousehold(householdIdList []string) ([]dto.Hou
 				PhoneNumber:       head.PhoneNumber,
 				EmailAddress:      head.EmailAddress,
 				ProfilePictureUrl: head.ProfilePictureUrl,
+				Birthday:          parseBirthdayString(*head.Birthday),
 			},
 		}
 	}), NoQueryError
 }
 
+func parseBirthdayString(birthday string) time.Time {
+	var year, month, day int
+	fmt.Sscanf(birthday, "%d-%d-%d", &year, &month, &day)
+
+	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+}
+
 func (s *searchHouseholdImpl) listPersonsGroupByHouseholdID(householdIDList ...string) (map[string][]PersonModel, QueryErrorDetail) {
+	const errorMessage = "Failed to query list of person"
 	cursor, err := s.db.Collection(personCollectionName).Find(s.ctx, bson.M{"householdId": bson.M{"$in": householdIDList}})
 
 	if err != nil {
-		log.Default().Printf("Failed to query list of person: %s", err.Error())
+		log.Default().Printf("%s: %s", errorMessage, err.Error())
 		return nil, QueryErrorDetail{
 			Code:    500,
-			Message: "Failed to query list of person",
+			Message: errorMessage,
 		}
 	}
 	var personList []PersonModel
 	err = cursor.All(s.ctx, &personList)
 
 	if err != nil {
-		log.Default().Printf("Failed to query list of person: %s", err.Error())
+		log.Default().Printf("%s: %s", errorMessage, err.Error())
 		return nil, QueryErrorDetail{
 			Code:    500,
-			Message: "Failed to query list of person",
+			Message: errorMessage,
 		}
 	}
 
@@ -154,13 +165,14 @@ func (s *searchHouseholdImpl) queryPersonModel(filter queries.SearchHouseholdFil
 	personCollection := s.db.Collection(personCollectionName)
 	opts := options.Find().SetSort(bson.D{{Key: "_id", Value: 1}}).SetLimit(int64(filter.Limit)).SetProjection(bson.M{"_id": 1, "householdId": 1})
 	regexOp := "$regex"
+	opt := "$options"
 	cursor, err := personCollection.Find(s.ctx,
 		bson.M{
 			"_id": bson.M{"$gt": filter.LastID},
 			"$or": []interface{}{
-				bson.M{"firstName": bson.M{regexOp: fmt.Sprintf("^%s", filter.NamePrefix)}},
-				bson.M{"middleName": bson.M{regexOp: fmt.Sprintf("^%s", filter.NamePrefix)}},
-				bson.M{"lastName": bson.M{regexOp: fmt.Sprintf("^%s", filter.NamePrefix)}},
+				bson.M{"firstName": bson.M{regexOp: fmt.Sprintf("^%s", filter.NamePrefix), opt: "i"}},
+				bson.M{"middleName": bson.M{regexOp: fmt.Sprintf("^%s", filter.NamePrefix), opt: "i"}},
+				bson.M{"lastName": bson.M{regexOp: fmt.Sprintf("^%s", filter.NamePrefix), opt: "i"}},
 			},
 		},
 		opts,
