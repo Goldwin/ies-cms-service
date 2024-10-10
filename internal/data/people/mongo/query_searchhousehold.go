@@ -103,7 +103,7 @@ func (s *searchHouseholdImpl) listHousehold(householdIdList []string) ([]dto.Hou
 					PhoneNumber:       e.PhoneNumber,
 					EmailAddress:      e.EmailAddress,
 					ProfilePictureUrl: e.ProfilePictureUrl,
-					Birthday:          parseBirthdayString(*e.Birthday),
+					Birthday:          parseBirthdayString(e.Birthday),
 				}
 			}),
 			HouseholdHead: dto.HouseholdPerson{
@@ -114,15 +114,18 @@ func (s *searchHouseholdImpl) listHousehold(householdIdList []string) ([]dto.Hou
 				PhoneNumber:       head.PhoneNumber,
 				EmailAddress:      head.EmailAddress,
 				ProfilePictureUrl: head.ProfilePictureUrl,
-				Birthday:          parseBirthdayString(*head.Birthday),
+				Birthday:          parseBirthdayString(head.Birthday),
 			},
 		}
 	}), NoQueryError
 }
 
-func parseBirthdayString(birthday string) time.Time {
+func parseBirthdayString(birthday *string) time.Time {
+	if birthday == nil {
+		return time.Time{}
+	}
 	var year, month, day int
-	fmt.Sscanf(birthday, "%d-%d-%d", &year, &month, &day)
+	fmt.Sscanf(*birthday, "%d-%d-%d", &year, &month, &day)
 
 	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 }
