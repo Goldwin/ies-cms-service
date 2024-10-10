@@ -121,7 +121,7 @@ func (s *searchHouseholdImpl) listHousehold(householdIdList []string) ([]dto.Hou
 }
 
 func parseBirthdayString(birthday *string) time.Time {
-	if birthday == nil {
+	if birthday == nil || *birthday == ""{
 		return time.Time{}
 	}
 	var year, month, day int
