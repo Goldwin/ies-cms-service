@@ -1,6 +1,7 @@
 package mongo
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
@@ -211,7 +212,7 @@ type PersonModel struct {
 	MiddleName        string `bson:"middleName"`
 	LastName          string `bson:"lastName"`
 	ProfilePictureUrl string `bson:"profilePictureUrl"`
-	Birthday          time.Time
+	Birthday          string `bson:"birthday"`
 }
 
 func (p *PersonModel) ToEntity() *entities.Person {
@@ -233,13 +234,18 @@ func (p *PersonModel) ToDTO() dto.PersonDTO {
 	if id == "" {
 		id = p.PersonID
 	}
+	var year, month, day int
+	fmt.Sscanf(p.Birthday, "%d-%d-%d", &year, &month, &day)
+
+	birthday := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+
 	return dto.PersonDTO{
 		ID:                id,
 		FirstName:         p.FirstName,
 		MiddleName:        p.MiddleName,
 		LastName:          p.LastName,
 		ProfilePictureUrl: p.ProfilePictureUrl,
-		Age:               int(time.Now().Sub(p.Birthday).Hours() / 24 / 365),
+		Age:               int(time.Now().Sub(birthday).Hours() / 24 / 365),
 	}
 }
 
@@ -294,7 +300,6 @@ func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 			MiddleName:        e.Attendee.MiddleName,
 			LastName:          e.Attendee.LastName,
 			ProfilePictureUrl: e.Attendee.ProfilePictureUrl,
-			Birthday:          time.Time{},
 		},
 		CheckedInBy: PersonModel{
 			ID:                e.CheckedInBy.PersonID,
@@ -303,7 +308,6 @@ func toAttendanceModel(e *entities.Attendance) AttendanceModel {
 			MiddleName:        e.CheckedInBy.MiddleName,
 			LastName:          e.CheckedInBy.LastName,
 			ProfilePictureUrl: e.CheckedInBy.ProfilePictureUrl,
-			Birthday:          time.Time{},
 		},
 		SecurityCode:   e.SecurityCode,
 		SecurityNumber: e.SecurityNumber,
