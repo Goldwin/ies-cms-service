@@ -151,6 +151,7 @@ func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, 
 		Name:       activity.Name,
 		Hour:       activity.Hour,
 		Minute:     activity.Minute,
+		Labels:     activity.Labels,
 	}).WithOutput(
 		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
 			return dto.FromEntities(&e)
@@ -196,6 +197,7 @@ func (a *attendanceComponentImpl) UpdateEventScheduleActivity(ctx context.Contex
 		Name:       activity.Name,
 		Hour:       activity.Hour,
 		Minute:     activity.Minute,
+		Labels:     activity.Labels,
 	}).WithOutput(
 		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
 			return dto.FromEntities(&e)

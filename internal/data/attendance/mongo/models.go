@@ -67,8 +67,8 @@ func toEventScheduleModel(e *entities.EventSchedule) EventScheduleModel {
 		Name:           e.Name,
 		TimezoneOffset: e.TimezoneOffset,
 		Type:           string(e.Type),
-		Activities: lo.Map(e.Activities, func(e entities.EventScheduleActivity, _ int) EventScheduleActivityModel {
-			return toEventScheduleActivityModel(&e)
+		Activities: lo.Map(e.Activities, func(e *entities.EventScheduleActivity, _ int) EventScheduleActivityModel {
+			return toEventScheduleActivityModel(e)
 		}),
 		Date:      e.Date,
 		Days:      e.Days,
@@ -88,7 +88,7 @@ func (e *EventScheduleModel) ToEventSchedule() *entities.EventSchedule {
 		Name:           e.Name,
 		TimezoneOffset: e.TimezoneOffset,
 		Type:           entities.EventScheduleType(e.Type),
-		Activities: lo.Map(e.Activities, func(e EventScheduleActivityModel, _ int) entities.EventScheduleActivity {
+		Activities: lo.Map(e.Activities, func(e EventScheduleActivityModel, _ int) *entities.EventScheduleActivity {
 			return e.ToEventScheduleActivity()
 		}),
 		OneTimeEventSchedule: entities.OneTimeEventSchedule{
@@ -107,10 +107,11 @@ func (e *EventScheduleModel) ToEventSchedule() *entities.EventSchedule {
 }
 
 type EventScheduleActivityModel struct {
-	ID     string `bson:"_id"`
-	Name   string `bson:"name"`
-	Hour   int    `bson:"hour"`
-	Minute int    `bson:"minute"`
+	ID     string               `bson:"_id"`
+	Name   string               `bson:"name"`
+	Hour   int                  `bson:"hour"`
+	Minute int                  `bson:"minute"`
+	Labels []ActivityLabelModel `bson:"labels"`
 }
 
 func toEventScheduleActivityModel(e *entities.EventScheduleActivity) EventScheduleActivityModel {
@@ -119,15 +120,21 @@ func toEventScheduleActivityModel(e *entities.EventScheduleActivity) EventSchedu
 		Name:   e.Name,
 		Hour:   e.Hour,
 		Minute: e.Minute,
+		Labels: lo.Map(e.Labels, func(e *entities.ActivityLabel, _ int) ActivityLabelModel {
+			return FromActivityLabelEntity(e)
+		}),
 	}
 }
 
-func (e *EventScheduleActivityModel) ToEventScheduleActivity() entities.EventScheduleActivity {
-	return entities.EventScheduleActivity{
+func (e *EventScheduleActivityModel) ToEventScheduleActivity() *entities.EventScheduleActivity {
+	return &entities.EventScheduleActivity{
 		ID:     e.ID,
 		Name:   e.Name,
 		Hour:   e.Hour,
 		Minute: e.Minute,
+		Labels: lo.Map(e.Labels, func(model ActivityLabelModel, _ int) *entities.ActivityLabel {
+			return model.ToEntity()
+		}),
 	}
 }
 
@@ -184,9 +191,10 @@ func toEventModel(e *entities.Event) EventModel {
 }
 
 type EventActivityModel struct {
-	ID   string    `bson:"_id"`
-	Name string    `bson:"name"`
-	Time time.Time `bson:"time"`
+	ID     string               `bson:"_id"`
+	Name   string               `bson:"name"`
+	Time   time.Time            `bson:"time"`
+	Labels []ActivityLabelModel `bson:"labels"`
 }
 
 func (e *EventActivityModel) ToEventActivity() *entities.EventActivity {
@@ -194,6 +202,9 @@ func (e *EventActivityModel) ToEventActivity() *entities.EventActivity {
 		ID:   e.ID,
 		Name: e.Name,
 		Time: e.Time,
+		Labels: lo.Map(e.Labels, func(model ActivityLabelModel, _ int) *entities.ActivityLabel {
+			return model.ToEntity()
+		}),
 	}
 }
 
@@ -202,6 +213,9 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 		ID:   e.ID,
 		Name: e.Name,
 		Time: e.Time,
+		Labels: lo.Map(e.Labels, func(e *entities.ActivityLabel, _ int) ActivityLabelModel {
+			return FromActivityLabelEntity(e)
+		}),
 	}
 }
 
@@ -372,5 +386,34 @@ func (e *EventAttendanceSummaryModel) ToDTO() dto.EventAttendanceSummaryDTO {
 		}),
 		Date: e.Date,
 		ID:   e.ID,
+	}
+}
+
+type ActivityLabelModel struct {
+	LabelID         string   `bson:"labelId"`
+	LabelName       string   `bson:"labelName"`
+	AttendanceTypes []string `bson:"attendanceType"`
+	Quantity        int      `bson:"quantity"`
+}
+
+func (model ActivityLabelModel) ToEntity() *entities.ActivityLabel {
+	return &entities.ActivityLabel{
+		LabelID:   model.LabelID,
+		LabelName: model.LabelName,
+		AttendanceTypes: lo.Map(model.AttendanceTypes, func(attendanceType string, _ int) entities.AttendanceType {
+			return entities.AttendanceType(attendanceType)
+		}),
+		Quantity: model.Quantity,
+	}
+}
+
+func FromActivityLabelEntity(e *entities.ActivityLabel) ActivityLabelModel {
+	return ActivityLabelModel{
+		LabelID:   e.LabelID,
+		LabelName: e.LabelName,
+		AttendanceTypes: lo.Map(e.AttendanceTypes, func(attendanceType entities.AttendanceType, _ int) string {
+			return string(attendanceType)
+		}),
+		Quantity: e.Quantity,
 	}
 }

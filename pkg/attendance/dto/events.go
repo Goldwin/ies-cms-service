@@ -23,7 +23,14 @@ func FromEventEntities(result *entities.Event) EventDTO {
 		Name:       result.Name,
 		Activities: lo.Map(result.EventActivities,
 			func(ea *entities.EventActivity, _ int) EventActivityDTO {
-				return EventActivityDTO{ID: ea.ID, Name: ea.Name, Time: ea.Time}
+				return EventActivityDTO{
+					ID: ea.ID, 
+					Name: ea.Name, 
+					Time: ea.Time, 
+					Labels: lo.Map(ea.Labels, func(label *entities.ActivityLabel, _ int) ActivityLabelDTO {
+						return FromActivityLabelEntity(label)
+					}),
+				}
 			}),
 		StartDate: result.StartDate,
 		EndDate:   result.EndDate,
@@ -31,7 +38,8 @@ func FromEventEntities(result *entities.Event) EventDTO {
 }
 
 type EventActivityDTO struct {
-	ID   string    `json:"id"`
-	Name string    `json:"name"`
-	Time time.Time `json:"time"`
+	ID     string    `json:"id"`
+	Name   string    `json:"name"`
+	Time   time.Time `json:"time"`
+	Labels []ActivityLabelDTO  `json:"labels"`
 }

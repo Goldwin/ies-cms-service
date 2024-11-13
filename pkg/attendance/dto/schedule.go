@@ -28,8 +28,17 @@ func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 		TimezoneOffset: result.TimezoneOffset,
 		Type:           string(result.Type),
 		Activities: lo.Map(result.Activities,
-			func(ea entities.EventScheduleActivity, _ int) EventScheduleActivityDTO {
-				return EventScheduleActivityDTO{ID: ea.ID, Name: ea.Name, Hour: ea.Hour, Minute: ea.Minute, ScheduleID: result.ID}
+			func(ea *entities.EventScheduleActivity, _ int) EventScheduleActivityDTO {
+				return EventScheduleActivityDTO{
+					ID:         ea.ID,
+					Name:       ea.Name,
+					Hour:       ea.Hour,
+					Minute:     ea.Minute,
+					ScheduleID: result.ID,
+					Labels: lo.Map(ea.Labels, func(label *entities.ActivityLabel, _ int) ActivityLabelDTO {
+						return FromActivityLabelEntity(label)
+					}),
+				}
 			}),
 		Date:      result.Date,
 		StartDate: result.StartDate,
@@ -41,9 +50,12 @@ func FromEntities(result *entities.EventSchedule) EventScheduleDTO {
 }
 
 type EventScheduleActivityDTO struct {
-	ScheduleID string `json:"scheduleId"`
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	Hour       int    `json:"hour"`
-	Minute     int    `json:"minute"`
+	ScheduleID string             `json:"scheduleId"`
+	ID         string             `json:"id"`
+	Name       string             `json:"name"`
+	Hour       int                `json:"hour"`
+	Minute     int                `json:"minute"`
+	Labels     []ActivityLabelDTO `json:"labels"`
 }
+
+

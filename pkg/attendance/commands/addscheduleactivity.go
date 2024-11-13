@@ -3,9 +3,11 @@ package commands
 import (
 	"fmt"
 
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 )
 
 const (
@@ -23,9 +25,13 @@ type AddEventScheduleActivityCommand struct {
 	Name       string
 	Hour       int
 	Minute     int
+	Labels     []dto.ActivityLabelDTO
 }
 
 func (c AddEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.EventSchedule] {
+	if(c.Labels == nil) {
+		c.Labels = []dto.ActivityLabelDTO{}
+	} 
 	if c.Hour < 0 || c.Hour > 23 || c.Minute < 0 || c.Minute > 59 {
 		return CommandExecutionResult[entities.EventSchedule]{
 			Status: ExecutionStatusFailed,
@@ -65,11 +71,14 @@ func (c AddEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExec
 		}
 	}
 
-	schedule.Activities = append(schedule.Activities, entities.EventScheduleActivity{
+	schedule.Activities = append(schedule.Activities, &entities.EventScheduleActivity{
 		ID:     uuid.NewString(),
 		Name:   c.Name,
 		Hour:   c.Hour,
 		Minute: c.Minute,
+		Labels: lo.Map(c.Labels, func(label dto.ActivityLabelDTO, _ int) *entities.ActivityLabel  {
+			return label.ToEntity()
+		}),
 	})
 
 	result, err := ctx.EventScheduleRepository().Save(schedule)

@@ -80,8 +80,13 @@ func createNextWeeklyEvent(weeklySchedule *entities.EventSchedule, ctx CommandCo
 				ID:         generateEventId(weeklySchedule.ID, d),
 				Name:       weeklySchedule.Name,
 				ScheduleID: weeklySchedule.ID,
-				EventActivities: lo.Map(weeklySchedule.Activities, func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
-					return &entities.EventActivity{ID: uuid.NewString(), Name: ea.Name, Time: time.Date(d.Year(), d.Month(), d.Day(), ea.Hour-weeklySchedule.TimezoneOffset, ea.Minute, 0, 0, time.UTC)}
+				EventActivities: lo.Map(weeklySchedule.Activities, func(ea *entities.EventScheduleActivity, _ int) *entities.EventActivity {
+					return &entities.EventActivity{
+						ID:     uuid.NewString(),
+						Name:   ea.Name,
+						Time:   time.Date(d.Year(), d.Month(), d.Day(), ea.Hour-weeklySchedule.TimezoneOffset, ea.Minute, 0, 0, time.UTC),
+						Labels: ea.Labels,
+					}
 				}),
 				StartDate: time.Date(d.Year(), d.Month(), d.Day(), weeklySchedule.StartTime.Hour-weeklySchedule.TimezoneOffset, weeklySchedule.StartTime.Minute, 0, 0, time.UTC),
 				EndDate:   time.Date(d.Year(), d.Month(), d.Day(), weeklySchedule.EndTime.Hour-weeklySchedule.TimezoneOffset, weeklySchedule.EndTime.Minute, 0, 0, time.UTC),
@@ -113,11 +118,12 @@ func createNextDailyEvent(dailySchedule *entities.EventSchedule, ctx CommandCont
 			StartDate:  time.Date(d.Year(), d.Month(), d.Day(), dailySchedule.StartTime.Hour-dailySchedule.TimezoneOffset, dailySchedule.StartTime.Minute, 0, 0, time.UTC),
 			EndDate:    time.Date(d.Year(), d.Month(), d.Day(), dailySchedule.EndTime.Hour-dailySchedule.TimezoneOffset, dailySchedule.EndTime.Minute, 0, 0, time.UTC),
 			EventActivities: lo.Map(dailySchedule.Activities,
-				func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
+				func(ea *entities.EventScheduleActivity, _ int) *entities.EventActivity {
 					return &entities.EventActivity{
-						ID:   uuid.NewString(),
-						Name: ea.Name,
-						Time: time.Date(d.Year(), d.Month(), d.Day(), ea.Hour-dailySchedule.TimezoneOffset, ea.Minute, 0, 0, time.UTC),
+						ID:     uuid.NewString(),
+						Name:   ea.Name,
+						Time:   time.Date(d.Year(), d.Month(), d.Day(), ea.Hour-dailySchedule.TimezoneOffset, ea.Minute, 0, 0, time.UTC),
+						Labels: ea.Labels,
 					}
 				}),
 		}
@@ -146,11 +152,12 @@ func createNextOneTimeEvent(oneTimeSchedule *entities.EventSchedule, ctx Command
 		StartDate:  time.Date(oneTimeSchedule.Date.Year(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.StartTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.StartTime.Minute, 0, 0, time.UTC),
 		EndDate:    time.Date(oneTimeSchedule.Date.Year(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), oneTimeSchedule.EndTime.Hour-oneTimeSchedule.TimezoneOffset, oneTimeSchedule.EndTime.Minute, 0, 0, time.UTC),
 		EventActivities: lo.Map(oneTimeSchedule.Activities,
-			func(ea entities.EventScheduleActivity, _ int) *entities.EventActivity {
+			func(ea *entities.EventScheduleActivity, _ int) *entities.EventActivity {
 				return &entities.EventActivity{
-					ID:   uuid.NewString(),
-					Name: ea.Name,
-					Time: time.Date(oneTimeSchedule.Date.Day(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), ea.Hour-oneTimeSchedule.TimezoneOffset, ea.Minute, 0, 0, time.UTC),
+					ID:     uuid.NewString(),
+					Name:   ea.Name,
+					Time:   time.Date(oneTimeSchedule.Date.Day(), oneTimeSchedule.Date.Month(), oneTimeSchedule.Date.Day(), ea.Hour-oneTimeSchedule.TimezoneOffset, ea.Minute, 0, 0, time.UTC),
+					Labels: ea.Labels,
 				}
 			}),
 	}
