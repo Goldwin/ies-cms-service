@@ -18,6 +18,7 @@ const (
 	HouseholdCollection               = "households"
 	PersonHouseholdCollection         = "person_households"
 	PersonAttendanceSummaryCollection = "person_attendance_summary"
+	LabelsCollection                  = "labels"
 )
 
 type PersonAttendanceSummaryModel struct {
@@ -415,5 +416,36 @@ func FromActivityLabelEntity(e *entities.ActivityLabel) ActivityLabelModel {
 			return string(attendanceType)
 		}),
 		Quantity: e.Quantity,
+	}
+}
+
+type LabelModel struct {
+	ID          string           `bson:"_id"`
+	Name        string           `bson:"name"`
+	Orientation string           `bson:"orientation"`
+	PaperSize   []float64        `bson:"paperSize"`
+	Margin      []float64        `bson:"margin"`
+	Objects     []map[string]any `bson:"objects"`
+}
+
+func (model LabelModel) ToDTO() dto.LabelDTO {
+	return dto.LabelDTO{
+		ID:          model.ID,
+		Name:        model.Name,
+		Orientation: model.Orientation,
+		PaperSize:   model.PaperSize,
+		Margin:      model.Margin,
+		Objects:     model.Objects,
+	}
+}
+
+func (model LabelModel) ToEntity() *entities.Label {
+	return &entities.Label{
+		ID:          model.ID,
+		Name:        model.Name,
+		Orientation: model.Orientation,
+		PaperSize:   model.PaperSize,
+		Margin:      model.Margin,
+		Objects:     model.Objects,
 	}
 }
