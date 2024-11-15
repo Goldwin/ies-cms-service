@@ -393,6 +393,7 @@ func (e *EventAttendanceSummaryModel) ToDTO() dto.EventAttendanceSummaryDTO {
 type ActivityLabelModel struct {
 	LabelID         string   `bson:"labelId"`
 	LabelName       string   `bson:"labelName"`
+	Type            string   `bson:"type"`
 	AttendanceTypes []string `bson:"attendanceType"`
 	Quantity        int      `bson:"quantity"`
 }
@@ -412,6 +413,7 @@ func FromActivityLabelEntity(e *entities.ActivityLabel) ActivityLabelModel {
 	return ActivityLabelModel{
 		LabelID:   e.LabelID,
 		LabelName: e.LabelName,
+		Type:      string(e.Type),
 		AttendanceTypes: lo.Map(e.AttendanceTypes, func(attendanceType entities.AttendanceType, _ int) string {
 			return string(attendanceType)
 		}),
@@ -422,6 +424,7 @@ func FromActivityLabelEntity(e *entities.ActivityLabel) ActivityLabelModel {
 type LabelModel struct {
 	ID          string           `bson:"_id"`
 	Name        string           `bson:"name"`
+	Type        string           `bson:"type"`
 	Orientation string           `bson:"orientation"`
 	PaperSize   []float64        `bson:"paperSize"`
 	Margin      []float64        `bson:"margin"`
@@ -432,6 +435,7 @@ func (model LabelModel) ToDTO() dto.LabelDTO {
 	return dto.LabelDTO{
 		ID:          model.ID,
 		Name:        model.Name,
+		Type:        model.Type,
 		Orientation: model.Orientation,
 		PaperSize:   model.PaperSize,
 		Margin:      model.Margin,
@@ -443,6 +447,7 @@ func (model LabelModel) ToEntity() *entities.Label {
 	return &entities.Label{
 		ID:          model.ID,
 		Name:        model.Name,
+		Type:        entities.LabelType(model.Type),
 		Orientation: model.Orientation,
 		PaperSize:   model.PaperSize,
 		Margin:      model.Margin,

@@ -6,17 +6,19 @@ import (
 )
 
 type LabelDTO struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Orientation string `json:"orientation"`
-	PaperSize   []float64 `json:"paperSize"`
-	Margin      []float64 `json:"margin"`
-	Objects     []map[string]any `json:"objects"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Type        string           `json:"type"`
+	Orientation string           `json:"orientation"`
+	PaperSize   []float64        `json:"paperSize,omitempty" `
+	Margin      []float64        `json:"margin,omitempty"`
+	Objects     []map[string]any `json:"objects,omitempty"`
 }
 
 type ActivityLabelDTO struct {
 	LabelID         string   `json:"labelId"`
 	LabelName       string   `json:"labelName"`
+	Type            string   `json:"type"`
 	AttendanceTypes []string `json:"attendanceTypes"`
 	Quantity        int      `json:"quantity"`
 }

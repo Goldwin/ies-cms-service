@@ -22,7 +22,8 @@ type listLabelsImpl struct {
 // Execute implements queries.ListLabels.
 func (l *listLabelsImpl) Execute(filter ListLabelsFilter) (ListLabelsResult, queries.QueryErrorDetail) {
 	var result []LabelModel
-	cursor, err := l.db.Collection(LabelsCollection).Find(l.ctx, bson.M{"_id": bson.M{"$gt": filter.LastID}}, options.Find().SetLimit(int64(filter.Limit)))
+	queryOptions := options.Find().SetLimit(int64(filter.Limit)).SetProjection(bson.M{"_id": 1, "name": 1, "orientation": 1, "type": 1})
+	cursor, err := l.db.Collection(LabelsCollection).Find(l.ctx, bson.M{"_id": bson.M{"$gt": filter.LastID}}, queryOptions)
 
 	if err != nil {
 		return ListLabelsResult{}, queries.InternalServerError(err)
