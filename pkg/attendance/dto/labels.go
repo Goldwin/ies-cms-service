@@ -27,6 +27,7 @@ func (d ActivityLabelDTO) ToEntity() *entities.ActivityLabel {
 	return &entities.ActivityLabel{
 		LabelID:   d.LabelID,
 		LabelName: d.LabelName,
+		Type:      entities.LabelType(d.Type),
 		AttendanceTypes: lo.Map(d.AttendanceTypes, func(attendanceType string, _ int) entities.AttendanceType {
 			return entities.AttendanceType(attendanceType)
 		}),
@@ -38,6 +39,7 @@ func FromActivityLabelEntity(label *entities.ActivityLabel) ActivityLabelDTO {
 	return ActivityLabelDTO{
 		LabelID:   label.LabelID,
 		LabelName: label.LabelName,
+		Type:      string(label.Type),
 		AttendanceTypes: lo.Map(label.AttendanceTypes, func(attendanceType entities.AttendanceType, _ int) string {
 			return string(attendanceType)
 		}),
