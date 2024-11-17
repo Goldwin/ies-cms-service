@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"github.com/Goldwin/ies-pik-cms/pkg/attendance/dto"
 	"github.com/Goldwin/ies-pik-cms/pkg/attendance/entities"
 	. "github.com/Goldwin/ies-pik-cms/pkg/common/commands"
+	"github.com/samber/lo"
 )
 
 const (
@@ -16,9 +18,14 @@ type UpdateEventScheduleActivityCommand struct {
 	Name       string
 	Hour       int
 	Minute     int
+	Labels     []dto.ActivityLabelDTO
 }
 
 func (c UpdateEventScheduleActivityCommand) Execute(ctx CommandContext) CommandExecutionResult[entities.EventSchedule] {
+	if c.Labels == nil {
+		c.Labels = []dto.ActivityLabelDTO{}
+	}
+
 	schedule, err := ctx.EventScheduleRepository().Get(c.ScheduleID)
 
 	if err != nil {
@@ -45,6 +52,9 @@ func (c UpdateEventScheduleActivityCommand) Execute(ctx CommandContext) CommandE
 			activity.Minute = c.Minute
 			activity.Hour = c.Hour
 			activity.Name = c.Name
+			activity.Labels = lo.Map(c.Labels, func(label dto.ActivityLabelDTO, _ int) *entities.ActivityLabel {
+				return label.ToEntity()
+			})
 			schedule.Activities[i] = activity
 			isActivityExists = true
 			break

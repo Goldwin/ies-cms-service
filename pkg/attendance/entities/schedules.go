@@ -30,7 +30,7 @@ type EventSchedule struct {
 	Name           string
 	TimezoneOffset int
 	Type           EventScheduleType
-	Activities     []EventScheduleActivity
+	Activities     []*EventScheduleActivity
 	StartTime      HourMinute
 	EndTime        HourMinute
 	OneTimeEventSchedule
@@ -120,4 +120,6 @@ type EventScheduleActivity struct {
 	Name   string
 	Hour   int
 	Minute int
+	Labels []*ActivityLabel
 }
+

@@ -37,6 +37,7 @@ type AttendanceQueryComponent interface {
 	ListEventAttendance(ctx context.Context, query queries.ListEventAttendanceFilter, output out.Output[queries.ListEventAttendanceResult]) out.Waitable
 	GetEventAttendanceSummary(ctx context.Context, filter queries.GetEventAttendanceSummaryFilter, output out.Output[queries.GetEventAttendanceSummaryResult]) out.Waitable
 	GetEventScheduleStats(ctx context.Context, filter queries.GetEventScheduleStatsFilter, output out.Output[queries.GetEventScheduleStatsResult]) out.Waitable
+	ListLabels(ctx context.Context, query queries.ListLabelsFilter, output out.Output[queries.ListLabelsResult]) out.Waitable
 }
 
 type AttendanceComponent interface {
@@ -46,6 +47,12 @@ type AttendanceComponent interface {
 
 type attendanceComponentImpl struct {
 	dataLayer AttendanceDataLayerComponent
+}
+
+// ListLabels implements AttendanceComponent.
+func (a *attendanceComponentImpl) ListLabels(ctx context.Context, filter queries.ListLabelsFilter, output out.Output[queries.ListLabelsResult]) out.Waitable {
+	query := a.dataLayer.QueryWorker().Query(ctx).ListLabels()
+	return utils.SingleQueryExecution(query).WithOutput(output).Execute(filter)
 }
 
 // GetEventScheduleStats implements AttendanceComponent.
@@ -151,6 +158,7 @@ func (a *attendanceComponentImpl) AddEventScheduleActivity(ctx context.Context, 
 		Name:       activity.Name,
 		Hour:       activity.Hour,
 		Minute:     activity.Minute,
+		Labels:     activity.Labels,
 	}).WithOutput(
 		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
 			return dto.FromEntities(&e)
@@ -196,6 +204,7 @@ func (a *attendanceComponentImpl) UpdateEventScheduleActivity(ctx context.Contex
 		Name:       activity.Name,
 		Hour:       activity.Hour,
 		Minute:     activity.Minute,
+		Labels:     activity.Labels,
 	}).WithOutput(
 		out.OutputAdapter(output, func(e entities.EventSchedule) dto.EventScheduleDTO {
 			return dto.FromEntities(&e)

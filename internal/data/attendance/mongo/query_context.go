@@ -18,6 +18,11 @@ type queryContextImpl struct {
 	listBySchedule queries.ListEventBySchedule
 }
 
+// ListLabels implements queries.QueryContext.
+func (q *queryContextImpl) ListLabels() queries.ListLabels {
+	return NewListLabels(q.ctx, q.db)
+}
+
 // GetEventScheduleStats implements queries.QueryContext.
 func (q *queryContextImpl) GetEventScheduleStats() queries.GetEventScheduleStats {
 	return NewGetEventScheduleStats(q.ctx, q.db)

@@ -8,4 +8,5 @@ type QueryContext interface {
 	ListEventAttendance() ListEventAttendance
 	GetEventAttendanceSummary() GetEventAttendanceSummary
 	GetEventScheduleStats() GetEventScheduleStats
+	ListLabels() ListLabels
 }

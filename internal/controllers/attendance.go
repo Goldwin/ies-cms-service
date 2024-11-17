@@ -46,6 +46,8 @@ func InitializeAttendanceController(r *gin.Engine, middleware middleware.Middlew
 	rg.GET("schedules/:scheduleID/events/:eventID/summary", middleware.Auth("ATTENDANCE_VIEW_EVENT_SUMMARY"), attendanceController.getSummary)
 
 	rg.GET("schedules/:scheduleID/stats", middleware.Auth("ATTENDANCE_VIEW_SCHEDULE_STATS"), attendanceController.getEventScheduleStats)
+
+	rg.GET("labels", middleware.Auth("ATTENDANCE_VIEW_LABELS"), attendanceController.listLabels)
 }
 
 func (a *attendanceController) listEventSchedules(c *gin.Context) {
@@ -393,4 +395,27 @@ func (a *attendanceController) getSummary(c *gin.Context) {
 		},
 	}
 	a.attendanceComponent.GetEventAttendanceSummary(c, filter, output).Wait()
+}
+
+func (a *attendanceController) listLabels(c *gin.Context) {
+	var filter queries.ListLabelsFilter
+
+	err := c.ShouldBindQuery(&filter)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	output := &outputDecorator[queries.ListLabelsResult]{
+		output: nil,
+		errFunction: func(err out.AppErrorDetail) {
+			c.JSON(400, err)
+		},
+		successFunc: func(result queries.ListLabelsResult) {
+			c.JSON(200, result)
+		},
+	}
+	a.attendanceComponent.ListLabels(c, filter, output).Wait()
 }

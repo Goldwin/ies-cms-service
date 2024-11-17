@@ -18,6 +18,7 @@ const (
 	HouseholdCollection               = "households"
 	PersonHouseholdCollection         = "person_households"
 	PersonAttendanceSummaryCollection = "person_attendance_summary"
+	LabelsCollection                  = "labels"
 )
 
 type PersonAttendanceSummaryModel struct {
@@ -67,8 +68,8 @@ func toEventScheduleModel(e *entities.EventSchedule) EventScheduleModel {
 		Name:           e.Name,
 		TimezoneOffset: e.TimezoneOffset,
 		Type:           string(e.Type),
-		Activities: lo.Map(e.Activities, func(e entities.EventScheduleActivity, _ int) EventScheduleActivityModel {
-			return toEventScheduleActivityModel(&e)
+		Activities: lo.Map(e.Activities, func(e *entities.EventScheduleActivity, _ int) EventScheduleActivityModel {
+			return toEventScheduleActivityModel(e)
 		}),
 		Date:      e.Date,
 		Days:      e.Days,
@@ -88,7 +89,7 @@ func (e *EventScheduleModel) ToEventSchedule() *entities.EventSchedule {
 		Name:           e.Name,
 		TimezoneOffset: e.TimezoneOffset,
 		Type:           entities.EventScheduleType(e.Type),
-		Activities: lo.Map(e.Activities, func(e EventScheduleActivityModel, _ int) entities.EventScheduleActivity {
+		Activities: lo.Map(e.Activities, func(e EventScheduleActivityModel, _ int) *entities.EventScheduleActivity {
 			return e.ToEventScheduleActivity()
 		}),
 		OneTimeEventSchedule: entities.OneTimeEventSchedule{
@@ -107,10 +108,11 @@ func (e *EventScheduleModel) ToEventSchedule() *entities.EventSchedule {
 }
 
 type EventScheduleActivityModel struct {
-	ID     string `bson:"_id"`
-	Name   string `bson:"name"`
-	Hour   int    `bson:"hour"`
-	Minute int    `bson:"minute"`
+	ID     string               `bson:"_id"`
+	Name   string               `bson:"name"`
+	Hour   int                  `bson:"hour"`
+	Minute int                  `bson:"minute"`
+	Labels []ActivityLabelModel `bson:"labels"`
 }
 
 func toEventScheduleActivityModel(e *entities.EventScheduleActivity) EventScheduleActivityModel {
@@ -119,15 +121,21 @@ func toEventScheduleActivityModel(e *entities.EventScheduleActivity) EventSchedu
 		Name:   e.Name,
 		Hour:   e.Hour,
 		Minute: e.Minute,
+		Labels: lo.Map(e.Labels, func(e *entities.ActivityLabel, _ int) ActivityLabelModel {
+			return FromActivityLabelEntity(e)
+		}),
 	}
 }
 
-func (e *EventScheduleActivityModel) ToEventScheduleActivity() entities.EventScheduleActivity {
-	return entities.EventScheduleActivity{
+func (e *EventScheduleActivityModel) ToEventScheduleActivity() *entities.EventScheduleActivity {
+	return &entities.EventScheduleActivity{
 		ID:     e.ID,
 		Name:   e.Name,
 		Hour:   e.Hour,
 		Minute: e.Minute,
+		Labels: lo.Map(e.Labels, func(model ActivityLabelModel, _ int) *entities.ActivityLabel {
+			return model.ToEntity()
+		}),
 	}
 }
 
@@ -184,9 +192,10 @@ func toEventModel(e *entities.Event) EventModel {
 }
 
 type EventActivityModel struct {
-	ID   string    `bson:"_id"`
-	Name string    `bson:"name"`
-	Time time.Time `bson:"time"`
+	ID     string               `bson:"_id"`
+	Name   string               `bson:"name"`
+	Time   time.Time            `bson:"time"`
+	Labels []ActivityLabelModel `bson:"labels"`
 }
 
 func (e *EventActivityModel) ToEventActivity() *entities.EventActivity {
@@ -194,6 +203,9 @@ func (e *EventActivityModel) ToEventActivity() *entities.EventActivity {
 		ID:   e.ID,
 		Name: e.Name,
 		Time: e.Time,
+		Labels: lo.Map(e.Labels, func(model ActivityLabelModel, _ int) *entities.ActivityLabel {
+			return model.ToEntity()
+		}),
 	}
 }
 
@@ -202,6 +214,9 @@ func toEventActivityModel(e *entities.EventActivity) EventActivityModel {
 		ID:   e.ID,
 		Name: e.Name,
 		Time: e.Time,
+		Labels: lo.Map(e.Labels, func(e *entities.ActivityLabel, _ int) ActivityLabelModel {
+			return FromActivityLabelEntity(e)
+		}),
 	}
 }
 
@@ -372,5 +387,81 @@ func (e *EventAttendanceSummaryModel) ToDTO() dto.EventAttendanceSummaryDTO {
 		}),
 		Date: e.Date,
 		ID:   e.ID,
+	}
+}
+
+type ActivityLabelModel struct {
+	LabelID         string   `bson:"labelId"`
+	LabelName       string   `bson:"labelName"`
+	Type            string   `bson:"type"`
+	AttendanceTypes []string `bson:"attendanceType"`
+	Quantity        int      `bson:"quantity"`
+}
+
+func (model ActivityLabelModel) ToEntity() *entities.ActivityLabel {
+	return &entities.ActivityLabel{
+		LabelID:   model.LabelID,
+		LabelName: model.LabelName,
+		Type:      entities.LabelType(model.Type),
+		AttendanceTypes: lo.Map(model.AttendanceTypes, func(attendanceType string, _ int) entities.AttendanceType {
+			return entities.AttendanceType(attendanceType)
+		}),
+		Quantity: model.Quantity,
+	}
+}
+
+func FromActivityLabelEntity(e *entities.ActivityLabel) ActivityLabelModel {
+	return ActivityLabelModel{
+		LabelID:   e.LabelID,
+		LabelName: e.LabelName,
+		Type:      string(e.Type),
+		AttendanceTypes: lo.Map(e.AttendanceTypes, func(attendanceType entities.AttendanceType, _ int) string {
+			return string(attendanceType)
+		}),
+		Quantity: e.Quantity,
+	}
+}
+
+func (model ActivityLabelModel) ToDTO() dto.ActivityLabelDTO {
+	return dto.ActivityLabelDTO{
+		LabelID:         model.LabelID,
+		LabelName:       model.LabelName,
+		Type:            model.Type,
+		AttendanceTypes: model.AttendanceTypes,
+		Quantity:        model.Quantity,
+	}
+}
+
+type LabelModel struct {
+	ID          string           `bson:"_id"`
+	Name        string           `bson:"name"`
+	Type        string           `bson:"type"`
+	Orientation string           `bson:"orientation"`
+	PaperSize   []float64        `bson:"paperSize"`
+	Margin      []float64        `bson:"margin"`
+	Objects     []map[string]any `bson:"objects"`
+}
+
+func (model LabelModel) ToDTO() dto.LabelDTO {
+	return dto.LabelDTO{
+		ID:          model.ID,
+		Name:        model.Name,
+		Type:        model.Type,
+		Orientation: model.Orientation,
+		PaperSize:   model.PaperSize,
+		Margin:      model.Margin,
+		Objects:     model.Objects,
+	}
+}
+
+func (model LabelModel) ToEntity() *entities.Label {
+	return &entities.Label{
+		ID:          model.ID,
+		Name:        model.Name,
+		Type:        entities.LabelType(model.Type),
+		Orientation: model.Orientation,
+		PaperSize:   model.PaperSize,
+		Margin:      model.Margin,
+		Objects:     model.Objects,
 	}
 }

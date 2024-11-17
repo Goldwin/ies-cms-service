@@ -42,6 +42,7 @@ func (g *getEventScheduleImpl) Execute(query GetEventScheduleFilter) (GetEventSc
 					Name:       e.Name,
 					Hour:       e.Hour,
 					Minute:     e.Minute,
+					Labels:     lo.Map(e.Labels, func(l ActivityLabelModel, _ int) dto.ActivityLabelDTO { return l.ToDTO() }),
 				}
 			}),
 			Date:      model.Date,
