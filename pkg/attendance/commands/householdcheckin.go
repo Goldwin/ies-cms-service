@@ -214,6 +214,11 @@ func (ag attendanceGenerator) generateAttendances() ([]*entities.Attendance, []i
 				reason: fmt.Sprintf("Activity %s not found", a.ActivityID),
 			})
 		}
+
+		activity.Labels = lo.Filter(activity.Labels, func(l *entities.ActivityLabel, _ int) bool {
+			return lo.Contains(l.AttendanceTypes, entities.AttendanceType(a.AttendanceType))
+		})
+
 		attendee, ok := ag.attendeesMap[a.PersonID]
 		if !ok {
 			invalidAttendances = append(invalidAttendances, invalidAttendance{
