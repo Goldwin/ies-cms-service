@@ -213,9 +213,12 @@ func (ag attendanceGenerator) generateAttendances() ([]*entities.Attendance, []i
 				person: a,
 				reason: fmt.Sprintf("Activity %s not found", a.ActivityID),
 			})
+			return nil
 		}
 
-		activity.Labels = lo.Filter(activity.Labels, func(l *entities.ActivityLabel, _ int) bool {
+		attendanceActivity := *activity
+
+		attendanceActivity.Labels = lo.Filter(activity.Labels, func(l *entities.ActivityLabel, _ int) bool {
 			return lo.Contains(l.AttendanceTypes, entities.AttendanceType(a.AttendanceType))
 		})
 
@@ -225,11 +228,12 @@ func (ag attendanceGenerator) generateAttendances() ([]*entities.Attendance, []i
 				person: a,
 				reason: fmt.Sprintf("Person %s not found", a.PersonID),
 			})
+			return nil
 		}
 		return &entities.Attendance{
 			ID:             ag.event.ID + "." + a.ActivityID + "." + a.PersonID,
 			Event:          ag.event,
-			EventActivity:  activity,
+			EventActivity:  &attendanceActivity,
 			Attendee:       attendee,
 			CheckedInBy:    ag.checkinPerson,
 			SecurityCode:   securityCode,
@@ -239,5 +243,8 @@ func (ag attendanceGenerator) generateAttendances() ([]*entities.Attendance, []i
 			FirstTime:      false,
 		}
 	})
-	return attendances, invalidAttendances
+	
+	return lo.Filter(attendances, func(a *entities.Attendance, _ int) bool {
+		return a != nil
+	}), invalidAttendances
 }
