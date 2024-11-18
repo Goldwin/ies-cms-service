@@ -31,7 +31,7 @@ func FromAttendanceEntities(result *entities.Attendance) EventAttendanceDTO {
 	return EventAttendanceDTO{
 		ID:       result.ID,
 		Event:    FromEventEntities(result.Event),
-		Activity: EventActivityDTO{ID: result.EventActivity.ID, Name: result.EventActivity.Name, Time: result.EventActivity.Time},
+		Activity: fromEventActivityEntity(result.EventActivity),
 		Attendee: AttendeeDTO{PersonID: result.Attendee.PersonID, FirstName: result.Attendee.FirstName, MiddleName: result.Attendee.MiddleName, LastName: result.Attendee.LastName, ProfilePictureURL: result.Attendee.ProfilePictureUrl},
 		CheckedInBy: AttendeeDTO{
 			PersonID:          result.CheckedInBy.PersonID,

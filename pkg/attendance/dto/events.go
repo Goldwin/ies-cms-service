@@ -43,3 +43,14 @@ type EventActivityDTO struct {
 	Time   time.Time          `json:"time"`
 	Labels []ActivityLabelDTO `json:"labels,omitempty"`
 }
+
+func fromEventActivityEntity(ea *entities.EventActivity) EventActivityDTO {
+	return EventActivityDTO{
+		ID:   ea.ID,
+		Name: ea.Name,
+		Time: ea.Time,
+		Labels: lo.Map(ea.Labels, func(label *entities.ActivityLabel, _ int) ActivityLabelDTO {
+			return FromActivityLabelEntity(label)
+		}),
+	}
+}
