@@ -5,9 +5,9 @@ import "time"
 type AttendanceType string
 
 const (
-	Volunteer AttendanceType = "volunteer"
-	Guest     AttendanceType = "guest"
-	Regular   AttendanceType = "regular"
+	Volunteer AttendanceType = "Volunteer"
+	Guest     AttendanceType = "Guest"
+	Regular   AttendanceType = "Regular"
 )
 
 var (
