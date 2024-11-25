@@ -17,10 +17,6 @@ const (
 	HouseholdCheckinCommandInvalidAttendanceError  = 30504
 )
 
-var (
-	charset = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-)
-
 type Attendee struct {
 	PersonID       string
 	ActivityID     string
@@ -205,7 +201,7 @@ type attendanceGenerator struct {
 func (ag attendanceGenerator) generateAttendances() ([]*entities.Attendance, []invalidAttendance) {
 	invalidAttendances := []invalidAttendance{}
 	attendances := lo.Map(ag.attendees, func(a Attendee, _ int) *entities.Attendance {
-		securityCode := lo.RandomString(5, charset)
+		securityCode := lo.RandomString(4, lo.AlphanumericCharset)
 		securityNumber := rand.Int() % 1000
 		activity, ok := ag.activitiesMap[a.ActivityID]
 		if !ok {
@@ -243,7 +239,7 @@ func (ag attendanceGenerator) generateAttendances() ([]*entities.Attendance, []i
 			FirstTime:      false,
 		}
 	})
-	
+
 	return lo.Filter(attendances, func(a *entities.Attendance, _ int) bool {
 		return a != nil
 	}), invalidAttendances
