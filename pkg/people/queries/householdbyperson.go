@@ -5,12 +5,16 @@ import (
 	"github.com/Goldwin/ies-pik-cms/pkg/people/dto"
 )
 
-type ViewHouseholdByPersonQuery struct {
+type ViewHouseholdByPersonFilter struct {
 	PersonID string
+}
+
+func (q ViewHouseholdByPersonFilter) Validate() error {
+	return nil
 }
 
 type ViewHouseholdByPersonResult queries.QueryResult[dto.Household]
 
 type ViewHouseholdByPerson interface {
-	Execute(query ViewHouseholdByPersonQuery) (ViewHouseholdByPersonResult, queries.QueryErrorDetail)
+	Execute(query ViewHouseholdByPersonFilter) (ViewHouseholdByPersonResult, queries.QueryErrorDetail)
 }

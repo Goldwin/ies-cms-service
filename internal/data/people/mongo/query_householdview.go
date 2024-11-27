@@ -24,7 +24,7 @@ const (
 )
 
 // Execute implements queries.ViewHouseholdByPerson.
-func (v *viewHouseholdByPersonImpl) Execute(query queries.ViewHouseholdByPersonQuery) (queries.ViewHouseholdByPersonResult, QueryErrorDetail) {
+func (v *viewHouseholdByPersonImpl) Execute(query queries.ViewHouseholdByPersonFilter) (queries.ViewHouseholdByPersonResult, QueryErrorDetail) {
 	personModel, queryError := v.getPerson(query.PersonID)
 	if queryError != NoQueryError {
 		return queries.ViewHouseholdByPersonResult{}, queryError

@@ -9,6 +9,10 @@ type ViewPersonQuery struct {
 	ID string
 }
 
+func (q ViewPersonQuery) Validate() error {
+	return nil
+}
+
 type ViewPersonResult queries.QueryResult[dto.Person]
 
 type ViewPerson interface {

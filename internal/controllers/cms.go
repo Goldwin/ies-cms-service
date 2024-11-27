@@ -144,7 +144,7 @@ func (a *cmsController) login(ctx *gin.Context) {
 		successFunc: func(res dto.SignInResult) {
 			result.AccessToken = res.AccessToken
 			result.AuthData = res.AuthData
-			a.peopleComponent.ViewPersonByEmail(ctx, queries.ViewPersonByEmailQuery{
+			a.peopleComponent.ViewPersonByEmail(ctx, queries.ViewPersonByEmailFilter{
 				Email: input.Email,
 			}, peopleOutput)
 		},

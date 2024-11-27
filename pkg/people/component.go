@@ -29,9 +29,9 @@ type PeopleManagementQueryComponent interface {
 
 type PeopleManagementCommandComponent interface {
 	ViewPerson(context.Context, queries.ViewPersonQuery, out.Output[queries.ViewPersonResult])
-	ViewPersonByEmail(context.Context, queries.ViewPersonByEmailQuery, out.Output[queries.ViewPersonResult])
-	SearchPerson(context.Context, queries.SearchPersonQuery, out.Output[queries.SearchPersonResult])
-	ViewHouseholdByPerson(context.Context, queries.ViewHouseholdByPersonQuery, out.Output[queries.ViewHouseholdByPersonResult])
+	ViewPersonByEmail(context.Context, queries.ViewPersonByEmailFilter, out.Output[queries.ViewPersonResult])
+	SearchPerson(context.Context, queries.SearchPersonFilter, out.Output[queries.SearchPersonResult])
+	ViewHouseholdByPerson(context.Context, queries.ViewHouseholdByPersonFilter, out.Output[queries.ViewHouseholdByPersonResult])
 	SearchHousehold(context.Context, queries.SearchHouseholdFilter, out.Output[queries.SearchHouseholdResult]) out.Waitable
 }
 
@@ -58,7 +58,7 @@ func (p *peopleManagementComponent) SearchHousehold(ctx context.Context, filter 
 }
 
 // ViewPersonByEmail implements PeopleManagementComponent.
-func (p *peopleManagementComponent) ViewPersonByEmail(ctx context.Context, input queries.ViewPersonByEmailQuery, output out.Output[queries.ViewPersonResult]) {
+func (p *peopleManagementComponent) ViewPersonByEmail(ctx context.Context, input queries.ViewPersonByEmailFilter, output out.Output[queries.ViewPersonResult]) {
 	result, err := p.queryWorker.Query(ctx).ViewPersonByEmail().Execute(input)
 	if err != q.NoQueryError {
 		output.OnError(out.ConvertQueryErrorDetail(err))
@@ -107,7 +107,7 @@ func (p *peopleManagementComponent) DeleteHousehold(ctx context.Context, input d
 }
 
 // ViewHouseholdByPerson implements PeopleManagementComponent.
-func (p *peopleManagementComponent) ViewHouseholdByPerson(ctx context.Context, input queries.ViewHouseholdByPersonQuery, output out.Output[queries.ViewHouseholdByPersonResult]) {
+func (p *peopleManagementComponent) ViewHouseholdByPerson(ctx context.Context, input queries.ViewHouseholdByPersonFilter, output out.Output[queries.ViewHouseholdByPersonResult]) {
 	result, err := p.queryWorker.Query(ctx).ViewHouseholdByPerson().Execute(input)
 	if err != q.NoQueryError {
 		output.OnError(out.ConvertQueryErrorDetail(err))
@@ -117,7 +117,7 @@ func (p *peopleManagementComponent) ViewHouseholdByPerson(ctx context.Context, i
 }
 
 // SearchPerson implements PeopleManagementComponent.
-func (p *peopleManagementComponent) SearchPerson(ctx context.Context, input queries.SearchPersonQuery, output out.Output[queries.SearchPersonResult]) {
+func (p *peopleManagementComponent) SearchPerson(ctx context.Context, input queries.SearchPersonFilter, output out.Output[queries.SearchPersonResult]) {
 	result, err := p.queryWorker.Query(ctx).SearchPerson().Execute(input)
 	if err != q.NoQueryError {
 		output.OnError(out.ConvertQueryErrorDetail(err))

@@ -172,7 +172,7 @@ func (c *peopleManagementController) viewPerson(ctx *gin.Context) {
 
 func (c *peopleManagementController) viewPersonHousehold(ctx *gin.Context) {
 	id := ctx.Param("id")
-	c.peopleComponent.ViewHouseholdByPerson(ctx, queries.ViewHouseholdByPersonQuery{
+	c.peopleComponent.ViewHouseholdByPerson(ctx, queries.ViewHouseholdByPersonFilter{
 		PersonID: id,
 	}, &outputDecorator[queries.ViewHouseholdByPersonResult]{
 		output: nil,
@@ -188,7 +188,7 @@ func (c *peopleManagementController) viewPersonHousehold(ctx *gin.Context) {
 }
 
 func (c *peopleManagementController) searchPerson(ctx *gin.Context) {
-	var input queries.SearchPersonQuery
+	var input queries.SearchPersonFilter
 	err := ctx.BindJSON(&input)
 	if err != nil {
 		ctx.AbortWithStatusJSON(400, gin.H{

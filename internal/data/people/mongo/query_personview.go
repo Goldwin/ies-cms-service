@@ -48,7 +48,7 @@ type viewPersonByEmailImpl struct {
 }
 
 // Execute implements queries.ViewPersonByEmail.
-func (v *viewPersonByEmailImpl) Execute(query queries.ViewPersonByEmailQuery) (queries.ViewPersonResult, QueryErrorDetail) {
+func (v *viewPersonByEmailImpl) Execute(query queries.ViewPersonByEmailFilter) (queries.ViewPersonResult, QueryErrorDetail) {
 	person := PersonModel{}
 	err := v.db.Collection(personCollectionName).FindOne(v.ctx, bson.M{"email": query.Email}).Decode(&person)
 	if err != nil && err == mongo.ErrNoDocuments {
