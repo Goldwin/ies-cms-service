@@ -52,7 +52,11 @@ func (p *Person) Validate() error {
 		return fmt.Errorf("invalid phone number: %s", p.PhoneNumber)
 	}
 
-	if p.Birthday != nil && !p.Birthday.IsValid() {
+	if p.Birthday == nil {
+		return fmt.Errorf("birthday is required")
+	} 
+
+	if !p.Birthday.IsValid() {
 		return fmt.Errorf("invalid birthday: %04d-%02d-%02d", p.Birthday.Year, p.Birthday.Month, p.Birthday.Day)
 	}
 
