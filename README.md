@@ -1,11 +1,12 @@
-# IES Church Management System
+# IES Church Management Service
 
 ## Overview
-This is an open source alternative for church management system applications.
-The goal of this project is to provide cheaper alternatives to small church that can't afford to use paid software to manage the church.
+This is the service that provide API for [IES Church Management App](https://github.com/Goldwin/ies-cms-webapp) and [IES attendance station](https://github.com/Goldwin/iespik_attendance_station).
 
+## Setup
 
-## Environment variable
+### Environment variable
+First, change the following environment variable 
 
 ```
 SERVICE_NAME=CMS
